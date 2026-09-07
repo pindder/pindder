@@ -1,0 +1,7 @@
+.draggable-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  touch-action: none; /* critical: prevents the page from scrolling while dragging on touch devices */
+}
