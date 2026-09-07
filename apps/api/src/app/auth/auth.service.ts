@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { CreateBrandDto } from '../brands/dto/create-brand.dto';
+import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from '../users/schemas/user.schema';
+import { Model } from 'mongoose';
+import { Brand } from '../brands/schemas/brand.schema';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Brand.name) private readonly brandModel: Model<Brand>,
+  ) {}
+
+  async userLogin(loginDto: LoginDto) {
+    // Implementation for user login
+    const user = await this.userModel.findOne({ email: loginDto.email });
+
+    if(!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if(user.password !== loginDto.password) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return user;
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async userRegistration(createUserDto: CreateUserDto) {
+    // Implementation for user registration
+    const user = new this.userModel(createUserDto);
+    await user.save();
+
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async brandLogin(brandLoginDto: LoginDto) {
+    // Implementation for brand login
+    const brand = await this.brandModel.findOne({ email: brandLoginDto.email });
+
+    if(!brand) {
+      throw new NotFoundException('Brand not found');
+    }
+
+    if(brand.password !== brandLoginDto.password) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return brand;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+  async brandRegistration(brandCreateDto: CreateBrandDto) {
+    // Implementation for brand registration
+    const brand = new this.brandModel(brandCreateDto);
+    await brand.save();
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    return brand;
   }
 }
