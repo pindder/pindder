@@ -53,4 +53,5 @@ Thumbs.db
 __screenshots__/
 
 vitest.config.*.timestamp*
+
 apps/api/.env
