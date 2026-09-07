@@ -6,14 +6,19 @@ import { AuthModule } from './auth/auth.module';
 import { BrandModule } from './brands/brand.module';
 import { UserModule } from './users/user.module';
 import { AuthMiddleware } from './middlewares/auth.middleware';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/pindder'),
+    MongooseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.getOrThrow<string>('MONGO_URI'),
+      }),
+    }),
     AuthModule,
     BrandModule,
     UserModule,
