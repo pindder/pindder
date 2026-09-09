@@ -1,5 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="#"></ion-back-button>
+    </ion-buttons>
     <ion-title>Orders</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -11,11 +14,31 @@
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>
-      Start with Ionic
-      <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a>
-    </p>
-  </div>
+  <ion-segment [scrollable]="true" value="call">
+    <ion-segment-button value="call" contentId="first">
+      <ion-label>All</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="globe" contentId="second">
+      <ion-label>Pending</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="basket" contentId="third">
+      <ion-label>Ongoing</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="barbell" contentId="fourth">
+      <ion-label>Completed</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <ion-segment-view>
+    <ion-segment-content class="p-3" id="first">
+      <div class="empty-state">
+        <img src="https://i.pravatar.cc/300?u=b" alt="No data" />
+
+        <h2>No data yet</h2>
+        <p>There’s nothing to display here.</p>
+      </div>
+    </ion-segment-content>
+    <ion-segment-content class="p-3" id="second">Second</ion-segment-content>
+    <ion-segment-content class="p-3" id="third">Third</ion-segment-content>
+    <ion-segment-content class="p-3" id="fourth">Fourth</ion-segment-content>
+  </ion-segment-view>
 </ion-content>

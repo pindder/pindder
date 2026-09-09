@@ -1,14 +1,24 @@
 import { Component } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from "@ionic/angular";
+import { IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, 
+  IonBackButton, IonSegmentButton, IonSegment, IonLabel, IonSegmentView,
+  IonSegmentContent 
+} from "@ionic/angular";
 
 @Component({
   selector: 'app-orders',
   imports: [
-    IonTitle, 
+    IonSegment,
+    IonSegmentView,
+    IonSegmentContent,
+    IonSegmentButton,
+    IonTitle,
     IonHeader,
     IonToolbar,
     IonContent,
-  ],
+    IonButtons,
+    IonBackButton,
+    IonLabel
+],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })

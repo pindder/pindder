@@ -1,0 +1,9 @@
+<div class="tile-border flex flex-col gap-2 px-3 py-3">
+    <p>{{ data.title }}</p>
+    <div class="flex flex-row gap-2">
+        <ion-button shape="round" size="large" [color]="data.color">
+            <ion-icon size="large" slot="icon-only" [name]="data.icon"></ion-icon>    
+        </ion-button>
+        <h1>{{ data.count }}</h1> 
+    </div>
+</div>

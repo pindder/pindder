@@ -1,0 +1,24 @@
+.rounded-rectangle {
+  width: 90%;
+  border-radius: 8px;
+  color: gray;
+  border: .01em solid var(--ion-color-border);
+}
+
+.border {
+  padding: 0 8px;
+  border: .01em solid gray;
+  border-radius: 8px;
+}
+
+ion-button {
+    --border-color: var(--ion-color-border);
+    --border-radius: 8px;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    --color: gray;
+}
+
+.custom-button {
+    background-color: var(--ion-color-primary-fade);
+}

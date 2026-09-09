@@ -6,12 +6,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { Brand } from '../brands/schemas/brand.schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Brand.name) private readonly brandModel: Model<Brand>,
+    private jwtService: JwtService,
   ) {}
 
   async userLogin(loginDto: LoginDto) {
@@ -26,7 +28,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return user;
+    const payload = { sub: user._id, username: user.username };
+    
+    return {
+      user: user,
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 
   async userRegistration(createUserDto: CreateUserDto) {
@@ -49,7 +56,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return brand;
+    const payload = { sub: brand._id, brand: brand.brandName };
+    
+    return {
+      user: brand,
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 
   async brandRegistration(brandCreateDto: CreateBrandDto) {

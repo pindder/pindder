@@ -1,0 +1,11 @@
+.ion-padding {
+    padding: 16px;
+}
+
+.ion-padding-start{
+    padding-left: 16px;
+}
+
+.secondary-text {
+  color: var(--secondary-text-color);
+}

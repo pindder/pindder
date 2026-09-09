@@ -2,6 +2,15 @@ import { Route } from '@angular/router';
 
 export const authRoutes: Route[] = [
     {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full',
+    },
+    // {
+    //     path: 'forgot-password',
+    //     loadComponent: () => import('./forgot-password/forgot-password').then((m) => m.ForgotPassword),
+    // },
+    {
         path: 'login',
         loadComponent: () => import('./login/login').then((m) => m.Login),
     },
