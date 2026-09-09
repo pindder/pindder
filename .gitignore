@@ -55,3 +55,4 @@ __screenshots__/
 vitest.config.*.timestamp*
 
 apps/api/.env
+render.yaml

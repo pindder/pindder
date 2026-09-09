@@ -8,7 +8,7 @@ import {
 } from '@ionic/angular';
 
 @Component({
-  selector: 'app-tabs',
+  selector: 'app-app.layout',
   imports: [
     IonIcon, 
     IonTabButton, 
@@ -16,9 +16,7 @@ import {
     IonLabel, 
     IonTabBar, 
   ],
-  templateUrl: './tabs.html',
-  styleUrl: './tabs.css',
+  templateUrl: './app.layout.html',
+  styleUrl: './app.layout.css',
 })
-export class Tabs {
-  
-}
+export class AppLayout {}

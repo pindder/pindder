@@ -34,6 +34,7 @@
     "isolatedModules": true,
     "importHelpers": true,
     "noEmitOnError": true,
+    "declaration": true,
     "declarationMap": true,
     "customConditions": ["@org/source"],
     "noUncheckedSideEffectImports": false

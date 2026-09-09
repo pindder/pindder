@@ -1,1 +1,40 @@
-<p>login works!</p>
+<ion-content [fullscreen]="true">
+    <ion-item lines="none">
+        <ion-title>Sign In</ion-title>
+    </ion-item>
+
+    <form #loginForm="ngForm" class="p-3">
+        <ion-input
+        name="email"
+        label="Email" 
+        label-placement="floating" 
+        fill="outline" 
+        placeholder="Enter your email"
+        [(ngModel)]="email"
+        ></ion-input>
+
+        <br />
+
+        <ion-input 
+        name="password"
+        type="password" 
+        label="Password" 
+        labelPlacement="floating" 
+        fill="outline" 
+        [(ngModel)]="password"
+        >
+            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+
+        <br />
+
+        <ion-button 
+        (click)="login()"
+        shape="round" 
+        expand="block" 
+        color="primary"
+        >Continue</ion-button>
+    </form>
+
+    <app-social-buttons></app-social-buttons>
+</ion-content>

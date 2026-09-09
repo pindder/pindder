@@ -1,1 +1,36 @@
-<p>register works!</p>
+<ion-header [translucent]="true">
+    <ion-toolbar>
+        <!-- <ion-buttons slot="start">
+        <ion-back-button default-href="#"></ion-back-button>
+        </ion-buttons> -->
+        <ion-title>Sign Up</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar>
+        <ion-title size="large">Sign Up</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    <ion-text>
+        <p class="px-3 secondary-text">
+            Enter your email address. We will send you a confirmation code there
+        </p>
+    </ion-text>
+
+    <div class="p-3">
+        <ion-input label="Fullname" label-placement="floating" fill="outline" placeholder="Enter your fullname"></ion-input>
+
+        <br />
+
+        <ion-input label="Email" label-placement="floating" fill="outline" placeholder="Enter your email"></ion-input>
+
+        <br />
+
+        <ion-button shape="round" expand="block" color="primary">Continue</ion-button>
+    </div>
+
+    <app-social-buttons></app-social-buttons>
+</ion-content>
