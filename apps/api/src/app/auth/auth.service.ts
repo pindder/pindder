@@ -7,13 +7,16 @@ import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { Brand } from '../brands/schemas/brand.schema';
 import { JwtService } from '@nestjs/jwt';
+import { Client } from '../clients/schemas/client.schema';
+import { CreateClientDto } from '../clients/dto/create-client.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectModel(Client.name) private readonly clientModel: Model<Client>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Brand.name) private readonly brandModel: Model<Brand>,
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async userLogin(loginDto: LoginDto) {
@@ -70,5 +73,37 @@ export class AuthService {
     await brand.save();
 
     return brand;
+  }
+
+  async clientLogin(loginDto: LoginDto) {
+    // Implementation for brand login
+    const client = await this.clientModel.findOne({ email: loginDto.email });
+
+    if(!client) {
+      throw new NotFoundException('Brand not found');
+    }
+
+    if(!client.password) {
+      // send magic link to user email
+    }
+
+    if(client.password !== loginDto.password) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const payload = { sub: client._id, username: client.username,  };
+    
+    return {
+      user: client,
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+
+  async clientRegistration(createClientDto: CreateClientDto) {
+    // Implementation for user registration
+    const client = new this.clientModel(createClientDto);
+    await client.save();
+
+    return client;
   }
 }

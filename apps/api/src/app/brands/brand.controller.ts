@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -28,9 +29,15 @@ export class BrandController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('referrals')
+  myReferrals(@Req() req: any) {
+    return this.brandService.brandReferrals(req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.brandService.findOne(+id);
+    return this.brandService.findOne(id);
   }
 
   @UseGuards(AuthGuard)
