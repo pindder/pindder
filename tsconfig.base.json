@@ -1,25 +1,4 @@
 {
-  // "compilerOptions": {
-  //   "composite": true,
-  //   "declarationMap": true,
-  //   "emitDeclarationOnly": true,
-  //   "importHelpers": true,
-  //   "isolatedModules": true,
-  //   "lib": ["es2022"],
-  //   "module": "nodenext",
-  //   "moduleResolution": "nodenext",
-  //   "noEmitOnError": true,
-  //   "noFallthroughCasesInSwitch": true,
-  //   "noImplicitOverride": true,
-  //   "noImplicitReturns": true,
-  //   "noUnusedLocals": true,
-  //   "skipLibCheck": true,
-  //   "strict": true,
-  //   "target": "es2022",
-  //   "customConditions": ["@org/source"],
-  //   "noUncheckedSideEffectImports": false,
-  //   "types": ["*"]
-  // }
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -37,6 +16,9 @@
     "declaration": true,
     "declarationMap": true,
     "customConditions": ["@org/source"],
-    "noUncheckedSideEffectImports": false
+    "noUncheckedSideEffectImports": false,
+    "paths": {
+      "@pindder/contracts": ["./packages/contracts/src/index.ts"]
+    }
   }
 }

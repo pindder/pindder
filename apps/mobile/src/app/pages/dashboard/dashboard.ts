@@ -7,6 +7,9 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonFabButton, IonFab,
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
 import { NotificationTile } from "../../components/notification-tile/notification-tile";
+import { NewClient } from "../../components/new-client/new-client";
+import { NewOrder } from "../../components/new-order/new-order";
+import { NewDesign } from "../../components/new-design/new-design";
 
 @Component({
   selector: 'app-dashboard',
@@ -35,6 +38,9 @@ import { NotificationTile } from "../../components/notification-tile/notificatio
     DataTile,
     NotificationTile,
     IonListHeader,
+    NewClient,
+    NewOrder,
+    NewDesign
 ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -43,6 +49,7 @@ export class Dashboard {
   public environmentInjector = inject(EnvironmentInjector);
 
   presentingElement!: HTMLElement | null;
+  public modalContent = signal<string>("");
   public isActionSheetOpen = signal<boolean>(false);
   public isModalOpen = signal<boolean>(false);
   public actionSheetButtons = [
@@ -50,7 +57,8 @@ export class Dashboard {
       text: 'New Client',
       icon: 'clipboard-outline',
       handler: () => {
-
+        this.modalContent.set("New Client");
+        this.isModalOpen.set(true);
       },
       // role: 'destructive',
       data: {
@@ -61,6 +69,7 @@ export class Dashboard {
       text: 'New Style',
       icon: 'color-palette-outline',
       handler: () => {
+        this.modalContent.set("New Design");
         this.isModalOpen.set(true);
       },
     },
@@ -68,7 +77,8 @@ export class Dashboard {
       text: 'New Order',
       icon: 'cart-outline',
       handler: () => {
-
+        this.modalContent.set("New Order");
+        this.isModalOpen.set(true);
       },
     },
     // {

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Date, HydratedDocument } from "mongoose";
 import { Design } from "../../designs/schemas/design.schema";
 import { Measurement } from "../../measurements/schemas/measurement.schema";
+import { OrderStatus } from "@pindder/contracts";
 
 export type OrderDocument = HydratedDocument<Order>;
 
@@ -25,7 +26,7 @@ export class Order {
     @Prop({ type: Number, required: true, default: 1 })
     units!: number;
 
-    @Prop({ type: String, required: true, enum: [] })
+    @Prop({ type: String, required: true, enum: Object.values(OrderStatus) })
     status!: string;
 }
 
