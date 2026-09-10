@@ -11,7 +11,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  app.enableCors();
+  app.enableCors({
+    origin: [
+      'http://localhost:4200',
+      'http://localhost:8100',
+    ],
+  });
   const port = process.env.PORT || 4000;
 
   // Swagger setup

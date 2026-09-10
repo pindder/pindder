@@ -30,15 +30,16 @@
   </ion-segment>
   <ion-segment-view>
     <ion-segment-content class="p-3" id="first">
-      <div class="empty-state">
-        <img src="https://i.pravatar.cc/300?u=b" alt="No data" />
-
-        <h2>No data yet</h2>
-        <p>There’s nothing to display here.</p>
-      </div>
+      <app-empty-state></app-empty-state>
     </ion-segment-content>
-    <ion-segment-content class="p-3" id="second">Second</ion-segment-content>
-    <ion-segment-content class="p-3" id="third">Third</ion-segment-content>
-    <ion-segment-content class="p-3" id="fourth">Fourth</ion-segment-content>
+    <ion-segment-content class="p-3" id="second">
+      <app-empty-state></app-empty-state>
+    </ion-segment-content>
+    <ion-segment-content class="p-3" id="third">
+      <app-empty-state></app-empty-state>
+    </ion-segment-content>
+    <ion-segment-content class="p-3" id="fourth">
+      <app-empty-state></app-empty-state>
+    </ion-segment-content>
   </ion-segment-view>
 </ion-content>

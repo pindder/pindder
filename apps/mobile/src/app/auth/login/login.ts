@@ -8,6 +8,8 @@ import { SocialButtons } from '../../components/social-buttons/social-buttons';
 import { AuthService } from '../auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { ILogin } from '@pindder/contracts';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -25,19 +27,21 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.css',
 })
 export class Login implements OnInit {
+  private router = inject(Router);
   private authService = inject(AuthService);
 
-  public email:string = "";
-  public password:string = "";
-
+  public loginData!: ILogin;
+  
   ngOnInit(): void {
-    
+    this.loginData = {
+      email: '',
+      password: ''
+    };
   }
 
   login() {
-    console.log(this.email, this.password);
-    this.authService.loginBrand({ email: this.email, password: this.password}).subscribe((val) => {
-      console.log(val);
+    this.authService.loginBrand(this.loginData).subscribe((val) => {
+      this.router.navigate(['app']);
     }, (error: HttpErrorResponse) => {
       console.log(error);
     })

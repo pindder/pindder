@@ -8,6 +8,9 @@ export class Brand {
   @Prop({ required: true })
   brandName?: string;
 
+  @Prop({ type: String, maxLength: 1000 })
+  description?: string;
+
   @Prop({ required: true })
   adminFullname?: string;
 
@@ -19,6 +22,12 @@ export class Brand {
 
   @Prop({ required: false })
   logoUri?: string;
+
+  @Prop({ type: String })
+  website?: string;
+
+  @Prop({ required: true, enum: [] })
+  status!: string;
 
   @Prop({ required: true })
   password!: string;
