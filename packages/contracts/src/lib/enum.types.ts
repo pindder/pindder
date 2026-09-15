@@ -4,6 +4,11 @@ export enum AccountStatus {
   PENDING = 'PENDING',
 }
 
+export enum Gender {
+    MALE = "MALE",
+    FEMALE = "FEMALE"
+}
+
 export enum AccountTypes {
     TAILOR = "TAILOR",
     BRAND = "BRAND",
@@ -42,4 +47,10 @@ export enum Sizes {
     '3XL' = '3XL', 
     '4XL' = '4XL', 
     '5XL' = '5XL'
+}
+
+export enum DataTypes {
+    CLIENT = "CLIENT",
+    DESIGN = "DESIGN",
+    NOTIFICATION = "NOTIFICATION",
 }

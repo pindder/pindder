@@ -13,4 +13,13 @@
       <ion-title size="large">clients</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  
+  @if(clients && clients.length > 0) {
+    <ion-list class="flex flex-col gap-3" inset="true">
+      @for(cl of clients; track $index){
+        <app-list-card [dataType]="dataTypes.CLIENT" [client]="cl"></app-list-card>
+      }
+    </ion-list>
+  }
 </ion-content>

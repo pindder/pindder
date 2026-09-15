@@ -16,9 +16,10 @@ export class ClientService {
     @InjectModel(Client.name) private readonly clientModel:  Model<Client>,
   ) {}
 
-  async create(createClientDto: CreateClientDto) {
+  async create(createClientDto: CreateClientDto, referee_id?: string) {
     const client = new this.clientModel(createClientDto);
     client.fullname = client.firstname + ' ' + client.lastname;
+    client.referee = referee_id;
 
     //check if the email already is in the system
     const existing_client = await this.clientModel.findOne({ email: client.email }).select('_id firstname lastname email phoneNo');
