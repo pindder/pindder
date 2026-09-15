@@ -3,7 +3,7 @@
  * This is a fully built backend to handle pindder's customers and admin responsibilities.
  */
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 
@@ -13,10 +13,14 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({
     origin: [
+      'https://pindder-buisness.onrender.com/app',
       'http://localhost:4200',
       'http://localhost:8100',
     ],
   });
+  
+  app.useGlobalPipes(new ValidationPipe());
+
   const port = process.env.PORT || 4000;
 
   // Swagger setup

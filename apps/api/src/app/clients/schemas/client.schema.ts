@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Brand } from '../../brands/schemas/brand.schema';
+import { User } from '../../users/schemas/user.schema';
 
 export type ClientDocument = HydratedDocument<Client>;
 
@@ -16,9 +17,6 @@ export class Client {
     lastname?: string;
 
     @Prop({ type: String, required: true, unique: true, index: true })
-    username!: string;
-
-    @Prop({ type: String, required: true, unique: true, index: true })
     email!: string;
 
     @Prop({ type: String, required: true })
@@ -28,7 +26,10 @@ export class Client {
     referee?: string;
 
     @Prop({ type: String, required: true })
-    password?: string;
+    gender!: string;
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User })
+    user?: string;
 }
 
 export const ClientSchema = SchemaFactory.createForClass(Client);

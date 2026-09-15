@@ -1,3 +1,66 @@
 <ion-content [fullscreen]="true">
-    
+    <form #loginForm="ngForm" class="p-3">
+        <ion-input
+        name="name"
+        type="text"
+        label="Name"
+        label-placement="floating" 
+        fill="solid"
+        helperText="Enter Name" 
+        placeholder="Name"
+        [(ngModel)]="design.designName"
+        ></ion-input>
+
+        <br/>
+
+        <ion-textarea 
+        name="description"
+        label="Description" 
+        labelPlacement="floating" 
+        fill="solid" 
+        helperText="Enter description"
+        placeholder="Enter a description"
+        [(ngModel)]="design.description"></ion-textarea>
+
+        <br />
+
+        <ion-select name="type" [(ngModel)]="design.type" label="Design Type" aria-label="Design Type" placeholder="Select type" label-placement="stacked">
+            @for(type of designTypes; track $index){<ion-select-option [value]="type">{{ type }}</ion-select-option>}
+        </ion-select>
+
+        <br/>
+
+        <ion-select 
+        name="sizes" 
+        [(ngModel)]="selectedSizes" 
+        (ionChange)="onSizesChange($event)"
+        label="Available Sizes" 
+        aria-label="sizes" 
+        placeholder="Select sizes" 
+        label-placement="stacked"
+        multiple="true"
+        >
+            @for(size of sizes; track $index){<ion-select-option [value]="size">{{ size }}</ion-select-option>}
+        </ion-select>
+
+        <br/>
+
+        <ion-input
+        type="amount"
+        fill="solid"
+        labelPlacement="floating"
+        helperText="Enter an amount"
+        [(ngModel)]="design.amount"
+        name=email
+        ></ion-input>
+
+        <br />
+
+        <ion-button 
+        (click)="submit()"
+        shape="round" 
+        expand="block" 
+        color="primary"
+        >Continue</ion-button>
+    </form>
 </ion-content>

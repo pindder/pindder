@@ -128,7 +128,7 @@ export class Dashboard {
     {
       id: 'abjhdioadnao',
       type: 'Catalog',
-      message: 'Someone recently viewed your catalog',
+      message: 'Someone viewed your catalog',
       icon: 'albums-outline',
       color: '',
       date: ''
@@ -154,7 +154,7 @@ export class Dashboard {
     {
       id: '',
       type: 'Transaction',
-      message: 'You initiated a withdrawal request',
+      message: 'Withdrawal request initiated',
       amount: '',
       icon: '',
       color: '',

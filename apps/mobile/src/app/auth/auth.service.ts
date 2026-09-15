@@ -1,30 +1,38 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Preferences } from '@capacitor/preferences';
 import { from, map, Observable, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ILogin } from '@pindder/contracts';
+import { ILogin, IVerification, TailorReg } from '@pindder/contracts';
+import { TokenService } from '../services/token.service';
+import { Preferences } from '@capacitor/preferences';
+import { ProfileService } from '../services/profile.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private readonly TOKEN_KEY = 'auth_token';
+  private tokenService = inject(TokenService);
+  private profileService = inject(ProfileService);
 
   loginBrand(loginDto: ILogin): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/auth/login-brand`, loginDto);
+    from(
+      Preferences.set({
+        key: 'email',
+        value: loginDto.email
+      })
+    );
+    return this.http.post<any>(`${environment.apiUrl}/auth/login-tailor`, loginDto);
   }
 
   registerBrand(createBrandDto: any): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/auth/register-brand`, createBrandDto)
-    .pipe(
+    return this.http.post<any>(
+      `${environment.apiUrl}/auth/register-brand`, 
+      createBrandDto
+    ).pipe(
       switchMap((res) =>
         from(
-          Preferences.set({
-            key: this.TOKEN_KEY,
-            value: res.access_token,
-          })
+          this.tokenService.setToken(res.access_token)
         ).pipe(
           map(() => res)
         )
@@ -32,30 +40,36 @@ export class AuthService {
     );
   }
 
+  registerTailor(tailorRegDto: TailorReg): Observable<any> {
+    return this.http.post<any>(
+      `${environment.apiUrl}/auth/register-tailor`, 
+      tailorRegDto
+    ).pipe(
+      switchMap((res) =>
+        from(
+          this.tokenService.setToken(res.access_token)
+        ).pipe(
+          map(() => res)
+        )
+      )
+    );;
+  }
+
+  verifyCode(verificationDto: IVerification): Observable<any> {
+    return this.http.post<any>(
+      `${environment.apiUrl}/auth/verify-code`, 
+      verificationDto
+    ).pipe(switchMap((res) => {
+      this.tokenService.setToken(res.token);
+      return this.profileService.getProfile();
+    }));
+  }
+
+  resendCode(email: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/auth/resend-token`, { email: email });
+  }
+
   async logout(): Promise<void> {
-    await Preferences.remove({
-      key: this.TOKEN_KEY,
-    });
-  }
-
-  async setToken(token: string): Promise<void> {
-    await Preferences.set({
-      key: this.TOKEN_KEY,
-      value: token,
-    });
-  }
-
-  async getToken(): Promise<string | null> {
-    const { value } = await Preferences.get({
-      key: this.TOKEN_KEY,
-    });
-
-    return value;
-  }
-
-  async isAuthenticated(): Promise<boolean> {
-    const token = await this.getToken();
-
-    return !!token;
+    this.tokenService.removeToken()
   }
 }

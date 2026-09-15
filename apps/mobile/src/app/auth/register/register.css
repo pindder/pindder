@@ -1,0 +1,8 @@
+h1{
+    font-weight: 600;
+}
+
+p{
+    color: var(--ion-secondary-color);
+}
+

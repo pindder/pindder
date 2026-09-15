@@ -13,4 +13,10 @@
       <ion-title size="large">styles</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  @if(designs.length < 1) {
+    <app-empty-state [imgPath]="'/images/add-to-cart.png'"></app-empty-state>
+  } @else {
+
+  }
 </ion-content>

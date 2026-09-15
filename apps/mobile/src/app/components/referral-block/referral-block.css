@@ -11,11 +11,15 @@
   border-radius: 8px;
 }
 
+.ml {
+  margin-left: 12px;
+}
+
 ion-button {
     --border-color: var(--ion-color-border);
     --border-radius: 8px;
-    --padding-top: 8px;
-    --padding-bottom: 8px;
+    --padding-top: 5px;
+    --padding-bottom: 5px;
     --color: gray;
 }
 
