@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { Client } from "../../clients/schemas/client.schema";
 import { Brand } from "../../brands/schemas/brand.schema";
+import { DesignTypes, Sizes } from "@pindder/contracts";
 
 export type DesignDocument = HydratedDocument<Design>;
 
@@ -19,10 +20,10 @@ export class Design {
     @Prop({ type: [String], required: true })
     images?: [string];
 
-    @Prop({ type: String, required: true, enum: ['READY_MADE', 'ON_DEMAND'] })
+    @Prop({ type: String, required: true, enum: DesignTypes })
     type!: string;
 
-    @Prop({ type: [String], enum: ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'] })
+    @Prop({ type: [String], enum: Sizes, required: true })
     sizes?: [string];
 
     @Prop({ type: Number })

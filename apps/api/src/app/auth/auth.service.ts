@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateBrandDto } from '../brands/dto/create-brand.dto';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -7,36 +7,101 @@ import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { Brand } from '../brands/schemas/brand.schema';
 import { JwtService } from '@nestjs/jwt';
-import { Client } from '../clients/schemas/client.schema';
-import { CreateClientDto } from '../clients/dto/create-client.dto';
+//import { Client } from '../clients/schemas/client.schema';
+import { Tailor } from '../tailors/schemas/tailor.schema';
+import { EmailService } from '../shared/email.service';
+import { CreateTailorDto } from '../tailors/dto/create-tailor.dto';
+import { AccountStatus, AccountTypes, IVerification, TokenTypes } from '@pindder/contracts';
+import { SharedService } from '../shared/shared.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(Client.name) private readonly clientModel: Model<Client>,
+    private readonly emailService: EmailService,
+    private readonly sharedService: SharedService,
+    @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
+    //@InjectModel(Client.name) private readonly clientModel: Model<Client>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Brand.name) private readonly brandModel: Model<Brand>,
     private readonly jwtService: JwtService,
   ) {}
 
+  async tailorLogin(loginDto: LoginDto) {
+    try {
+      let token;
+      const tailor = await this.tailorModel.findOne({ email: loginDto.email });
+
+      if(!tailor) { 
+        throw new HttpException('', HttpStatus.UNAUTHORIZED);
+      }
+
+      const hasToken = await this.sharedService.hasValidToken(tailor._id);
+
+      if(hasToken) {
+        token = await this.sharedService.updateToken(tailor._id, TokenTypes.CODE);
+      } else {
+        token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE,);
+      }
+      
+      this.emailService.sendOneTimeLoginCode(tailor, token.token);
+
+      return { status: 200, message: `Login code has been sent to your email!` };
+      
+    } catch(error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async tailorRegistration(tailorRegistrationDto: CreateTailorDto) {
+    try {
+      let tailor = await this.tailorModel.findOne({ email: tailorRegistrationDto.email });
+
+      if(tailor) {
+        throw new HttpException('A user already exists with the provided email', HttpStatus.CONFLICT);
+      }
+
+      tailor = new this.tailorModel(tailorRegistrationDto);
+      tailor.firstname = tailorRegistrationDto.fullname.split(' ')[0];
+      tailor.lastname = tailorRegistrationDto.fullname.split(' ')[1];
+      tailor.username = tailorRegistrationDto.email.split('@')[0];
+      tailor.accountType = AccountTypes.TAILOR;
+      await tailor.save();
+
+      this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
+      const token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE);
+
+      this.emailService.sendOneTimeLoginCode(tailor, token.token);
+
+      return { status: 200, data: tailor, message: `Account created successfully!` };
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
   async userLogin(loginDto: LoginDto) {
     // Implementation for user login
-    const user = await this.userModel.findOne({ email: loginDto.email });
+    try{
+      let token;
+      const user = await this.userModel.findOne({ email: loginDto.email });
 
-    if(!user) {
-      throw new NotFoundException('User not found');
+      if(!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const hasToken = await this.sharedService.hasValidToken(user._id);
+
+      if(hasToken) {
+        token = await this.sharedService.updateToken(user._id, TokenTypes.CODE);
+      } else {
+        token = await this.sharedService.createToken(AccountTypes.TAILOR, user._id, TokenTypes.CODE,);
+      }
+      
+      this.emailService.sendOneTimeLoginCode(user, token.token);
+
+      return { status: 200, message: `Login code has been sent to your email!` };
+    } catch(error: any) {
+      throw new InternalServerErrorException();
     }
-
-    if(user.password !== loginDto.password) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    const payload = { sub: user._id, username: user.username };
-    
-    return {
-      user: user,
-      access_token: await this.jwtService.signAsync(payload),
-    };
   }
 
   async userRegistration(createUserDto: CreateUserDto) {
@@ -44,7 +109,13 @@ export class AuthService {
     const user = new this.userModel(createUserDto);
     await user.save();
 
-    return user;
+    this.emailService.sendWelcomeEmail(user.email, user.username);
+    const token = await this.sharedService.createToken(AccountTypes.TAILOR, user._id, TokenTypes.CODE);
+
+    this.emailService.sendOneTimeLoginCode(user, token.token);
+
+    return { status: 200, data: user, message: `Account created successfully!` };
+
   }
 
   async brandLogin(brandLoginDto: LoginDto) {
@@ -53,10 +124,6 @@ export class AuthService {
 
     if(!brand) {
       throw new NotFoundException('Brand not found');
-    }
-
-    if(brand.password !== brandLoginDto.password) {
-      throw new UnauthorizedException('Invalid email or password');
     }
 
     const payload = { sub: brand._id, brand: brand.brandName };
@@ -75,35 +142,54 @@ export class AuthService {
     return brand;
   }
 
-  async clientLogin(loginDto: LoginDto) {
-    // Implementation for brand login
-    const client = await this.clientModel.findOne({ email: loginDto.email });
+  async verifyOneTimeLoginCode(data: IVerification) {
+    try {
+      let payload;
+      let acct;
 
-    if(!client) {
-      throw new NotFoundException('Brand not found');
+      const token = await this.sharedService.findToken(data.code);
+
+      // if token is not found throw an exception
+      if(!token) {
+        throw new NotFoundException();
+      }
+
+      // check for the associated acct on the token against all acctTypes
+      if(token.accountType === AccountTypes.TAILOR) {
+        acct = await this.tailorModel.findById(token.tailor);
+      } 
+      else if(token.accountType === AccountTypes.USER) {
+        acct = await this.userModel.findById(token.user);
+      }
+      else if(token.accountType === AccountTypes.BRAND) {
+        acct = await this.brandModel.findById(token.brand);
+      }
+
+      // throw an error if the acct associated with the token could not be found
+      if(!acct) throw new NotFoundException();
+
+      // generate payload for token
+      payload = { sub: acct._id, username: acct.username, email: acct.email }
+
+      // sign tokens
+      const auth_token = await this.jwtService.signAsync(payload);
+      
+      // update token and token type
+      const result = await this.sharedService.updateToken(acct._id, TokenTypes.JWT, auth_token);
+      
+      // update acct status to ACTIVE From PENDING
+      if(acct && acct.status == AccountStatus.PENDING) {
+        acct.status = AccountStatus.ACTIVE;
+        await acct.save();
+      }
+
+      return result;
+    } catch(error) {
+      throw new InternalServerErrorException();
     }
-
-    if(!client.password) {
-      // send magic link to user email
-    }
-
-    if(client.password !== loginDto.password) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    const payload = { sub: client._id, username: client.username,  };
-    
-    return {
-      user: client,
-      access_token: await this.jwtService.signAsync(payload),
-    };
   }
 
-  async clientRegistration(createClientDto: CreateClientDto) {
-    // Implementation for user registration
-    const client = new this.clientModel(createClientDto);
-    await client.save();
-
-    return client;
+  async resendToken() {
+    
   }
 }

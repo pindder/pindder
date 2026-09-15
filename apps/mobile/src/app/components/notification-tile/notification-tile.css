@@ -1,0 +1,18 @@
+ion-item::part(native) {
+  background: #ffffff;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+
+ion-item::part(detail-icon) {
+  color: white;
+  opacity: 1;
+  font-size: 20px;
+}
+
+ion-icon {
+    font-size: x-small;
+}

@@ -20,45 +20,47 @@
         <ion-input
         name="firstname"
         type="text"
-        label="Firstname" 
         label-placement="floating" 
-        fill="outline" 
+        fill="solid"
+        helperText="Enter Firstname" 
         placeholder="Firstname"
-        [(ngModel)]="profile.firstname"
+        [(ngModel)]="client.firstname"
         ></ion-input>
-
-        <br />
 
         <ion-input 
         name="lastname"
         type="text" 
-        label="Lastname" 
         labelPlacement="floating" 
-        fill="outline" 
-        [(ngModel)]="profile.lastname"
+        helperText="Enter Lastname"
+        fill="solid" 
+        [(ngModel)]="client.lastname"
         ></ion-input>
-
-        <br />
 
         <ion-input
-        name="email"
-        label="Email" 
-        label-placement="floating" 
-        fill="outline" 
-        placeholder="Enter your email"
-        [(ngModel)]="profile.email"
-        ></ion-input>
-
-        <br />
+        type="email"
+        fill="solid"
+        labelPlacement="floating"
+        helperText="Enter a valid email"
+        errorText="Invalid email"
+        [(ngModel)]="client.email"
+        name=email
+      ></ion-input>
 
         <ion-input 
         name="phoneNo"
         type="text" 
-        label="Phone Number" 
         labelPlacement="floating" 
-        fill="outline" 
-        [(ngModel)]="profile.phoneNo"
+        fill="solid"
+        helperText="Enter Phone No" 
+        [(ngModel)]="client.phoneNo"
         ></ion-input>
+
+        <br />
+
+        <ion-select name="gender" [(ngModel)]="client.gender" label="Gender" aria-label="Gender" placeholder="Select gender" label-placement="stacked">
+          <ion-select-option value="Male">Male</ion-select-option>
+          <ion-select-option value="Female">Female</ion-select-option>
+        </ion-select> 
 
         <br />
 

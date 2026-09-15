@@ -1,23 +1,32 @@
-import { Component } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, 
-  IonToolbar, IonInput, 
-  IonButton, IonText 
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {  IonInput,
+  // IonSelect,
+  // IonSelectOption
 } from "@ionic/angular";
-import { SocialButtons } from "../../components/social-buttons/social-buttons";
+import { TailorReg } from '@pindder/contracts';
 
 @Component({
   selector: 'app-register',
   imports: [
-    IonText,
-    IonHeader,
-    IonContent,
-    IonToolbar,
-    IonTitle,
+    // IonSelect,
+    // IonSelectOption,
     IonInput,
-    IonButton,
-    SocialButtons
-],
+    FormsModule
+  ],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
-export class Register {}
+export class Register implements OnInit{
+  registrationData!: TailorReg;
+
+  ngOnInit(): void {
+    this.registrationData = {
+      fullname: '',
+      email: '',
+      phoneNo: '',
+      gender: '',
+      referralCode: ''
+    };
+  }
+}

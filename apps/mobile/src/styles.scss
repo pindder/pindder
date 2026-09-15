@@ -4,6 +4,7 @@
 @import "@ionic/angular/css/structure.css"; 
 @import "@ionic/angular/css/typography.css"; 
 @import "@ionic/angular/css/display.css";
+@import 'remixicon/fonts/remixicon.css';
 
 :root {
   --ion-color-primary: #F1641D;
@@ -20,6 +21,10 @@
 
 .ion-padding {
     padding: 16px;
+}
+
+.p-0 {
+    padding: 0px;
 }
 
 .p-1 {
@@ -40,6 +45,11 @@
 
 .p-5 {
     padding: 32px;
+}
+
+.px-0 {
+    padding-left: opx;
+    padding-right: 0px;
 }
 
 .px-1 {
@@ -82,6 +92,15 @@
     padding-bottom: 12px;
 }
 
+.py-4 {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.pt-4 {
+    padding-top: 16px;
+}
+
 .flex {
     display: flex;
 }
@@ -96,6 +115,10 @@
 
 .items-center {
     align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
 }
 
 .gap-1 {

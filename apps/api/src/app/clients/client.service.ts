@@ -4,25 +4,72 @@ import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Client } from './schemas/client.schema';
 import { Model } from 'mongoose';
+import { Follow } from './schemas/follows.schema';
+import { User } from '../users/schemas/user.schema';
+import { ClientAssociationDto } from './dto/client-association.dto';
 
 @Injectable()
 export class ClientService {
   constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Follow.name) private readonly followModel: Model<Follow>,
     @InjectModel(Client.name) private readonly clientModel:  Model<Client>,
   ) {}
 
   async create(createClientDto: CreateClientDto) {
     const client = new this.clientModel(createClientDto);
     client.fullname = client.firstname + ' ' + client.lastname;
-    client.username = client.email.split('@')[0]; 
+
+    //check if the email already is in the system
+    const existing_client = await this.clientModel.findOne({ email: client.email }).select('_id firstname lastname email phoneNo');
+    
+    const existing_user = await this.userModel.findOne({ email: client.email }); 
+
+    if(existing_client || existing_user) {
+
+      const res = { 
+        client: existing_user ?? existing_client, 
+        message: `The email provided currently exists on pindder,
+        would you like to verify the information and add the client to your client list?`
+      }
+
+      return res;
+    }
+
     await client.save();
 
+    const new_follow = new this.followModel({
+      client: client._id,
+      tailor: client.referee
+    });
+
+    await new_follow.save();
+    
     return client._id;
   }
 
-  async findAll() {
+  async addExistingClientToTailor(clientAssociationDto: ClientAssociationDto) {
+    try {
+      const client = await this.clientModel.findById(clientAssociationDto.client);
+
+      if(client) {
+        const new_follow = new this.followModel({
+          client: client._id,
+          tailor: client.referee
+        });
+        await new_follow.save();
+
+        throw new HttpException('', HttpStatus.CONFLICT);
+
+      }
+    } catch(error: any) {
+
+    }
+  }
+
+  async findAll(acct_id: string) {
     const clients = await this.clientModel
-      .find()
+      .find({ referee: acct_id })
       .populate('referee', '-_v')
       .exec();
 

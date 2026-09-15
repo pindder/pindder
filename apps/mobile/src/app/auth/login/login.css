@@ -9,3 +9,12 @@
 .secondary-text {
   color: var(--secondary-text-color);
 }
+
+h1 {
+    font-size: 36px;
+    font-weight: 500;
+}
+
+p {
+    color: var(--secondary-text-color);
+}

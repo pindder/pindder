@@ -7,4 +7,5 @@ export class CreateClientDto {
     phoneNo!: string;
     referee?: string;
     password?: string;
+    gender!: string;
 }

@@ -1,36 +1,59 @@
-<ion-header [translucent]="true">
-    <ion-toolbar>
-        <!-- <ion-buttons slot="start">
-        <ion-back-button default-href="#"></ion-back-button>
-        </ion-buttons> -->
-        <ion-title>Sign Up</ion-title>
-    </ion-toolbar>
-</ion-header>
+<form #regForm="ngForm" class="p-3">
+    <ion-input 
+    name="fullname"
+    label="Fullname" 
+    label-placement="floating" 
+    fill="solid" 
+    helperText="Enter your fullname" 
+    placeholder="Enter your fullname"
+    [(ngModel)]="registrationData.fullname"
+    ></ion-input>
 
-<ion-content [fullscreen]="true">
-    <ion-header collapse="condense">
-        <ion-toolbar>
-        <ion-title size="large">Sign Up</ion-title>
-        </ion-toolbar>
-    </ion-header>
+    <br />
 
-    <ion-text>
-        <p class="px-3 secondary-text">
-            Enter your email address. We will send you a confirmation code there
-        </p>
-    </ion-text>
+    <ion-input
+    name="email" 
+    label="Email" 
+    label-placement="floating" 
+    fill="solid" 
+    helperText="Enter your email" 
+    placeholder="Enter your email"
+    [(ngModel)]="registrationData.email"
+    ></ion-input>
 
-    <div class="p-3">
-        <ion-input label="Fullname" label-placement="floating" fill="outline" placeholder="Enter your fullname"></ion-input>
+    <br />
 
-        <br />
+    <ion-input 
+    name="phoneNo"
+    label="Telephone" 
+    label-placement="floating" 
+    fill="solid" 
+    helperText="Enter your phone no" 
+    placeholder="Enter your phoneNo"
+    [(ngModel)]="registrationData.phoneNo"
+    ></ion-input>
 
-        <ion-input label="Email" label-placement="floating" fill="outline" placeholder="Enter your email"></ion-input>
+    <br/>
 
-        <br />
+    <ion-input 
+    name="referral_code"
+    label="Referral Code" 
+    label-placement="floating" 
+    fill="solid" 
+    helperText="Enter referral code" 
+    placeholder="Enter referral code"
+    [(ngModel)]="registrationData.referralCode"
+    ></ion-input>
 
-        <ion-button shape="round" expand="block" color="primary">Continue</ion-button>
-    </div>
+    <br/>
 
-    <app-social-buttons></app-social-buttons>
-</ion-content>
+    <!-- <ion-select name="gender" [(ngModel)]="registrationData.gender" label="Gender" aria-label="Gender" placeholder="Select gender" label-placement="stacked">
+        <ion-select-option value="Male">Male</ion-select-option>
+        <ion-select-option value="Female">Female</ion-select-option>
+    </ion-select> -->
+    
+    <br/>
+
+    <!-- <ion-button shape="round" expand="block" color="primary">Continue</ion-button> -->
+</form>
+    

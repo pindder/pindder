@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonLabel, IonButton, IonInput, IonFooter } from "@ionic/angular";
-import { IProfile } from '@pindder/contracts';
+import { IonContent, IonLabel, IonButton, IonInput, IonFooter, IonSelectOption } from "@ionic/angular";
+import { IClient } from '@pindder/contracts';
+import { ClientService } from '../../services/client.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-new-client',
@@ -14,23 +16,33 @@ import { IProfile } from '@pindder/contracts';
     IonLabel,
     IonContent,
     FormsModule,
-    IonFooter
+    IonFooter,
+    IonSelectOption
 ],
   templateUrl: './new-client.html',
   styleUrl: './new-client.css',
 })
 export class NewClient implements OnInit{
-  profile!: IProfile;
+  private clientService = inject(ClientService);
+
+  client!: IClient;
 
   ngOnInit(): void {
-    this.profile = {
+    this.client = {
       firstname: "",
       lastname: "",
       email: "",
       phoneNo: "",
-      address: ""
-    }  
+      address: "",
+      gender: ""
+    };  
   }
 
-  submit() {}
+  submit() {
+    this.clientService.createClient(this.client).subscribe((val) => {
+      console.log(val);
+    }, (error: HttpErrorResponse) => {
+      console.log(error);
+    })
+  }
 }

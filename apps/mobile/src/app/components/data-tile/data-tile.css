@@ -2,3 +2,12 @@
     border-radius: 8px;
     border: 1px solid #E7E7E7;
 }
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: gray;
+  border: .01em solid var(--ion-color-border);
+}

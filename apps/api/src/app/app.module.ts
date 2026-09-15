@@ -12,6 +12,10 @@ import { DesignModule } from './designs/design.module';
 import { SubscriptionModule } from './subscriptions/subscription.module';
 import { AdminModule } from './admins/admin.module';
 import { MeasurementModule } from './measurements/measurement.module';
+import { TailorModule } from './tailors/tailor.module';
+import { SharedService } from './shared/shared.service';
+import { SharedModule } from './shared/shared.module';
+import { TokenModule } from './tokens/token.module';
 
 @Module({
   imports: [
@@ -33,8 +37,11 @@ import { MeasurementModule } from './measurements/measurement.module';
     SubscriptionModule,
     AdminModule,
     MeasurementModule,
+    TailorModule,
+    SharedModule,
+    TokenModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SharedService],
 })
 export class AppModule {}

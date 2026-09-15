@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { AccountStatus, AccountTypes } from '@pindder/contracts';
 import { HydratedDocument } from 'mongoose';
 
 export type BrandDocument = HydratedDocument<Brand>;
@@ -14,6 +15,9 @@ export class Brand {
   @Prop({ required: true })
   adminFullname?: string;
 
+  @Prop({ type: String })
+  username?: string;
+
   @Prop({ required: true, unique: true, index: true })
   email!: string;
 
@@ -26,11 +30,11 @@ export class Brand {
   @Prop({ type: String })
   website?: string;
 
-  @Prop({ required: true, enum: [] })
+  @Prop({ type: String, required: true, enum: AccountStatus })
   status!: string;
 
-  @Prop({ required: true })
-  password!: string;
+  @Prop({ type: String, enum: AccountTypes, required: true })
+  accountType!: string;
 }
 
 export const BrandSchema = SchemaFactory.createForClass(Brand);

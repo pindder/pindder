@@ -7,6 +7,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CreateBrandDto } from '../brands/dto/create-brand.dto';
+import { CreateTailorDto } from '../tailors/dto/create-tailor.dto';
+import { IVerification } from '@pindder/contracts';
 
 @Controller('auth')
 export class AuthController {
@@ -30,5 +32,20 @@ export class AuthController {
   @Post('register-brand')
   brandRegistration(@Body() brandCreateDto: CreateBrandDto) {
     return this.authService.brandRegistration(brandCreateDto);
+  }
+
+  @Post('login-tailor')
+  tailorLogin(@Body() loginDto: LoginDto) {
+    return this.authService.tailorLogin(loginDto);
+  }
+
+  @Post('register-tailor')
+  tailorRegistration(@Body() tailorCreateDto: CreateTailorDto) {
+    return this.authService.tailorRegistration(tailorCreateDto);
+  }
+
+  @Post('verify-code')
+  verifyCode(@Body() verificationDto: IVerification) {
+    return this.authService.verifyOneTimeLoginCode(verificationDto);
   }
 }

@@ -6,6 +6,10 @@ import { UserModule } from '../users/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientModule } from '../clients/client.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EmailService } from '../shared/email.service';
+import { TailorModule } from '../tailors/tailor.module';
+import { TokenModule } from '../tokens/token.module';
+import { SharedService } from '../shared/shared.service';
 
 @Module({
   imports: [
@@ -15,16 +19,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: async (configService: ConfigService) => ({
         global: true,
         secret: configService.getOrThrow<string>('AUTH_SECRET'),
-        signOptions: { expiresIn: '1h' },
+        // signOptions: { expiresIn: '1h' },
         verifyOptions: { ignoreExpiration: false },
       })
     }),
     ClientModule,
     UserModule, 
+    TailorModule,
     BrandModule,
+    TokenModule
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, EmailService, SharedService],
   exports: [JwtModule]
 })
 export class AuthModule {}

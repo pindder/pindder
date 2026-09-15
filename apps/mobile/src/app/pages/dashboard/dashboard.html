@@ -13,7 +13,7 @@
 
 <ion-content [fullscreen]="true">
   <!-- Profile Header-->
-  <ion-item lines="none">
+  <ion-item class="pt-4" lines="none">
     <ion-avatar aria-hidden="true" slot="start">
       <img [sizes]="" src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
     </ion-avatar>
@@ -31,23 +31,24 @@
   </ion-header> -->
 
   <!-- Referral Block-->
-  <ion-card class="border-primary">
+  <ion-card>
     <app-referral-block></app-referral-block>
   </ion-card>
 
   <!-- Data Cards -->
-  <ion-grid [fixed]="true">
-    <ion-row>
+  
+  <ion-grid class="p-0" [fixed]="true">
+    <ion-row class="p-0">
       @for(tile of tiles; track $index){
-        <ion-col sizeMd="3" sizeXs="6">
+        <ion-col class="p-0" sizeLg="3" sizeMd="3" sizeXs="6">
           <app-data-tile [data]="tile"></app-data-tile>
         </ion-col>
       }
     </ion-row>
   </ion-grid>
 
-  <ion-list>
-    <ion-list-header>
+  <ion-list inset="true">
+    <ion-list-header class="px-0">
       <ion-label>Recent Notifications</ion-label>
       <ion-button fill="clear">Clear all</ion-button>
     </ion-list-header>
