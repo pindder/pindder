@@ -13,10 +13,14 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({
     origin: [
-      'https://pindder-buisness.onrender.com/app',
+      'https://pindder-buisness.onrender.com',
       'http://localhost:4200',
       'http://localhost:8100',
+      'http://localhost',       // Capacitor Android
+      'capacitor://localhost',  // Capacitor iOS
+      'ionic://localhost',      // Ionic iOS (legacy)
     ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
   
   app.useGlobalPipes(new ValidationPipe());
