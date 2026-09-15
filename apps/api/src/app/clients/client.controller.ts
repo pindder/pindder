@@ -18,9 +18,10 @@ import { AuthGuard } from '../auth/auth.guard';
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createClientDto: CreateClientDto) {
-    return this.clientService.create(createClientDto);
+  create(@Req() req: any, @Body() createClientDto: CreateClientDto) {
+    return this.clientService.create(createClientDto, req.user.sub);
   }
 
   @UseGuards(AuthGuard)

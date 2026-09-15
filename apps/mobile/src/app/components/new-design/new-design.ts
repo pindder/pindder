@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonTextarea, IonButton, IonInput, IonSelectOption } from "@ionic/angular";
+import { IonContent, IonTextarea, IonButton, IonInput, IonSelectOption, ViewWillEnter } from "@ionic/angular";
 import { DesignTypes, IDesign, Sizes } from '@pindder/contracts';
 import { CloudinaryModule } from '@cloudinary/ng';
 import { Cloudinary } from '@cloudinary/url-gen';
@@ -13,7 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './new-design.html',
   styleUrl: './new-design.css',
 })
-export class NewDesign implements OnInit{
+export class NewDesign implements ViewWillEnter{
   private designService = inject(DesignService);
 
   design!: IDesign;
@@ -21,7 +21,7 @@ export class NewDesign implements OnInit{
   sizes: string[] = [];
   selectedSizes: string[] = [];
 
-  ngOnInit(): void {
+  ionViewWillEnter(): void {
     const cld = new Cloudinary({
       cloud: {
         cloudName: 'demo'

@@ -1,5 +1,8 @@
-<ion-item>
-    <ion-card>
-        
-    </ion-card>
-</ion-item>
+@if(dataType === dataTypes.CLIENT && client){
+    <div class="px-3 flex flex-col border">
+        <div class="">
+            <h4>{{ client.firstname + " " + client.lastname }}</h4>
+            <p>{{ client.phoneNo }}</p>
+        </div>
+    </div>
+}

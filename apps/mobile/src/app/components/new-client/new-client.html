@@ -1,115 +1,67 @@
-<!-- <ion-header>
-    <ion-toolbar>
-        <ion-buttons>
-            <ion-back-button default-href="#"></ion-back-button>
-        </ion-buttons>
-    </ion-toolbar>
-    <ion-title>Add Client</ion-title>
-</ion-header> -->
-
 <ion-content [fullscreen]="true">
-    <!-- <ion-header>
-        <ion-toolbar>
-            <ion-title size="large">Add Client</ion-title>
-        </ion-toolbar>
-    </ion-header> -->
+  <form #loginForm="ngForm" (ngSubmit)="submit()" class="p-3">
+    <ion-input
+      name="firstname"
+      type="text"
+      labelPlacement="floating" 
+      fill="solid"
+      helperText="Enter Firstname" 
+      placeholder="Firstname"
+      [(ngModel)]="client.firstname"
+    ></ion-input>
 
-    <form #loginForm="ngForm" class="p-3">
-        <ion-label>Personal Information</ion-label>
+    <ion-input 
+      name="lastname"
+      type="text" 
+      labelPlacement="floating" 
+      helperText="Enter Lastname"
+      fill="solid" 
+      [(ngModel)]="client.lastname"
+    ></ion-input>
 
-        <ion-input
-        name="firstname"
-        type="text"
-        label-placement="floating" 
-        fill="solid"
-        helperText="Enter Firstname" 
-        placeholder="Firstname"
-        [(ngModel)]="client.firstname"
-        ></ion-input>
+    <ion-input
+      name="email"
+      type="email"
+      fill="solid"
+      labelPlacement="floating"
+      helperText="Enter a valid email"
+      errorText="Invalid email"
+      [(ngModel)]="client.email"
+    ></ion-input>
 
-        <ion-input 
-        name="lastname"
-        type="text" 
-        labelPlacement="floating" 
-        helperText="Enter Lastname"
-        fill="solid" 
-        [(ngModel)]="client.lastname"
-        ></ion-input>
+    <ion-input 
+      name="phoneNo"
+      type="tel" 
+      labelPlacement="floating" 
+      fill="solid"
+      helperText="Enter Phone No" 
+      [(ngModel)]="client.phoneNo"
+    ></ion-input>
 
-        <ion-input
-        type="email"
-        fill="solid"
-        labelPlacement="floating"
-        helperText="Enter a valid email"
-        errorText="Invalid email"
-        [(ngModel)]="client.email"
-        name=email
-      ></ion-input>
+    <br />
 
-        <ion-input 
-        name="phoneNo"
-        type="text" 
-        labelPlacement="floating" 
-        fill="solid"
-        helperText="Enter Phone No" 
-        [(ngModel)]="client.phoneNo"
-        ></ion-input>
+    <ion-select 
+      name="gender" 
+      [(ngModel)]="client.gender" 
+      label="Gender" 
+      aria-label="Gender" 
+      placeholder="Select gender" 
+      labelPlacement="stacked"
+    >
+      @for (gender of genders; track gender) {
+        <ion-select-option [value]="gender">{{ gender }}</ion-select-option>
+      }
+    </ion-select> 
 
-        <br />
+    <br />
 
-        <ion-select name="gender" [(ngModel)]="client.gender" label="Gender" aria-label="Gender" placeholder="Select gender" label-placement="stacked">
-          <ion-select-option value="Male">Male</ion-select-option>
-          <ion-select-option value="Female">Female</ion-select-option>
-        </ion-select> 
-
-        <br />
-
-        <ion-footer>
-        <ion-button 
-        (click)="submit()"
+    <div class="mt-4">
+      <ion-button 
+        type="submit"
         shape="round" 
         expand="block" 
         color="primary"
-        >Continue</ion-button>
-        </ion-footer>
-    </form>
-
-    <!-- <ion-list>
-        <ion-item>
-          <ion-avatar slot="start">
-            <img src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
-          </ion-avatar>
-          <ion-label>
-            <h2>Connor Smith</h2>
-            <p>Sales Rep</p>
-          </ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-avatar slot="start">
-            <img src="https://i.pravatar.cc/300?u=a" alt="Portrait of Daniel Smith" />
-          </ion-avatar>
-          <ion-label>
-            <h2>Daniel Smith</h2>
-            <p>Product Designer</p>
-          </ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-avatar slot="start">
-            <img src="https://i.pravatar.cc/300?u=d" alt="Portrait of Greg Smith" />
-          </ion-avatar>
-          <ion-label>
-            <h2>Greg Smith</h2>
-            <p>Director of Operations</p>
-          </ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-avatar slot="start">
-            <img src="https://i.pravatar.cc/300?u=l" alt="Portrait of Zoey Smith" />
-          </ion-avatar>
-          <ion-label>
-            <h2>Zoey Smith</h2>
-            <p>CEO</p>
-          </ion-label>
-        </ion-item>
-    </ion-list> -->
+      >Continue</ion-button>
+    </div>
+  </form>
 </ion-content>
