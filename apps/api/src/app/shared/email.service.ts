@@ -3,18 +3,27 @@ import { Resend } from 'resend';
 import { Brand } from '../brands/schemas/brand.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { User } from '../users/schemas/user.schema';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
      private readonly resend: Resend;
+     private readonly sender_email: string;
 
-    constructor() {
-        this.resend = new Resend(process.env.RESEND_API_KEY);
+    constructor(private readonly configService: ConfigService) {
+        // Initialize Resend with key from environment
+        this.resend = new Resend(this.configService.get<string>('RESEND_API_KEY'));
+        
+        // Read sender email from environment, fallback if not set
+        this.sender_email = this.configService.get<string>(
+        'SENDER_EMAIL', 
+        'Pindder <hello@pindder.com>'
+        );
     }
 
     async sendWelcomeEmail(to: string, name: string) {
         const { data, error } = await this.resend.emails.send({
-        from: 'Pindder <onboarding@resend.dev>',
+        from: this.sender_email,
         to: [to],
         subject: 'Welcome to Pindder',
         html: `
@@ -34,7 +43,7 @@ export class EmailService {
 
     async sendOneTimeLoginCode(user: User | Tailor | Brand, code: string) {
         const { data, error } = await this.resend.emails.send({
-        from: 'Pindder <onboarding@resend.dev>',
+        from: this.sender_email,
         to: [user!.email],
         subject: 'Login Request: OTP Code',
         html: `
