@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -17,36 +17,40 @@ export class ClientService {
   ) {}
 
   async create(createClientDto: CreateClientDto, referee_id?: string) {
-    const client = new this.clientModel(createClientDto);
-    client.fullname = client.firstname + ' ' + client.lastname;
-    client.referee = referee_id;
+    try{
+      //check if the email already is in the system
+      const existing_client = await this.clientModel.findOne({ email: createClientDto.email }).select('_id firstname lastname email phoneNo');
+      
+      const existing_user = await this.userModel.findOne({ email: createClientDto.email }); 
 
-    //check if the email already is in the system
-    const existing_client = await this.clientModel.findOne({ email: client.email }).select('_id firstname lastname email phoneNo');
-    
-    const existing_user = await this.userModel.findOne({ email: client.email }); 
+      if(existing_client || existing_user) {
 
-    if(existing_client || existing_user) {
+        const res = { 
+          client: existing_user ?? existing_client, 
+          message: `The email provided currently exists on pindder,
+          would you like to verify the information and add the client to your client list?`
+        }
 
-      const res = { 
-        client: existing_user ?? existing_client, 
-        message: `The email provided currently exists on pindder,
-        would you like to verify the information and add the client to your client list?`
+        return res;
       }
 
-      return res;
+      const client = new this.clientModel(createClientDto);
+      client.fullname = client.firstname + ' ' + client.lastname;
+      client.referee = referee_id;
+
+      await client.save();
+
+      const new_follow = new this.followModel({
+        client: client._id,
+        tailor: client.referee
+      });
+
+      await new_follow.save();
+      
+      return client._id;
+    } catch (error: any) {
+      throw new InternalServerErrorException(`${error}`);
     }
-
-    await client.save();
-
-    const new_follow = new this.followModel({
-      client: client._id,
-      tailor: client.referee
-    });
-
-    await new_follow.save();
-    
-    return client._id;
   }
 
   async addExistingClientToTailor(clientAssociationDto: ClientAssociationDto) {

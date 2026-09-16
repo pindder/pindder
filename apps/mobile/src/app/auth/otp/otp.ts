@@ -7,8 +7,8 @@ import { IonButton, IonContent, IonHeader, IonInputOtp,
 import { IVerification } from '@pindder/contracts';
 import { AuthService } from '../auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Preferences } from '@capacitor/preferences';
 import { Router } from '@angular/router';
+import { TokenService } from '../../services/token.service';
 
 @Component({
   imports: [
@@ -30,6 +30,7 @@ import { Router } from '@angular/router';
 })
 export class Otp implements OnInit{
   private authService = inject(AuthService);
+  private tokenService = inject(TokenService);
   private router = inject(Router);
 
   verificationData!: IVerification;
@@ -41,24 +42,31 @@ export class Otp implements OnInit{
   }
 
   async verifyOtp() {
-    this.authService.verifyCode(this.verificationData).subscribe((val) => {
-      this.router.navigate(['app'])
-    }, (error: HttpErrorResponse) => {
-      console.log(error);
-    })
+    console.log(this.verificationData);
+    this.authService.verifyCode(this.verificationData).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.tokenService.setPreferenceValue('account', JSON.stringify(data.account));
+        this.router.navigate(['app'])
+      }, 
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    });
   }
 
   async resendOtp() {
-    const { value } = await Preferences.get({
-      key: 'email',
-    });
+    let value = await this.tokenService.getPreferenceValue('email');
 
     if(value) {
-      this.authService.resendCode(value).subscribe((val) => {
-        console.log(val);
-      }, (error: HttpErrorResponse) => {
-        console.log(error);
-      })
+      this.authService.resendCode(value).subscribe({
+        next: (val) => {
+          console.log(val);
+        }, 
+        error: (error: HttpErrorResponse) => {
+          console.log(error);
+        }
+      });
     }
   }
 }

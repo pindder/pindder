@@ -5,6 +5,7 @@ import { ClientModule } from '../clients/client.module';
 import { BrandModule } from '../brands/brand.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Design, DesignSchema } from './schemas/design.schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { Design, DesignSchema } from './schemas/design.schema';
     BrandModule
   ],
   controllers: [DesignController],
-  providers: [DesignService],
+  providers: [DesignService, JwtService],
 })
 export class DesignModule {}

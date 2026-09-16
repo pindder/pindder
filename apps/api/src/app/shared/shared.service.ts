@@ -23,7 +23,7 @@ export class SharedService {
 
             return token;
         } catch(error: any) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(`${error}`);
         }
     }
 
@@ -42,35 +42,43 @@ export class SharedService {
             } else {
                 return { hasToken: true, existing_token: acct_token };;
             }
-        } catch(error){
-            throw new InternalServerErrorException();
+        } catch(error: any){
+            throw new InternalServerErrorException(`${error}`);
         }
     }
 
     async createToken(acctType: string, acct_id: any, tokenType?: string) {
-        const token = new this.tokenModel();
+        try {
+            const token = new this.tokenModel();
 
-        token.type = tokenType ?? TokenTypes.CODE;
-        token.token = generateCode();
-        token.status = TokenStatus.ACTIVE;
-        token.accountType = acctType;
+            token.type = tokenType ?? TokenTypes.CODE;
+            token.token = generateCode();
+            token.status = TokenStatus.ACTIVE;
+            token.accountType = acctType;
 
-        if(acctType === AccountTypes.TAILOR) token.tailor = acct_id;
-        if(acctType === AccountTypes.BRAND) token.brand = acct_id;
-        if(acctType === AccountTypes.USER) token.user = acct_id;
+            if(acctType === AccountTypes.TAILOR) token.tailor = acct_id;
+            if(acctType === AccountTypes.BRAND) token.brand = acct_id;
+            if(acctType === AccountTypes.USER) token.user = acct_id;
 
-        await token.save(); 
+            await token.save(); 
 
-        return token;
+            return token;
+        } catch(error: any) {
+            throw new InternalServerErrorException(`${error}`);
+        }
     }
 
     async updateToken(acct_id: any, tokenType: string, newToken?: string) {
-        const token = await this.tokenModel.findOneAndUpdate({ $or: [{ tailor: acct_id }, { user: acct_id }, { brand: acct_id }] }, {
-            type: tokenType,
-            token: newToken ?? generateCode(),
-            status: TokenStatus.ACTIVE
-        }, { upsert: true, new: true });
+        try {
+            const token = await this.tokenModel.findOneAndUpdate({ $or: [{ tailor: acct_id }, { user: acct_id }, { brand: acct_id }] }, {
+                type: tokenType,
+                token: newToken ?? generateCode(),
+                status: TokenStatus.ACTIVE
+            }, { upsert: true, returnDocument: "after" });
 
-        return token;
+            return token;
+        } catch(error) {
+            throw new InternalServerErrorException(`${error}`);
+        }
     }
 }

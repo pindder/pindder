@@ -169,7 +169,7 @@ export class AuthService {
       if(!acct) throw new NotFoundException();
 
       // generate payload for token
-      payload = { sub: acct._id, username: acct.username, email: acct.email }
+      payload = { sub: acct._id, username: acct.username, email: acct.email, acctType: acct.accountType }
 
       // sign tokens
       const auth_token = await this.jwtService.signAsync(payload);
@@ -184,8 +184,12 @@ export class AuthService {
       }
 
       return result;
-    } catch(error) {
-      throw new InternalServerErrorException();
+    } catch(error: any) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      
+      throw new InternalServerErrorException(`${error}`);
     }
   }
 

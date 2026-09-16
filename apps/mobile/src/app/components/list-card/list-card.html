@@ -1,8 +1,25 @@
 @if(dataType === dataTypes.CLIENT && client){
-    <div class="px-3 flex flex-col border">
+    <div class="px-3 flex items-center justify-between border">
         <div class="">
-            <h4>{{ client.firstname + " " + client.lastname }}</h4>
+            <h5>{{ client.firstname + " " + client.lastname }}</h5>
             <p>{{ client.phoneNo }}</p>
         </div>
+        <div class="flex gap-3 items-center">
+            <p>{{ client.createdAt | date }}</p>
+            <ion-icon name="trash-outline" color="danger"></ion-icon>
+        </div>
     </div>
+} 
+@else if(dataType === dataTypes.DESIGN) {
+    <ion-card>
+        <img alt="style-img" [src]="design.images[0]" />
+        <ion-card-header>
+            <ion-card-title>{{ design.amount.toLocaleString() }}</ion-card-title>
+            <ion-card-subtitle></ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+            {{ design.name }}
+        </ion-card-content>
+    </ion-card>
 }
