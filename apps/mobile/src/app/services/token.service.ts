@@ -7,7 +7,7 @@ import { Preferences } from '@capacitor/preferences';
 export class TokenService {
   private readonly TOKEN_KEY = 'access_token';
 
-  async setKeyValue(key: string, val: string): Promise<void> {
+  async setPreferenceValue(key: string, val: string): Promise<void> {
     await Preferences.set({
       key: key,
       value: val
@@ -29,6 +29,14 @@ export class TokenService {
     return value;
   }
 
+  async getProfile() {
+    const { value } = await Preferences.get({
+      key: 'account'
+    });
+
+    return value;
+  }
+
   async isAuthenticated(): Promise<boolean> {
     const token = await this.getToken();
 
@@ -39,5 +47,17 @@ export class TokenService {
     await Preferences.remove({
       key: this.TOKEN_KEY,
     });
+  }
+
+  async getPreferenceValue(key: string) {
+    const { value } = await Preferences.get({
+      key: key
+    });
+
+    return value;
+  }
+
+  async clearToken() {
+    await Preferences.clear();
   }
 }

@@ -1,10 +1,10 @@
-import { DesignTypes, Sizes } from "@pindder/contracts";
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { DesignTypes } from "@pindder/contracts";
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateDesignDto {
     @IsString()
     @IsNotEmpty()
-    designName!: string;
+    name!: string;
     
     @IsNotEmpty()
     @IsNumber()
@@ -16,6 +16,9 @@ export class CreateDesignDto {
     @IsEnum(DesignTypes)
     type!: string;
 
-    @IsEnum(Sizes)
+    @IsArray()
     sizes?: [string];
+
+    @IsArray()
+    images?: [string];
 }

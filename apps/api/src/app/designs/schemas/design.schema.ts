@@ -1,15 +1,15 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { Client } from "../../clients/schemas/client.schema";
-import { Brand } from "../../brands/schemas/brand.schema";
 import { DesignTypes, Sizes } from "@pindder/contracts";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
 
 export type DesignDocument = HydratedDocument<Design>;
 
 @Schema({ timestamps: true })
 export class Design {
-    @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: () => Client || Brand })
-    owner!: [Client | Brand];
+    @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: () => Client || Tailor })
+    owner!: string;
 
     @Prop({ type: String, required: true })
     name!: string;
@@ -18,7 +18,7 @@ export class Design {
     description?: string;
 
     @Prop({ type: [String], required: true })
-    images?: [string];
+    images!: [string];
 
     @Prop({ type: String, required: true, enum: DesignTypes })
     type!: string;
@@ -29,10 +29,10 @@ export class Design {
     @Prop({ type: Number })
     productionDuration?: number; 
 
-    @Prop({ type: Number, required: true })
+    @Prop({ type: Number })
     deliveryDuration?: number; 
 
-    @Prop({ type: Number, required: true, default: 0 })
+    @Prop({ type: Number })
     units!: number; 
 
     @Prop({ type: String, enum: [] })

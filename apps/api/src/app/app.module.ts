@@ -16,6 +16,7 @@ import { TailorModule } from './tailors/tailor.module';
 import { SharedService } from './shared/shared.service';
 import { SharedModule } from './shared/shared.module';
 import { TokenModule } from './tokens/token.module';
+import { AccountModule } from './accounts/account.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { TokenModule } from './tokens/token.module';
     TailorModule,
     SharedModule,
     TokenModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [AppService, SharedService],

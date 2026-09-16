@@ -1,5 +1,39 @@
 <ion-content [fullscreen]="true">
     <form #loginForm="ngForm" class="p-3">
+        <div class="image-grid">
+        <!-- Existing Uploaded Previews -->
+            @for (imgUrl of uploadedImageUrls; track imgUrl; let i = $index) {
+                <div class="image-card">
+                    <img [src]="imgUrl" alt="Uploaded preview" />
+                    <ion-button 
+                    color="danger" 
+                    size="small" 
+                    fill="clear" 
+                    class="delete-btn" 
+                    (click)="removeImage(i)"
+                    >
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                </div>
+            }
+
+            <!-- Loading Spinner Card -->
+            @if (isUploading) {
+            <div class="image-card upload-card loading">
+                <ion-spinner name="crescent" color="primary"></ion-spinner>
+                <span class="upload-text">Uploading...</span>
+            </div>
+            }
+
+            <!-- Add Images Trigger Card -->
+            <div class="image-card upload-card" (click)="selectAndUploadMultipleImages()">
+            <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
+            <span class="upload-text">Add Images</span>
+            </div>
+        </div>
+
+        <br/>
+
         <ion-input
         name="name"
         type="text"
@@ -8,7 +42,7 @@
         fill="solid"
         helperText="Enter Name" 
         placeholder="Name"
-        [(ngModel)]="design.designName"
+        [(ngModel)]="design.name"
         ></ion-input>
 
         <br/>
@@ -16,7 +50,7 @@
         <ion-textarea 
         name="description"
         label="Description" 
-        labelPlacement="floating" 
+        label-placement="floating" 
         fill="solid" 
         helperText="Enter description"
         placeholder="Enter a description"
@@ -24,8 +58,8 @@
 
         <br />
 
-        <ion-select name="type" [(ngModel)]="design.type" label="Design Type" aria-label="Design Type" placeholder="Select type" label-placement="stacked">
-            @for(type of designTypes; track $index){<ion-select-option [value]="type">{{ type }}</ion-select-option>}
+        <ion-select name="design_type" [(ngModel)]="design.type" label="Design Type" aria-label="Design Type" placeholder="Select type" label-placement="stacked">
+            @for(type of designTypes; track type){<ion-select-option [value]="type">{{ type }}</ion-select-option>}
         </ion-select>
 
         <br/>
@@ -40,18 +74,18 @@
         label-placement="stacked"
         multiple="true"
         >
-            @for(size of sizes; track $index){<ion-select-option [value]="size">{{ size }}</ion-select-option>}
+            @for(size of sizes; track size){<ion-select-option [value]="size">{{ size }}</ion-select-option>}
         </ion-select>
 
         <br/>
 
         <ion-input
-        type="amount"
+        name="amount"
+        type="number"
         fill="solid"
-        labelPlacement="floating"
+        label-placement="floating"
         helperText="Enter an amount"
         [(ngModel)]="design.amount"
-        name=email
         ></ion-input>
 
         <br />

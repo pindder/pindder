@@ -1,8 +1,9 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, EnvironmentInjector, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, EnvironmentInjector, inject, signal } from '@angular/core';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonFabButton, IonFab, 
   IonIcon, IonButton, IonModal, IonItem, IonList, IonButtons, IonAvatar, 
-  IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonCard, IonListHeader, 
+  IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonCard, IonListHeader,
+  ViewWillEnter, 
 } from "@ionic/angular";
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
@@ -10,6 +11,7 @@ import { NotificationTile } from "../../components/notification-tile/notificatio
 import { NewClient } from "../../components/new-client/new-client";
 import { NewOrder } from "../../components/new-order/new-order";
 import { NewDesign } from "../../components/new-design/new-design";
+import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,14 +47,18 @@ import { NewDesign } from "../../components/new-design/new-design";
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard {
-  public environmentInjector = inject(EnvironmentInjector);
+export class Dashboard implements ViewWillEnter{
+  private cdr = inject(ChangeDetectorRef);
+  private tokenService = inject(TokenService);
 
+  profile!: any;
+  environmentInjector = inject(EnvironmentInjector);
   presentingElement!: HTMLElement | null;
-  public modalContent = signal<string>("");
-  public isActionSheetOpen = signal<boolean>(false);
-  public isModalOpen = signal<boolean>(false);
-  public actionSheetButtons = [
+  
+  modalContent = signal<string>("");
+  isActionSheetOpen = signal<boolean>(false);
+  isModalOpen = signal<boolean>(false);
+  actionSheetButtons = [
     {
       text: 'New Client',
       icon: 'clipboard-outline',
@@ -69,7 +75,7 @@ export class Dashboard {
       text: 'New Style',
       icon: 'color-palette-outline',
       handler: () => {
-        this.modalContent.set("New Design");
+        this.modalContent.set("New Style");
         this.isModalOpen.set(true);
       },
     },
@@ -81,15 +87,8 @@ export class Dashboard {
         this.isModalOpen.set(true);
       },
     },
-    // {
-    //   text: 'Cancel',
-    //   role: 'cancel',
-    //   data: {
-    //     action: 'cancel',
-    //   },
-    // },
   ];
-  public tiles = [
+  tiles = [
     {
       title: "Pending Orders",
       icon: "hourglass-outline",
@@ -115,7 +114,7 @@ export class Dashboard {
       color: "danger"
     }
   ];
-  public notifications = [
+  notifications = [
     {
       id: 'ncaiojmcnio',
       type: 'Order',
@@ -162,8 +161,18 @@ export class Dashboard {
     },
   ];
 
-  ngOnInit(): void {
+
+  
+  ionViewWillEnter(): void {
     this.presentingElement = document.querySelector('.ion-page');
+    this.loadProfile();
+    this.cdr.markForCheck();
+  }
+
+  async loadProfile() {
+    const profile = await this.tokenService.getProfile();
+    this.profile = profile ? JSON.parse(profile) : null;
+    console.log(this.profile);
   }
 
   async openActionSheet() {

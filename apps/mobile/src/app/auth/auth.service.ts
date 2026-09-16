@@ -4,7 +4,6 @@ import { from, map, Observable, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ILogin, IVerification, TailorReg } from '@pindder/contracts';
 import { TokenService } from '../services/token.service';
-import { Preferences } from '@capacitor/preferences';
 import { ProfileService } from '../services/profile.service';
 
 @Injectable({
@@ -16,12 +15,7 @@ export class AuthService {
   private profileService = inject(ProfileService);
 
   loginBrand(loginDto: ILogin): Observable<any> {
-    from(
-      Preferences.set({
-        key: 'email',
-        value: loginDto.email
-      })
-    );
+    from(this.tokenService.setPreferenceValue('email', loginDto.email));
     return this.http.post<any>(`${environment.apiUrl}/auth/login-tailor`, loginDto);
   }
 

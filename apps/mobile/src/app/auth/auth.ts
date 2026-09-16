@@ -38,29 +38,34 @@ export class Auth implements OnInit{
 
   login() {
     //this.router.navigate(['auth/otp']);
-    this.authService.loginBrand(this.loginComponent.loginData).subscribe((val) => {
-      this.router.navigate(['auth/otp']);
-    }, (error: HttpErrorResponse) => {
-      console.log(error);
+    this.authService.loginBrand(this.loginComponent.loginData).subscribe({
+      next: (val) => {
+        this.router.navigate(['auth/otp']);
+      }, 
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
     });
   }
 
   register() {
     //this.router.navigate(['auth/otp']);
-    this.authService.registerTailor(this.registrationComponent.registrationData).subscribe((val) => {
-      setTimeout(() => this.router.navigate(['auth/otp']), 3000);
-    }, (error: HttpErrorResponse) => {
-      console.log(error);
+    this.authService.registerTailor(this.registrationComponent.registrationData).subscribe({
+      next: (val) => {
+        //setTimeout(() => this.router.navigate(['auth/otp']), 3000);
+        this.router.navigate(['auth/otp']);
+      }, 
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
     });
   }
 
   requestLoginCode(action: string) {
-    console.log(action);
+    //console.log(action);
     if(action == 'sign_up') {
-      console.log(this.registrationComponent.registrationData);
       this.register();
     } else {
-      console.log(this.loginComponent.loginData);
       this.login();
     }
   }
