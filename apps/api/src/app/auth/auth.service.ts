@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateBrandDto } from '../brands/dto/create-brand.dto';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -27,28 +27,40 @@ export class AuthService {
   ) {}
 
   async tailorLogin(loginDto: LoginDto) {
-    try {
+  try {
       let token;
       const tailor = await this.tailorModel.findOne({ email: loginDto.email });
 
-      if(!tailor) { 
-        throw new HttpException('', HttpStatus.UNAUTHORIZED);
+      // 1. Pass an explicit, meaningful message instead of ''
+      if (!tailor) {
+        throw new UnauthorizedException('Invalid email or account does not exist');
       }
 
       const hasToken = await this.sharedService.hasValidToken(tailor._id);
 
-      if(hasToken) {
+      if (hasToken) {
         token = await this.sharedService.updateToken(tailor._id, TokenTypes.CODE);
       } else {
-        token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE,);
+        token = await this.sharedService.createToken(
+          AccountTypes.TAILOR, 
+          tailor._id, 
+          TokenTypes.CODE
+        );
       }
       
-      this.emailService.sendOneTimeLoginCode(tailor, token.token);
+      await this.emailService.sendOneTimeLoginCode(tailor, token.token);
 
-      return { status: 200, message: `Login code has been sent to your email!` };
+      return { status: 200, message: 'Login code has been sent to your email!' };
       
-    } catch(error) {
-      throw new InternalServerErrorException();
+    } catch (error) {
+      // 2. Re-throw known NestJS HTTP exceptions so they keep their status code & message
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      // 3. Log unknown database/system errors and return a 500
+      console.error('tailorLogin error:', error);
+      throw new InternalServerErrorException('An error occurred while logging in');
     }
   }
 
@@ -67,13 +79,14 @@ export class AuthService {
       tailor.accountType = AccountTypes.TAILOR;
       await tailor.save();
 
-      this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
+      await this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
       const token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE);
 
-      this.emailService.sendOneTimeLoginCode(tailor, token.token);
+      await this.emailService.sendOneTimeLoginCode(tailor, token.token);
 
       return { status: 200, data: tailor, message: `Account created successfully!` };
     } catch(error: any) {
+      console.error(error);
       throw new InternalServerErrorException(`${error}`);
     }
   }
