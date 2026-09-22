@@ -105,11 +105,6 @@ export class Orders implements ViewWillEnter, OnInit{
     })
   }
 
-  openModal() {
-    console.log('clicked open modal');
-    this.modal.present();
-  }
-
   async openNewOrderModal() {
     const modal = await this.modalCtrl.create({
       component: NewOrder,

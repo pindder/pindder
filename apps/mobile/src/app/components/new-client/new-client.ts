@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonButton, IonInput, IonSelectOption, 
   ViewWillEnter, IonSelect, ToastController, IonList,
@@ -10,7 +10,7 @@ import { IonContent, IonButton, IonInput, IonSelectOption,
   IonIcon,
   ModalController
 } from "@ionic/angular";
-import { DataTypes, Gender, IClient, IResponse } from '@pindder/contracts';
+import { Gender, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -36,6 +36,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class NewClient implements ViewWillEnter{
   @Output() closeModal = new EventEmitter();
+  @Input() origin!: string;
 
   private clientService = inject(ClientService);
   private toastController = inject(ToastController);
@@ -53,7 +54,9 @@ export class NewClient implements ViewWillEnter{
 
   genders: string[] = Object.keys(Gender);;
 
-  ionViewWillEnter(): void {   }
+  ionViewWillEnter(): void { 
+    console.log(this.origin)
+  }
 
   async presentToast(
     msg: string,
@@ -79,7 +82,8 @@ export class NewClient implements ViewWillEnter{
     this.clientService.createClient(this.client).subscribe({
       next: (res: IResponse<IClient>) => {
         this.presentToast(res.msg, 'primary', 'top');
-        this.closeModal.emit(DataTypes.CLIENT);
+        console.log(res.data);
+        this.modalCtrl.dismiss(res.data, 'selected');
       }, 
       error: (error: HttpErrorResponse) => {
         console.log(error);

@@ -61,8 +61,18 @@ export class Clients implements ViewWillEnter{
   async openNewClientModal() {
     const modal = await this.modalCtrl.create({
       component: NewClient, // Standalone modal component for searching clients
+      componentProps: {
+        origin: DataTypes.CLIENT
+      }
     });
 
     await modal.present();
+
+    //Listen for the selected client payload when dismissed
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'selected' && data) {
+      this.clients.push(data);
+      this.cdr.markForCheck();
+    }
   }
 }

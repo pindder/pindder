@@ -7,7 +7,7 @@ import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DesignTypes, IDesign } from '@pindder/contracts';
+import { DesignTypes, IDesign, Sizes } from '@pindder/contracts';
 import { forkJoin } from 'rxjs';
 import { Camera } from '@capacitor/camera';
 import { FormsModule } from '@angular/forms';
@@ -32,22 +32,21 @@ export class DesignView implements ViewWillEnter, OnInit{
   style_id = signal<string>("");
   design!: IDesign;
   uploadedImageUrls: string[] = [];
-  sizes: string[] = [];
   selectedSizes: string[] = [];
   isUploading: boolean = false;
   isActionSheetOpen = signal<boolean>(false);
   modalContent = signal<string>("");
   actionSheetButtons = [
     {
-      text: 'Add Images',
-      icon: 'image-outline',
+      text: 'Upload Images',
+      icon: 'cloud-upload-outline',
       disabled:  this.uploadedImageUrls.length === 4,
       handler: () => {
         this.selectAndUploadMultipleImages();
       },
     },
     {
-      text: 'Create Order',
+      text: 'New Order',
       icon: 'bag-add-outline',
       handler: () => {
         this.router.navigate(['app/orders'], {
@@ -68,6 +67,7 @@ export class DesignView implements ViewWillEnter, OnInit{
   ];
 
   designTypes = Object.keys(DesignTypes);
+  sizes = Object.keys(Sizes);
 
   ionViewWillEnter(): void {
     const style_id = this.ar.snapshot.paramMap.get('id');
@@ -96,6 +96,9 @@ export class DesignView implements ViewWillEnter, OnInit{
     this.designService.fetchDesign(this.style_id()).subscribe({
       next: (res) => {
         this.design = res.data;
+        console.log(this.design);
+        this.selectedSizes = res.data.sizes;
+        console.log(this.selectedSizes);
         this.uploadedImageUrls = res.data.images;
         this.cdr.markForCheck();
       },
