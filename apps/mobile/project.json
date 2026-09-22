@@ -6,6 +6,16 @@
   "sourceRoot": "apps/mobile/src",
   "tags": [],
   "targets": {
+    "architect": {
+      "build": {
+        "options": {
+          "allowedCommonJsDependencies": [
+            "@capacitor-community/photoviewer",
+            "jeep-photoviewer"
+          ]
+        }
+      }
+    },
     "build": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
@@ -21,7 +31,7 @@
             "input": "apps/mobile/public"
           }
         ],
-        "styles": ["apps/mobile/src/styles.scss"]
+        "styles": ["apps/mobile/src/styles.scss","node_modules/photoswipe/dist/photoswipe.css"]
       },
       "configurations": {
         "production": {

@@ -8,6 +8,8 @@ export enum OrderStatus {
 export interface IOrder {
   id?: string;
   productId: string;
+  style: string;
+  client: string;
   amount: number;
   deliveryDate: string | Date;
   measurementId?: string;

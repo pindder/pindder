@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { Follow } from './schemas/follows.schema';
 import { User } from '../users/schemas/user.schema';
 import { ClientAssociationDto } from './dto/client-association.dto';
+import { IResponse } from '@pindder/contracts';
 
 @Injectable()
 export class ClientService {
@@ -47,8 +48,41 @@ export class ClientService {
 
       await new_follow.save();
       
-      return client._id;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Your client was added successfully.',
+        data: client._id
+      };
+
+      return res;
     } catch (error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
+  async search(query: string, user_id: string) {
+    try {
+      const sanitizedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(sanitizedQuery, 'i');
+
+      const clients = await this.clientModel.find({
+        $or: [
+          { email: searchRegex },
+          { firstname: searchRegex },
+          { fullname: searchRegex },
+          { lastname: searchRegex },
+          { phoneNo: searchRegex }
+        ],
+        $and: [
+          {
+            referee: user_id
+          }
+        ]
+      }).exec();
+
+      return clients;
+
+    } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
     }
   }
@@ -98,7 +132,19 @@ export class ClientService {
     return `This action updates a #${id} client`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} client`;
+  async remove(id: string) {
+    try {
+      const client = await this.clientModel.findByIdAndDelete(id);
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: "The client was removed successfully.",
+        data: client?._id
+      }
+
+      return res;
+    } catch(error: any) {
+      throw new InternalServerErrorException();
+    }
   }
 }

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -23,6 +24,11 @@ export class SubscriptionController {
   @Get()
   findAll() {
     return this.subscriptionService.findAll();
+  }
+
+  @Get('filter')
+  filterByStatus(@Query('status') query: string) {
+    return this.subscriptionService.filterByStatus(query);
   }
 
   @Get(':id')

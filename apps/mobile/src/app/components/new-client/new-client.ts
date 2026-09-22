@@ -1,25 +1,45 @@
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonButton, IonInput, IonSelectOption, ViewWillEnter, IonSelect } from "@ionic/angular";
-import { Gender, IClient } from '@pindder/contracts';
+import { IonContent, IonButton, IonInput, IonSelectOption, 
+  ViewWillEnter, IonSelect, ToastController, IonList,
+  IonItem,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonIcon,
+  ModalController
+} from "@ionic/angular";
+import { DataTypes, Gender, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-new-client',
   imports: [
+    IonList,
+    IonItem, 
     IonInput,
     IonButton,
     IonSelect,
     IonContent,
     FormsModule,
-    IonSelectOption
+    IonSelectOption,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonIcon
 ],
   templateUrl: './new-client.html',
   styleUrl: './new-client.css',
 })
 export class NewClient implements ViewWillEnter{
+  @Output() closeModal = new EventEmitter();
+
   private clientService = inject(ClientService);
+  private toastController = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
   client: IClient = {
     firstname: '',
@@ -30,15 +50,41 @@ export class NewClient implements ViewWillEnter{
     gender: '',
     address: '',
   };
-  genders: string[] = Object.keys(Gender);
-  
-  ionViewWillEnter(): void { }
+
+  genders: string[] = Object.keys(Gender);;
+
+  ionViewWillEnter(): void {   }
+
+  async presentToast(
+    msg: string,
+    color: 'danger' | 'light' | 'dark' | 'success' | 'primary' | 'secondary', 
+    position: 'top' | 'middle' | 'bottom'
+  ) {
+    const toast = await this.toastController.create({
+      message: msg,
+      duration: 1500,
+      position: position,
+      color: color,
+      animated: true,
+    });
+
+    await toast.present();
+  }
+
+  dismissModal() {
+    this.modalCtrl.dismiss(null, 'cancel');
+  }
 
   submit() {
-    this.clientService.createClient(this.client).subscribe((val) => {
-      console.log(val);
-    }, (error: HttpErrorResponse) => {
-      console.log(error);
-    })
+    this.clientService.createClient(this.client).subscribe({
+      next: (res: IResponse<IClient>) => {
+        this.presentToast(res.msg, 'primary', 'top');
+        this.closeModal.emit(DataTypes.CLIENT);
+      }, 
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+        this.presentToast(error.message, 'danger', 'top');
+      }
+    });
   }
 }

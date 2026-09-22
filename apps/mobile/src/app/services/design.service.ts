@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { IDesign } from '@pindder/contracts';
+import { IDesign, IResponse } from '@pindder/contracts';
 
 @Injectable({
   providedIn: 'root',
@@ -24,11 +24,23 @@ export class DesignService {
     );
   }
 
-  createDesign(design: IDesign): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/designs`, design);
+  createDesign(design: IDesign): Observable<IResponse<IDesign>> {
+    return this.http.post<IResponse<IDesign>>(`${environment.apiUrl}/designs`, design);
   }
 
-  fetchDesigns() {
+  fetchDesigns(): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/designs`);
+  }
+
+  fetchDesign(design_id: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/designs/${design_id}`);
+  }
+
+  searchDesign(query: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/designs/search?q=${query}`);
+  }
+
+  removeDesign(design_id: string): Observable<any> {
+    return this.http.delete<any>(`${environment.apiUrl}/designs/${design_id}`);
   }
 }

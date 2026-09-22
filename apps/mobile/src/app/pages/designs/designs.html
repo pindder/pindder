@@ -17,11 +17,19 @@
   @if(designs.length < 1) {
     <app-empty-state [imgPath]="'/images/add-to-cart.png'"></app-empty-state>
   } @else {
+    <div class="p-3">
+      <ion-button 
+      (click)="openNewDesignModal()"
+      shape="round" 
+      expand="block" 
+      color="primary"
+      ><ion-icon name="add-outline" slot="start"></ion-icon> New Style</ion-button>
+    </div>
     <ion-grid>
       <ion-row class="p-0">
       @for(design of designs; track design._id){
         <ion-col class="p-0" sizeLg="3" sizeMd="3" sizeXs="6">
-          <app-list-card [design]="design" [dataType]="dataTypes.DESIGN"></app-list-card>
+          <app-list-card [design]="design" [dataType]="dataTypes.DESIGN" (updateList)="updateDesignsList($event)" (edit)="gotoStyle($event)"></app-list-card>
         </ion-col>
       }
       </ion-row>

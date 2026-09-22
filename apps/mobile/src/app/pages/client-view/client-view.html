@@ -1,0 +1,145 @@
+<ion-header [translucent]="true">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button default-href="/app/clients"></ion-back-button>
+        </ion-buttons>
+        <ion-buttons slot="primary">
+            <ion-button (click)="openActionSheet()">
+                <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Client Data</ion-title>
+    </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar>
+            <ion-title size="large">Client Data</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    @if(client){
+        <form id="editClientForm" #editClientForm="ngForm" (ngSubmit)="submit()" class="">
+            <ion-list lines="full">
+                <ion-item>
+                    <ion-input 
+                    name="firstname"
+                    type="text"
+                    [(ngModel)]="client.firstname" 
+                    label="Firstname" 
+                    labelPlacement="stacked"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-input 
+                    name="lastname"
+                    type="text" 
+                    label="Lastname"
+                    labelPlacement="stacked"  
+                    [(ngModel)]="client.lastname"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-input
+                    name="email"
+                    type="email"
+                    label="Email address"
+                    labelPlacement="stacked"
+                    [(ngModel)]="client.email"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-input 
+                    name="phoneNo"
+                    label="Phone No"
+                    type="tel" 
+                    labelPlacement="stacked" 
+                    [(ngModel)]="client.phoneNo"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-select 
+                    name="gender" 
+                    [(ngModel)]="client.gender" 
+                    label="Gender" 
+                    aria-label="Gender" 
+                    placeholder="Select gender" 
+                    labelPlacement="stacked"
+                    >
+                    @for (gender of genders; track gender) {
+                        <ion-select-option [value]="gender">{{ gender }}</ion-select-option>
+                    }
+                    </ion-select> 
+                </ion-item>
+            </ion-list>
+        </form>
+
+        <!-- Action Buttons-->
+        <div class="flex flex-col gap-2 p-3">
+            @if(!measurements){
+            <ion-button 
+                id="open-modal"
+                type="button"
+                shape="round" 
+                expand="block" 
+                color="light"
+            ><ion-icon name="add-outline"></ion-icon> Add Measurement</ion-button>
+            }@else{
+            <ion-button 
+                id="open-modal"
+                type="button"
+                shape="round" 
+                expand="block" 
+                color="light"
+            ><ion-icon name="create-outline"></ion-icon>Edit Measurement</ion-button>
+            }
+            <ion-button 
+                form="editClientForm"
+                type="submit"
+                shape="round" 
+                expand="block" 
+                color="primary"
+            ><ion-icon name="save-outline"></ion-icon>Save Client</ion-button>
+        </div>
+
+        <!-- Measurements Modal-->
+        <ion-modal #modal trigger="open-modal" [presentingElement]="presentingElement">
+            <ng-template>
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-title>Measurement</ion-title>
+                        <ion-buttons slot="end">
+                            <ion-button (click)="modal.dismiss()">
+                                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+                            </ion-button>
+                        </ion-buttons>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content>
+                    <!-- <div class="p-3">
+                        <ion-label class="p-1">Take your client's measurment data effortlessly.</ion-label>
+                    </div> -->
+                    <app-measurement [client_id]="client_id"></app-measurement>
+                </ion-content>
+            </ng-template>
+        </ion-modal>
+    }@else {
+        <!-- Optional Loading Spinner -->
+        <div class="ion-text-center ion-padding">
+        <ion-spinner name="crescent"></ion-spinner>
+        </div>
+    }   
+
+     <!-- Action Sheet -->
+    <ion-action-sheet
+        id="open-modal"
+        [isOpen]="isActionSheetOpen()"
+        header="Quick Actions"
+        [buttons]="actionSheetButtons"
+        (didDismiss)="isActionSheetOpen.set(false)">
+    </ion-action-sheet>
+</ion-content>

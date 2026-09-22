@@ -1,0 +1,154 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button default-href="/app/styles"></ion-back-button>
+        </ion-buttons>
+        <ion-buttons slot="primary">
+            <ion-button (click)="openActionSheet()">
+                <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Style</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar>
+            <ion-title size="large">style</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    @if(design){
+        <!-- <div class="p-3 image-grid"> -->
+        <div class="horizontal-scroll-container flex gap-3 py-4">
+            <!-- Existing Uploaded Previews -->
+            @for (imgUrl of uploadedImageUrls; track imgUrl; let i = $index) {
+                <div class="scroll-item">
+                    <img (click)="openImage(imgUrl)" [src]="imgUrl" alt="Uploaded preview" />
+                    <ion-button 
+                    [id]="'present-alert' + i"
+                    color="danger" 
+                    size="small" 
+                    fill="clear" 
+                    class="delete-btn" 
+                    >
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                    <ion-alert
+                    [trigger]="'present-alert-' + i"
+                    header="Delete Image"
+                    message="Are you sure you want to remove this image?"
+                    [buttons]="[
+                        { text: 'Cancel', role: 'cancel' },
+                        { 
+                        text: 'Delete', 
+                        role: 'confirm',
+                        handler: () => removeImage( i)
+                        }
+                    ]"
+                    ></ion-alert>
+                </div>
+            }
+
+            <!-- Loading Spinner Card -->
+            <!-- @if (isUploading) {
+            <div class="image-card upload-card loading">
+                <ion-spinner name="crescent" color="primary"></ion-spinner>
+                <span class="upload-text">Uploading...</span>
+            </div>
+            } -->
+
+            <!-- Add Images Trigger Card -->
+            <!-- @if(design.images.length < 5){
+                <div class="scroll-item upload-card" (click)="selectAndUploadMultipleImages()">
+                    <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
+                    <span class="upload-text">Add Images</span>
+                </div>
+            } -->
+        </div>
+
+        <form class="">
+            <ion-list lines="full">
+                <ion-item>
+                    <ion-input
+                    name="name"
+                    type="text"
+                    label="Name"
+                    label-placement="floating" 
+                    placeholder="Name"
+                    [(ngModel)]="design.name"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-textarea 
+                    name="description"
+                    label="Description" 
+                    label-placement="floating" 
+                    rows="6"
+                    placeholder="Enter a description"
+                    [(ngModel)]="design.description"></ion-textarea>
+                </ion-item>
+                
+                <ion-item>
+                    <ion-select 
+                    name="design_type" 
+                    [(ngModel)]="design.type" 
+                    label="Design Type" 
+                    aria-label="Design Type" 
+                    placeholder="Select type" 
+                    label-placement="stacked">
+                        @for(type of designTypes; track type){
+                            <ion-select-option [value]="type">{{ type }}</ion-select-option>
+                        }
+                    </ion-select>
+                </ion-item>
+                
+                <ion-item>
+                    <ion-select 
+                    name="sizes" 
+                    [(ngModel)]="selectedSizes" 
+                    (ionChange)="onSizesChange($event)"
+                    label="Available Sizes" 
+                    aria-label="sizes" 
+                    placeholder="Select sizes" 
+                    label-placement="stacked"
+                    multiple="true"
+                    >
+                        @for(size of sizes; track size){
+                            <ion-select-option [value]="size">{{ size }}</ion-select-option>
+                        }
+                    </ion-select>
+                </ion-item>
+                
+                <ion-item>
+                    <ion-input
+                    name="amount"
+                    type="number"
+                    label-placement="floating"
+                    [(ngModel)]="design.amount"
+                    ></ion-input>
+                </ion-item>
+            </ion-list>
+
+            <div class="p-3">
+                <ion-button 
+                (click)="submit()"
+                shape="round" 
+                expand="block" 
+                color="primary"
+                ><ion-icon name="save-outline" slot="start"></ion-icon> Save Style</ion-button>
+            </div>
+        </form>
+    }
+
+    <!-- Action Sheet -->
+    <ion-action-sheet
+        id="open-modal"
+        [isOpen]="isActionSheetOpen()"
+        header="Quick Actions"
+        [buttons]="actionSheetButtons"
+        (didDismiss)="isActionSheetOpen.set(false)">
+    </ion-action-sheet>
+</ion-content>

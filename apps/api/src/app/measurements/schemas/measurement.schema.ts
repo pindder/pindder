@@ -1,44 +1,30 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { Design } from "../../designs/schemas/design.schema";
 import { Client } from "../../clients/schemas/client.schema";
+import { MeasurementTypes } from "@pindder/contracts";
+import { User } from "../../users/schemas/user.schema";
 
 export type MeasurementDocument = HydratedDocument<Measurement>;
 
 @Schema({ timestamps: true })
 export class Measurement {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Client })
-    owner?: string;
+    client?: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Design })
-    design?: Design;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User })
+    user?: string;
 
-    @Prop({ type: String, enum: [] })
+    @Prop({ type: String, enum: MeasurementTypes, default: MeasurementTypes.CUSTOM })
     measurementType!: string;
-    
-    @Prop({ type: Number })
-    waist?: number;
 
-    @Prop({ type: Number })
-    neck?: number;
+    // @Prop({ type: String, enum: Sizes })
+    // size?: string;
 
-    @Prop({ type: Number })
-    armLength?: Number;
+    @Prop({ type: Map, of: mongoose.Schema.Types.Mixed, default: {} })
+    measurements?: Map<string, string>;
 
-    @Prop({ type: Number })
-    trouserLength?: Number;
-
-    @Prop({ type: Number })
-    wrist?: number;
-
-    @Prop({ type: Number })
-    shoulder?: number;
-
-    @Prop({ type: Number })
-    chest?: number;
-
-    @Prop({ type: Number })
-    tigh?: number;
+    @Prop({ type: String})
+    notes?: string;
 }
 
 export const MeasurementSchema = SchemaFactory.createForClass(Measurement);

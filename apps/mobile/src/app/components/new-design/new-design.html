@@ -1,3 +1,13 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>New Style</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
 <ion-content [fullscreen]="true">
     <form #loginForm="ngForm" class="p-3">
         <div class="image-grid">
@@ -6,14 +16,27 @@
                 <div class="image-card">
                     <img [src]="imgUrl" alt="Uploaded preview" />
                     <ion-button 
+                    [id]="'present-alert' + i"
                     color="danger" 
                     size="small" 
                     fill="clear" 
                     class="delete-btn" 
-                    (click)="removeImage(i)"
                     >
                     <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                     </ion-button>
+                    <ion-alert
+                    [trigger]="'present-alert-' + i"
+                    header="Delete Image"
+                    message="Are you sure you want to remove this image?"
+                    [buttons]="[
+                        { text: 'Cancel', role: 'cancel' },
+                        { 
+                        text: 'Delete', 
+                        role: 'confirm',
+                        handler: () => removeImage( i)
+                        }
+                    ]"
+                    ></ion-alert>
                 </div>
             }
 
@@ -85,7 +108,7 @@
         fill="solid"
         label-placement="floating"
         helperText="Enter an amount"
-        [(ngModel)]="design.amount"
+        [(ngModel)]="design.amount" 
         ></ion-input>
 
         <br />

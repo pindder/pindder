@@ -6,5 +6,5 @@ export interface IDesign {
     description: string;
     type: string;
     sizes: any;
-    images: any;
+    images: any[];
 }

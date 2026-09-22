@@ -1,3 +1,141 @@
-<ion-content [fullscreen]="true">
-    
+<ion-header>
+    <ion-toolbar>
+        <ion-title>New Order</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content color="light" [fullscreen]="true">
+    <ion-list [inset]="true">
+        <ion-list-header>
+            <ion-label>Client Information</ion-label>
+        </ion-list-header>
+
+        @if(!selectedClient){
+        <ion-item lines="none" class="ion-justify-content-between">
+            <!-- Unique trigger ID for New Client -->
+            <ion-button 
+                id="open-new-client-modal"
+                type="button"
+                fill="outline"
+                shape="round" 
+                color="primary"
+                (click)="openNewClientModal()"
+            >
+                <ion-icon name="person-add-outline" slot="start"></ion-icon>
+                New Client
+            </ion-button>
+            
+            <!-- Unique trigger ID for Select Client Search -->
+            <ion-button 
+                id="open-select-client-modal"
+                type="button"
+                shape="round" 
+                color="primary"
+                (click)="openSelectClientModal()"
+            >
+                <ion-icon name="search-outline" slot="start"></ion-icon>
+                Search Client
+            </ion-button> 
+        </ion-item>
+        }@else if (selectedClient) {
+        <ion-item lines="none">
+            <ion-label>
+            <h2>
+                {{ selectedClient.fullname || (selectedClient.firstname ? selectedClient.firstname + ' ' + selectedClient.lastname : 'Unnamed Client') }}
+            </h2>
+            @if (selectedClient.email) {
+                <p>{{ selectedClient.email }}</p>
+            }
+            @if (selectedClient.phoneNo) {
+                <p>{{ selectedClient.phoneNo }}</p>
+            }
+            </ion-label>
+            
+            <!-- Changed slot="icon-only" to slot="end" and wrapped in a button for better tap target -->
+            <ion-button fill="clear" slot="end" (click)="removeSelectedClient()">
+                <ion-icon name="close-circle-outline" color="danger" size="medium"></ion-icon>
+            </ion-button>
+        </ion-item>
+        }
+    </ion-list>
+
+    <ion-list [inset]="true">
+        <ion-list-header>
+            <ion-label>Style</ion-label>
+        </ion-list-header>
+
+        @if(!selectedDesign){
+        <ion-item lines="none" class="ion-justify-content-between">
+            <!-- Unique trigger ID for New Design -->
+            <ion-button 
+                id="open-new-design-modal"
+                type="button"
+                fill="outline"
+                shape="round" 
+                color="primary"
+                (click)="openNewDesignModal()"
+            >
+                <ion-icon name="color-palette-outline" slot="start"></ion-icon>
+                New Style
+            </ion-button>
+            
+            <!-- Unique trigger ID for Select Client Search -->
+            <ion-button 
+                id="open-select-design-modal"
+                type="button"
+                shape="round" 
+                color="primary"
+                (click)="openSelectDesignModal()"
+            >
+                <ion-icon name="search-outline" slot="start"></ion-icon>
+                Search Style
+            </ion-button> 
+        </ion-item>
+        }@else if (selectedDesign) {
+        <div class="flex justify-between items-center px-3 py-2 gap-3">
+            <div class="flex gap-3">
+                <ion-thumbnail>
+                    <img src="{{ selectedDesign.images[0] }}" alt=""/>
+                </ion-thumbnail>
+                <ion-label>
+                    <h2>
+                        {{ selectedDesign.name }} ({{ selectedDesign.type }})
+                    </h2>
+                    @if (selectedDesign.amount) {
+                        <p>{{ selectedDesign.amount.toLocaleString() }}</p>
+                    }
+                </ion-label>
+            </div>
+            <!-- Changed slot="icon-only" to slot="end" and wrapped in a button for better tap target -->
+            <div>
+                <ion-button fill="clear" slot="end" (click)="removeSelectedDesign()">
+                    <ion-icon name="close-circle-outline" color="danger" size="small" slot="end"></ion-icon>
+                </ion-button>
+            </div>
+        </div>
+        }
+    </ion-list>
+
+    @if(selectedClient && selectedDesign){
+    <ion-list [inset]="true">
+        <ion-list-header>
+            <ion-label>Order Details</ion-label>
+        </ion-list-header>
+
+        <div class="p-3">
+            <ion-datetime [showDefaultTitle]="true"></ion-datetime>
+        </div>
+    </ion-list>
+    }
+
+    <div class="p-3">
+        <ion-button shape="round" expand="block" color="primary">
+            Place Order
+        </ion-button>
+    </div>
 </ion-content>

@@ -16,9 +16,17 @@
 
   
   @if(clients && clients.length > 0) {
+    <div class="p-3">
+      <ion-button 
+      (click)="openNewClientModal()"
+      shape="round" 
+      expand="block" 
+      color="primary"
+      ><ion-icon name="add-outline" slot="start"></ion-icon> New Client</ion-button>
+    </div>
     <ion-list class="flex flex-col gap-3" inset="true">
       @for(cl of clients; track $index){
-        <app-list-card [dataType]="dataTypes.CLIENT" [client]="cl"></app-list-card>
+        <app-list-card [dataType]="dataTypes.CLIENT" [client]="cl" (updateList)="updateClientsList(cl)"></app-list-card>
       }
     </ion-list>
   }
