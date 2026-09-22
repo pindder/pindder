@@ -4,6 +4,7 @@ import { UpdateDesignDto } from './dto/update-design.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Design } from './schemas/design.schema';
 import { Model } from 'mongoose';
+import { IResponse } from '@pindder/contracts';
 
 @Injectable()
 export class DesignService {
@@ -15,7 +16,7 @@ export class DesignService {
       const newDesign = new this.designModel(createDesignDto);
       newDesign.owner = acct_id;
 
-      await newDesign.save()
+      await newDesign.save();
 
       return newDesign;
     } catch(error: any) {
@@ -31,18 +32,64 @@ export class DesignService {
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
     }
-    return `This action returns all design`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} design`;
+  async search(query: string, user_id: string) {
+    try {
+      const sanitizedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(sanitizedQuery, 'i');
+
+      const designs = await this.designModel.find({
+        $or: [
+          { name: searchRegex },
+        ],
+        $and: [
+          {
+            referee: user_id
+          }
+        ]
+      }).exec();
+
+      return designs;
+
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
+  async findOne(id: string) {
+    try {
+      const design = await this.designModel.findById(id);
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Design retrieval successful.',
+        data: design
+      }
+
+      return res;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
   }
 
   update(id: number, updateDesignDto: UpdateDesignDto) {
     return `This action updates a #${id} design`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} design`;
+  async remove(id: string) {
+    try {
+      const design = await this.designModel.findByIdAndDelete(id);
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: `You have successfully deleted the ${design?.name} style.`,
+        data: design
+      }
+
+      return res;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
   }
 }

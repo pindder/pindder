@@ -1,0 +1,72 @@
+<ion-header [translucent]="true">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button default-href="/app/profile"></ion-back-button>
+        </ion-buttons>
+        <ion-title>Edit Profile</ion-title>
+    </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar>
+            <ion-title size="large">Edit Profile</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    @if(profile){
+        <form id="editProfileForm" #editProfileForm="ngForm" (ngSubmit)="submit()" class="">
+            <ion-list lines="full">
+                <ion-item>
+                    <ion-input 
+                    name="firstname"
+                    type="text"
+                    [(ngModel)]="profile.firstname" 
+                    label="Firstname" 
+                    labelPlacement="stacked"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-input 
+                    name="lastname"
+                    type="text" 
+                    label="Lastname"
+                    labelPlacement="stacked"  
+                    [(ngModel)]="profile.lastname"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-input
+                    name="email"
+                    type="email"
+                    label="Email address"
+                    labelPlacement="stacked"
+                    [(ngModel)]="profile.email"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-input 
+                    name="phoneNo"
+                    label="Phone No"
+                    type="tel" 
+                    labelPlacement="stacked" 
+                    [(ngModel)]="profile.phoneNo"
+                    ></ion-input>
+                </ion-item>
+            </ion-list>
+        </form>
+
+        <!-- Action Buttons-->
+        <div class="flex flex-col gap-2 p-3">
+            <ion-button 
+                form="editProfileForm"
+                type="submit"
+                shape="round" 
+                expand="block" 
+                color="primary"
+            >Continue</ion-button>
+        </div>
+    }
+</ion-content>

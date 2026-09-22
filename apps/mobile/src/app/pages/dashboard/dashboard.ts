@@ -1,9 +1,10 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { ChangeDetectorRef, Component, EnvironmentInjector, inject, signal } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonFabButton, IonFab, 
-  IonIcon, IonButton, IonModal, IonItem, IonList, IonButtons, IonAvatar, 
+import { ChangeDetectorRef, Component, EnvironmentInjector, inject, OnInit, signal } from '@angular/core';
+import { IonContent, IonFabButton, IonFab, 
+  IonIcon, IonButton, IonModal, IonItem, IonList, IonAvatar, 
   IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonCard, IonListHeader,
-  ViewWillEnter, 
+  ViewWillEnter,
+  ModalController, 
 } from "@ionic/angular";
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
@@ -12,6 +13,8 @@ import { NewClient } from "../../components/new-client/new-client";
 import { NewOrder } from "../../components/new-order/new-order";
 import { NewDesign } from "../../components/new-design/new-design";
 import { TokenService } from '../../services/token.service';
+import { Router } from '@angular/router';
+import { DataTypes } from '@pindder/contracts';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,15 +28,11 @@ import { TokenService } from '../../services/token.service';
     IonAvatar,
     IonModal,
     IonButton,
-    IonButtons,
     IonList,
     IonItem,
     IonIcon,
     IonFab,
     IonFabButton,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     DragDropModule,
     ReferralBlock,
@@ -47,9 +46,11 @@ import { TokenService } from '../../services/token.service';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements ViewWillEnter{
+export class Dashboard implements ViewWillEnter, OnInit{
+  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private tokenService = inject(TokenService);
+  private modalCtrl = inject(ModalController);
 
   profile!: any;
   environmentInjector = inject(EnvironmentInjector);
@@ -61,7 +62,7 @@ export class Dashboard implements ViewWillEnter{
   actionSheetButtons = [
     {
       text: 'New Client',
-      icon: 'clipboard-outline',
+      icon: 'person-add-outline',
       handler: () => {
         this.modalContent.set("New Client");
         this.isModalOpen.set(true);
@@ -81,7 +82,7 @@ export class Dashboard implements ViewWillEnter{
     },
     {
       text: 'New Order',
-      icon: 'cart-outline',
+      icon: 'bag-add-outline',
       handler: () => {
         this.modalContent.set("New Order");
         this.isModalOpen.set(true);
@@ -161,7 +162,9 @@ export class Dashboard implements ViewWillEnter{
     },
   ];
 
-
+  ngOnInit(): void {
+    this.presentingElement = document.querySelector('.ion-page');
+  }
   
   ionViewWillEnter(): void {
     this.presentingElement = document.querySelector('.ion-page');
@@ -172,10 +175,39 @@ export class Dashboard implements ViewWillEnter{
   async loadProfile() {
     const profile = await this.tokenService.getProfile();
     this.profile = profile ? JSON.parse(profile) : null;
-    console.log(this.profile);
+    //console.log(this.profile);
   }
 
   async openActionSheet() {
     this.isActionSheetOpen.set(true);
+  }
+
+  async closeModal(dataType: string) {
+    console.log('Closing modal payload:', dataType);
+
+    // 1. Update your local state signal
+    this.isModalOpen.set(false);
+
+    // 2. Programmatically dismiss the active Ionic overlay
+    try {
+      await this.modalCtrl.dismiss();
+    } catch (e) {
+      // In case no modal instance was registered via ModalController
+    }
+
+    // 3. Navigate after dismissing
+    if (!dataType) return;
+
+    switch (dataType) {
+      case DataTypes.CLIENT:
+        await this.router.navigate(['/app/clients']);
+        break;
+      case DataTypes.DESIGN:
+        await this.router.navigate(['/app/styles']);
+        break;
+      case DataTypes.ORDER:
+        await this.router.navigate(['/app/orders']);
+        break;
+    }
   }
 }

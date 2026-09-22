@@ -97,6 +97,31 @@
     padding-bottom: 16px;
 }
 
+.my-1 {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.my-2 {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.my-3 {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.my-4 {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.my-5 {
+    margin-top: 42px;
+    margin-bottom: 42px;
+}
+
 .pt-4 {
     padding-top: 16px;
 }
@@ -150,6 +175,16 @@
     margin-right: 4px;
 }
 
+.gap-x-2 {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.gap-x-3 {
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
 .text-primary {
     color: var(--ion-color-primary);
 }
@@ -174,4 +209,8 @@
 .border-secondary {
     border-radius: 8px;
     border: .01em solid var(--ion-color-border);
+}
+
+img {
+    border-radius: 8px;
 }

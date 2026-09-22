@@ -1,7 +1,18 @@
+export enum MeasurementTypes {
+    STANDARD = "STANDARD",
+    CUSTOM = "CUSTOM"
+}
+
 export enum AccountStatus {
   ACTIVE = 'ACTIVE',
   SUSPENDED = 'SUSPENDED',
   PENDING = 'PENDING',
+}
+
+export enum PaymentStatus {
+  PROCESSING = 'PROCESSING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
 }
 
 export enum Gender {
@@ -52,5 +63,6 @@ export enum Sizes {
 export enum DataTypes {
     CLIENT = "CLIENT",
     DESIGN = "DESIGN",
+    ORDER = "ORDER",
     NOTIFICATION = "NOTIFICATION",
 }

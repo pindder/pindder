@@ -3,4 +3,7 @@
 
     <h2>No data yet</h2>
     <p>There’s nothing to display here.</p>
+    @if(parentComponent === dataTypes.ORDER){
+        <app-create-order-button (click)="launchCreateOrderModal()"></app-create-order-button>
+    }
 </div>

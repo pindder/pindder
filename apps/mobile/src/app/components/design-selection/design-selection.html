@@ -1,0 +1,49 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Select Client</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismiss()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+    
+    <!-- Client Search Input (Note: [debounce]="0" delegates debouncing to RxJS pipeline) -->
+    <ion-searchbar 
+        placeholder="Search by name, email, phone..." 
+        [debounce]="0" 
+        (ionInput)="onSearchInput($event)"
+    ></ion-searchbar>
+
+    <!-- Loading Spinner State -->
+    @if (isLoading) {
+        <div class="flex justify-center p-4 ion-text-center">
+            <ion-spinner name="crescent" color="primary"></ion-spinner>
+        </div>
+    } @else {
+        <!-- Results List -->
+        @if (searchResults.length > 0) {
+            <ion-list>
+                @for (design of searchResults; track design._id) {
+                    <ion-item button (click)="selectDesign(design)">
+                        <ion-thumbnail slot="start">
+                            <img src="{{ design.images[0] }}" alt=""/>
+                        </ion-thumbnail>
+                        <ion-label>
+                            <h2>{{ design.name }}</h2>
+                            <p>{{ design.amount }}</p>
+                        </ion-label>
+                        <!-- <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon> -->
+                    </ion-item>
+                }
+            </ion-list>
+        } @else {
+            <!-- Empty State -->
+            <div class="ion-padding ion-text-center">
+                <ion-label color="medium">No matching clients found.</ion-label>
+            </div>
+        }
+    }
+</ion-content>

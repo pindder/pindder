@@ -1,25 +1,31 @@
 @if(dataType === dataTypes.CLIENT && client){
     <div class="px-3 flex items-center justify-between border">
-        <div class="">
+        <div (click)="viewClient()" class="">
             <h5>{{ client.firstname + " " + client.lastname }}</h5>
             <p>{{ client.phoneNo }}</p>
         </div>
         <div class="flex gap-3 items-center">
             <p>{{ client.createdAt | date }}</p>
-            <ion-icon name="trash-outline" color="danger"></ion-icon>
+            <ion-icon (click)="presentDeleteAlert(dataTypes.CLIENT)" name="trash-outline" color="danger"></ion-icon>
         </div>
     </div>
 } 
 @else if(dataType === dataTypes.DESIGN) {
-    <ion-card>
+    <div class="flex flex-col gap-2 p-2">
         <img alt="style-img" [src]="design.images[0]" />
-        <ion-card-header>
-            <ion-card-title>{{ design.amount.toLocaleString() }}</ion-card-title>
-            <ion-card-subtitle></ion-card-subtitle>
-        </ion-card-header>
-
-        <ion-card-content>
-            {{ design.name }}
-        </ion-card-content>
-    </ion-card>
+        <div class="flex justify-between">
+            <ion-label>
+                <h2>{{ design.name }}</h2>
+                <p>{{ design.amount.toLocaleString() }}</p>
+            </ion-label>
+            <ion-buttons>
+                <ion-button (click)="editDesign()">
+                    <ion-icon color="primary" size="small" slot="icon-only" name="create-outline"></ion-icon>
+                </ion-button>
+                <ion-button (click)="presentDeleteAlert(dataTypes.DESIGN)">
+                    <ion-icon color="danger" size="small" slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-button>
+            </ion-buttons>
+        </div>
+    </div>
 }

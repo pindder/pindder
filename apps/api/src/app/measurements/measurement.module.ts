@@ -4,6 +4,7 @@ import { MeasurementController } from './measurement.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Measurement, MeasurementSchema } from './schemas/measurement.schema';
 import { Design, DesignSchema } from '../designs/schemas/design.schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { Design, DesignSchema } from '../designs/schemas/design.schema';
     ])
   ],
   controllers: [MeasurementController],
-  providers: [MeasurementService],
+  providers: [MeasurementService, JwtService],
   exports: [MongooseModule]
 })
 export class MeasurementModule {}

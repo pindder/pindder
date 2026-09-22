@@ -1,15 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Order } from './schemas/order.schema';
+import { Model } from 'mongoose';
+import { OrderStatus } from '@pindder/contracts';
 
 @Injectable()
 export class OrderService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  constructor(
+    @InjectModel(Order.name) private readonly orderModel: Model<Order>
+  ) {}
+
+  async create(createOrderDto: CreateOrderDto) {
+    try {
+      const newOrder = new this.orderModel(createOrderDto);
+
+      newOrder.status = OrderStatus.PENDING;
+
+      await newOrder.save();
+
+      return newOrder;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
   }
 
   findAll() {
     return `This action returns all order`;
+  }
+
+  async filterByStatus(query: string) {
+    try {
+      const sanitizedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(sanitizedQuery, 'i');
+
+      const orders = await this.orderModel.find({ 
+        $or: [
+          { status: searchRegex },
+        ]
+      }).exec();
+
+      return orders;
+
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
   }
 
   findOne(id: number) {

@@ -3,6 +3,7 @@ import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './schemas/order.schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { Order, OrderSchema } from './schemas/order.schema';
     ])
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService, JwtService],
 })
 export class OrderModule {}

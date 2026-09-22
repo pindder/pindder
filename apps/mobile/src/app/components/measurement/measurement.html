@@ -1,0 +1,59 @@
+<ion-content>
+  <form [formGroup]="form">
+    <div formArrayName="measurements">
+      @for (control of measurements.controls; track $index; let i = $index) {
+        <div [formGroupName]="i" class="flex items-center gap-2 mb-3">
+          <ion-item class="flex-1" lines="outline">
+            <ion-input
+              formControlName="key"
+              label="Measurement"
+              labelPlacement="stacked"
+              placeholder="e.g. Chest"
+            ></ion-input>
+          </ion-item>
+
+          <ion-item class="flex-1" lines="outline">
+            <ion-input
+              formControlName="value"
+              label="Value"
+              labelPlacement="stacked"
+              placeholder="e.g. 42 in"
+            ></ion-input>
+          </ion-item>
+
+          <ion-button 
+            color="danger" 
+            fill="clear" 
+            (click)="removeMeasurement(i)"
+            [disabled]="measurements.length === 1"
+          >
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      }
+    </div>
+
+    <ion-button 
+      expand="block" 
+      fill="outline" 
+      color="primary"
+      shape="round" 
+      class="p-2" 
+      (click)="addMeasurement()"
+    >
+      <ion-icon name="add-outline" slot="start"></ion-icon>
+      Add Custom Field
+    </ion-button>
+    <ion-button 
+    expand="block" 
+    color="primary" 
+    fill="solid"
+    shape="round" 
+    class="p-2"
+    [disabled]="form.invalid" 
+    (click)="submit()"
+  >
+    Save Measurements
+  </ion-button>
+  </form>
+</ion-content>

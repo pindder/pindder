@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { DesignService } from './design.service';
 import { CreateDesignDto } from './dto/create-design.dto';
@@ -30,18 +31,27 @@ export class DesignController {
     return this.designService.findAll(req.user.sub);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.designService.findOne(+id);
+  @UseGuards(AuthGuard)
+  @Get('search')
+  search(@Query('q') query: string, @Req() req: any) {
+    return this.designService.search(query, req.user.sub);
   }
 
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.designService.findOne(id);
+  }
+
+  @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDesignDto: UpdateDesignDto) {
     return this.designService.update(+id, updateDesignDto);
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.designService.remove(+id);
+    return this.designService.remove(id);
   }
 }

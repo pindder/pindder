@@ -4,3 +4,4 @@ export * from './lib/order.types';
 export * from './lib/enum.types';
 export * from './lib/client.types';
 export * from './lib/design.types';
+export * from './lib/generic.types';

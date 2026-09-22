@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('orders')
 export class OrderController {
@@ -23,6 +26,12 @@ export class OrderController {
   @Get()
   findAll() {
     return this.orderService.findAll();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('filter')
+  search(@Query('status') query: string) {
+    return this.orderService.filterByStatus(query);
   }
 
   @Get(':id')

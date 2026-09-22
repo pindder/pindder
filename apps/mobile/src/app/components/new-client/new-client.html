@@ -1,60 +1,73 @@
-<ion-content [fullscreen]="true">
+<ion-header>
+    <ion-toolbar>
+        <ion-title>New Client</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
   <form #loginForm="ngForm" (ngSubmit)="submit()" class="p-3">
-    <ion-input
-      name="firstname"
-      type="text"
-      labelPlacement="floating" 
-      fill="solid"
-      helperText="Enter Firstname" 
-      placeholder="Firstname"
-      [(ngModel)]="client.firstname"
-    ></ion-input>
+    <ion-list lines="true">
+      <ion-item>
+        <ion-input 
+        name="firstname"
+        type="text"
+        [(ngModel)]="client.firstname" 
+        label="Firstname" 
+        labelPlacement="stacked"
+        ></ion-input>
+      </ion-item>
 
-    <ion-input 
-      name="lastname"
-      type="text" 
-      labelPlacement="floating" 
-      helperText="Enter Lastname"
-      fill="solid" 
-      [(ngModel)]="client.lastname"
-    ></ion-input>
+      <ion-item>
+        <ion-input 
+          name="lastname"
+          type="text" 
+          label="Lastname"
+          labelPlacement="stacked"  
+          [(ngModel)]="client.lastname"
+        ></ion-input>
+      </ion-item>
 
-    <ion-input
-      name="email"
-      type="email"
-      fill="solid"
-      labelPlacement="floating"
-      helperText="Enter a valid email"
-      errorText="Invalid email"
-      [(ngModel)]="client.email"
-    ></ion-input>
+      <ion-item>
+        <ion-input
+          name="email"
+          type="email"
+          label="Email address"
+          labelPlacement="stacked"
+          [(ngModel)]="client.email"
+        ></ion-input>
+      </ion-item>
 
-    <ion-input 
-      name="phoneNo"
-      type="tel" 
-      labelPlacement="floating" 
-      fill="solid"
-      helperText="Enter Phone No" 
-      [(ngModel)]="client.phoneNo"
-    ></ion-input>
+      <ion-item>
+        <ion-input 
+          name="phoneNo"
+          label="Phone No"
+          type="tel" 
+          labelPlacement="stacked" 
+          [(ngModel)]="client.phoneNo"
+        ></ion-input>
+      </ion-item>
 
-    <br />
+      <ion-item>
+        <ion-select 
+          name="gender" 
+          [(ngModel)]="client.gender" 
+          label="Gender" 
+          aria-label="Gender" 
+          placeholder="Select gender" 
+          labelPlacement="stacked"
+        >
+          @for (gender of genders; track gender) {
+            <ion-select-option [value]="gender">{{ gender }}</ion-select-option>
+          }
+        </ion-select> 
+      </ion-item>
+    </ion-list>
 
-    <ion-select 
-      name="gender" 
-      [(ngModel)]="client.gender" 
-      label="Gender" 
-      aria-label="Gender" 
-      placeholder="Select gender" 
-      labelPlacement="stacked"
-    >
-      @for (gender of genders; track gender) {
-        <ion-select-option [value]="gender">{{ gender }}</ion-select-option>
-      }
-    </ion-select> 
-
-    <br />
-
+    <br/>
     <div class="mt-4">
       <ion-button 
         type="submit"
