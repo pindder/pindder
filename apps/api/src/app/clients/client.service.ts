@@ -51,7 +51,7 @@ export class ClientService {
       const res: IResponse<any> = {
         statusCode: 200,
         msg: 'Your client was added successfully.',
-        data: client._id
+        data: client
       };
 
       return res;

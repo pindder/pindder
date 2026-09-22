@@ -13,35 +13,45 @@
     <ion-list [inset]="true">
         <ion-list-header>
             <ion-label>Client Information</ion-label>
+            <ion-buttons slot="primary">
+                <ion-button (click)="openNewClientModal()">
+                    <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+                </ion-button>
+            </ion-buttons>
         </ion-list-header>
 
         @if(!selectedClient){
-        <ion-item lines="none" class="ion-justify-content-between">
+        <div class="">
+            <app-empty-state 
+            [icon]="'person-add'" 
+            [title]="'No Client Added'" 
+            [desc]="'click the button to add a client to this order.'" 
+            [buttonText]="'Add Client'"
+            (action)="openClientActionSheet()"
+            ></app-empty-state>
             <!-- Unique trigger ID for New Client -->
-            <ion-button 
+            <!-- <ion-button 
                 id="open-new-client-modal"
                 type="button"
                 fill="outline"
-                shape="round" 
                 color="primary"
                 (click)="openNewClientModal()"
             >
                 <ion-icon name="person-add-outline" slot="start"></ion-icon>
                 New Client
-            </ion-button>
+            </ion-button> -->
             
             <!-- Unique trigger ID for Select Client Search -->
-            <ion-button 
+            <!-- <ion-button 
                 id="open-select-client-modal"
                 type="button"
-                shape="round" 
                 color="primary"
                 (click)="openSelectClientModal()"
             >
                 <ion-icon name="search-outline" slot="start"></ion-icon>
-                Search Client
-            </ion-button> 
-        </ion-item>
+                Exisitng Client
+            </ion-button>  -->
+        </div>
         }@else if (selectedClient) {
         <ion-item lines="none">
             <ion-label>
@@ -70,32 +80,37 @@
         </ion-list-header>
 
         @if(!selectedDesign){
-        <ion-item lines="none" class="ion-justify-content-between">
+        <div class="">
+            <app-empty-state 
+            [icon]="'color-palette-outline'" 
+            [title]="'No Style Added'" 
+            [desc]="'click the button to add a style to this order.'" 
+            [buttonText]="'Add Style'"
+            (action)="openDesignActionSheet()"
+            ></app-empty-state>
             <!-- Unique trigger ID for New Design -->
-            <ion-button 
+            <!-- <ion-button 
                 id="open-new-design-modal"
                 type="button"
                 fill="outline"
-                shape="round" 
                 color="primary"
                 (click)="openNewDesignModal()"
             >
                 <ion-icon name="color-palette-outline" slot="start"></ion-icon>
                 New Style
-            </ion-button>
+            </ion-button> -->
             
             <!-- Unique trigger ID for Select Client Search -->
-            <ion-button 
+            <!-- <ion-button 
                 id="open-select-design-modal"
                 type="button"
-                shape="round" 
                 color="primary"
                 (click)="openSelectDesignModal()"
             >
                 <ion-icon name="search-outline" slot="start"></ion-icon>
                 Search Style
-            </ion-button> 
-        </ion-item>
+            </ion-button>  -->
+        </div>
         }@else if (selectedDesign) {
         <div class="flex justify-between items-center px-3 py-2 gap-3">
             <div class="flex gap-3">
@@ -128,14 +143,43 @@
         </ion-list-header>
 
         <div class="p-3">
-            <ion-datetime [showDefaultTitle]="true"></ion-datetime>
+            <ion-datetime 
+            [showDefaultTitle]="true"
+            [(ngModel)]="selectedDate" 
+            (ionChange)="onDateChange($event)"
+            ></ion-datetime>
+            <!-- <ion-datetime-button datetime="datetime"></ion-datetime-button>
+
+            <ion-modal [keepContentsMounted]="true">
+                <ng-template>
+                    <ion-datetime id="datetime"></ion-datetime>
+                </ng-template>
+            </ion-modal> -->
         </div>
     </ion-list>
     }
 
     <div class="p-3">
-        <ion-button shape="round" expand="block" color="primary">
+        <ion-button [disabled]="selectedClient == undefined || selectedDesign == undefined" shape="round" expand="block" color="primary">
             Place Order
         </ion-button>
     </div>
+
+    <!-- Client Action Sheet -->
+    <ion-action-sheet
+        id="open-modal"
+        [isOpen]="isClientActionSheetOpen()"
+        header="Quick Actions"
+        [buttons]="clientActionSheetButtons"
+        (didDismiss)="isClientActionSheetOpen.set(false)">
+    </ion-action-sheet>
+
+    <!-- Design Action Sheet -->
+    <ion-action-sheet
+        id="open-modal"
+        [isOpen]="isDesignActionSheetOpen()"
+        header="Quick Actions"
+        [buttons]="designActionSheetButtons"
+        (didDismiss)="isDesignActionSheetOpen.set(false)">
+    </ion-action-sheet>
 </ion-content>

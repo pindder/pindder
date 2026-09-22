@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { IonButton, IonIcon } from "@ionic/angular";
 
 @Component({
@@ -7,4 +7,6 @@ import { IonButton, IonIcon } from "@ionic/angular";
   templateUrl: './create-order-button.html',
   styleUrl: './create-order-button.css',
 })
-export class CreateOrderButton { }
+export class CreateOrderButton { 
+  @Input() buttonText!: string;
+}

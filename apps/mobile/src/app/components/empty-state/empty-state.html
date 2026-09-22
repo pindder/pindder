@@ -1,9 +1,8 @@
 <div class="empty-state">
-    <img [src]="imgPath" alt="No data" />
+    @if(imgPath){<img [src]="imgPath" alt="No data" />}
+    @else if(icon) {<ion-icon [name]="icon" size="large"></ion-icon>}
 
-    <h2>No data yet</h2>
-    <p>There’s nothing to display here.</p>
-    @if(parentComponent === dataTypes.ORDER){
-        <app-create-order-button (click)="launchCreateOrderModal()"></app-create-order-button>
-    }
+    <h2>{{ title ? title : 'No data yet' }}</h2>
+    <p>{{ desc ? desc : 'There’s nothing to display here.' }}</p>
+    <app-create-order-button [buttonText]="buttonText" (click)="clickAction()"></app-create-order-button>
 </div>

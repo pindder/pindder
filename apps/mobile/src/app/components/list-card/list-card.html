@@ -1,11 +1,11 @@
 @if(dataType === dataTypes.CLIENT && client){
-    <div class="px-3 flex items-center justify-between border">
+    <div class="px-3 flex items-center justify-between border border-left-2">
         <div (click)="viewClient()" class="">
-            <h5>{{ client.firstname + " " + client.lastname }}</h5>
-            <p>{{ client.phoneNo }}</p>
+            <p class="text-md font-semibold">{{ client.firstname + " " + client.lastname }}</p>
+            <p class="text-sm text-secondary">{{ client.phoneNo }}</p>
         </div>
         <div class="flex gap-3 items-center">
-            <p>{{ client.createdAt | date }}</p>
+            <p class="text-secondary text-xs">{{ client.createdAt | date }}</p>
             <ion-icon (click)="presentDeleteAlert(dataTypes.CLIENT)" name="trash-outline" color="danger"></ion-icon>
         </div>
     </div>
@@ -20,10 +20,10 @@
             </ion-label>
             <ion-buttons>
                 <ion-button (click)="editDesign()">
-                    <ion-icon color="primary" size="small" slot="icon-only" name="create-outline"></ion-icon>
+                    <ion-icon color="primary" size="medium" slot="icon-only" name="create-outline"></ion-icon>
                 </ion-button>
                 <ion-button (click)="presentDeleteAlert(dataTypes.DESIGN)">
-                    <ion-icon color="danger" size="small" slot="icon-only" name="trash-outline"></ion-icon>
+                    <ion-icon color="danger" size="medium" slot="icon-only" name="trash-outline"></ion-icon>
                 </ion-button>
             </ion-buttons>
         </div>

@@ -18,7 +18,13 @@ export class DesignService {
 
       await newDesign.save();
 
-      return newDesign;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Your style was added successfully.',
+        data: newDesign
+      };
+
+      return res;
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
     }
@@ -45,7 +51,7 @@ export class DesignService {
         ],
         $and: [
           {
-            referee: user_id
+            owner: user_id
           }
         ]
       }).exec();

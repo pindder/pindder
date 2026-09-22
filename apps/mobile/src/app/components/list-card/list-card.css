@@ -9,6 +9,11 @@ img {
     border-radius: 16px;
 }
 
+.border-left-2 {
+    border-left-width: 5px;
+    border-left-color: var(--ion-color-primary);
+}
+
 ion-card-title {
     font-size: 16px;
 }

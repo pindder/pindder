@@ -34,32 +34,19 @@
       <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
     </ion-segment-content>
     <ion-segment-content class="p-3" id="second">
-      <app-empty-state></app-empty-state>
+      <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
     </ion-segment-content>
     <ion-segment-content class="p-3" id="third">
-      <app-empty-state></app-empty-state>
+      <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
     </ion-segment-content>
     <ion-segment-content class="p-3" id="fourth">
-      <app-empty-state></app-empty-state>
+      <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
     </ion-segment-content>
   </ion-segment-view>
 
   <ion-modal #modal [presentingElement]="presentingElement">
     <ng-template>
-      <!-- <ion-header>
-          <ion-toolbar>
-              <ion-title>New Order</ion-title>
-              <ion-buttons slot="end">
-                  <ion-button (click)="modal.dismiss()">
-                      <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
-                  </ion-button>
-              </ion-buttons>
-          </ion-toolbar>
-      </ion-header> -->
       <ion-content>
-          <!-- <div class="p-3">
-              <ion-label class="p-1">Take your client's measurment data effortlessly.</ion-label>
-          </div> -->
           <app-new-order></app-new-order>
       </ion-content>
     </ng-template>

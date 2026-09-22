@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { Client } from "../../clients/schemas/client.schema";
 import { DesignTypes, Sizes } from "@pindder/contracts";
 import { Tailor } from "../../tailors/schemas/tailor.schema";
+import { User } from "../../users/schemas/user.schema";
 
 export type DesignDocument = HydratedDocument<Design>;
 
 @Schema({ timestamps: true })
 export class Design {
-    @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: () => Client || Tailor })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User || Tailor })
     owner!: string;
 
     @Prop({ type: String, required: true })
