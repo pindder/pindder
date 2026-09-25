@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonHeader, IonToolbar, IonContent, IonList, IonItem, IonInput, ViewWillEnter, 
-  IonButton, IonSelect, IonSelectOption, IonButtons, IonTitle, IonBackButton, IonModal, 
-  IonSpinner, IonIcon, IonActionSheet,
+import { IonHeader, IonToolbar, IonContent, IonList, IonItem, IonInput, 
+  ViewWillEnter, IonButton, IonSelect, IonSelectOption, IonButtons, 
+  IonTitle, IonBackButton, IonModal, IonSpinner, IonIcon, IonActionSheet, 
+  IonLabel 
 } from '@ionic/angular';
 import { Gender, IClient } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
@@ -16,8 +17,7 @@ import { Measurement } from '../../components/measurement/measurement';
     IonList, IonItem, IonInput, FormsModule,
     IonButton, IonSelect, IonSelectOption,
     IonModal, IonSpinner, IonIcon,
-    IonModal, IonIcon, Measurement
-  ],
+    IonModal, IonIcon, Measurement, IonLabel],
   templateUrl: './client-view.html',
   styleUrl: './client-view.css',
 })
@@ -92,6 +92,10 @@ export class ClientView implements ViewWillEnter, OnInit{
 
   async openActionSheet() {
     this.isActionSheetOpen.set(true);
+  }
+
+  async openModal() {
+    this.modal.present();
   }
 
   submit() {

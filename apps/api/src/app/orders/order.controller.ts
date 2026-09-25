@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Req,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -18,14 +19,16 @@ import { AuthGuard } from '../auth/auth.guard';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
+    return this.orderService.create(createOrderDto, req.user.sub);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  findAll(@Req() req: any) {
+    return this.orderService.findAll(req.user.sub);
   }
 
   @UseGuards(AuthGuard)
@@ -34,9 +37,10 @@ export class OrderController {
     return this.orderService.filterByStatus(query);
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+    return this.orderService.findOne(id);
   }
 
   @Patch(':id')
@@ -46,6 +50,6 @@ export class OrderController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+    return this.orderService.remove(id);
   }
 }

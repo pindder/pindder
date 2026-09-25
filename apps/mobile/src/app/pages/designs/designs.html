@@ -15,7 +15,13 @@
   </ion-header>
 
   @if(designs.length < 1) {
-    <app-empty-state [imgPath]="'/images/add-to-cart.png'"></app-empty-state>
+    <app-empty-state 
+    [imgPath]="'/images/add-to-cart.png'"
+    [title]="'No Style Added'" 
+    [desc]="'click the button to add a style to this order.'" 
+    [buttonText]="'New Style'"
+    (action)="openNewDesignModal()"
+    ></app-empty-state>
   } @else {
     <div class="p-3">
       <ion-button 

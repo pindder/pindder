@@ -26,7 +26,10 @@
     </div>
     <ion-list class="flex flex-col gap-3" inset="true">
       @for(cl of clients; track $index){
-        <app-list-card [dataType]="dataTypes.CLIENT" [client]="cl" (updateList)="updateClientsList(cl)"></app-list-card>
+        <app-list-card 
+        [dataType]="dataTypes.CLIENT" 
+        [client]="cl" 
+        (updateList)="updateClientsList(cl)"></app-list-card>
       }
     </ion-list>
   }

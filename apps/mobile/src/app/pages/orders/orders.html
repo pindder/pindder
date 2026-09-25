@@ -31,7 +31,13 @@
 
   <ion-segment-view>
     <ion-segment-content class="p-3" id="first">
-      <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
+      @if(orders.length == 0){
+        <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
+      } @else{
+        @for(order of orders; track order._id){
+          <app-list-card [dataType]="dataTypes.ORDER" [order]="order"></app-list-card>
+        }
+      }
     </ion-segment-content>
     <ion-segment-content class="p-3" id="second">
       <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>

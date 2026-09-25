@@ -32,3 +32,8 @@ ion-radio.radio-checked::part(mark) {
 img {
   border-radius: 8px;
 }
+
+ion-avatar {
+  width: 80px;
+  height: 80px;
+}

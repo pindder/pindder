@@ -2,7 +2,12 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@an
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { 
-  IonContent, IonItem, IonInput, IonButton, IonIcon
+  IonContent, IonItem, IonInput, IonButton, IonIcon,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonButtons,
+  ModalController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { trashOutline, addOutline } from 'ionicons/icons';
@@ -14,7 +19,8 @@ import { HttpErrorResponse } from '@angular/common/http';
   imports: [
     CommonModule, ReactiveFormsModule, 
     IonContent, IonItem, IonInput, 
-    IonButton, IonIcon,
+    IonButton, IonIcon, IonHeader,
+    IonTitle, IonToolbar, IonButtons
   ],
   templateUrl: './measurement.html',
   styleUrl: './measurement.css',
@@ -25,6 +31,7 @@ export class Measurement implements OnInit{
   private fb = inject(FormBuilder);
   private clientService = inject(ClientService);
   private cdr = inject(ChangeDetectorRef);
+  private modalCtrl = inject(ModalController);
 
   form!: FormGroup;
   isLoading = signal<boolean>(true);
@@ -97,6 +104,10 @@ export class Measurement implements OnInit{
 
   removeMeasurement(index: number) {
     this.measurements.removeAt(index);
+  }
+
+  dismissModal() {
+    this.modalCtrl.dismiss(null, 'cancel');
   }
 
   submit() {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@angular/core';
 import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, 
   IonContent, IonButton, IonIcon, IonAlert, ViewWillEnter, IonInput, 
   IonTextarea, IonSelect, IonList, IonSelectOption, IonItem, 
@@ -23,6 +23,8 @@ import { AppService } from '../../services/app.service';
   styleUrl: './design-view.css',
 })
 export class DesignView implements ViewWillEnter, OnInit{
+  @Input() design!: IDesign;
+
   private designService = inject(DesignService);
   private ar = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
@@ -30,7 +32,7 @@ export class DesignView implements ViewWillEnter, OnInit{
   private router = inject(Router);
 
   style_id = signal<string>("");
-  design!: IDesign;
+  //design!: IDesign;
   uploadedImageUrls: string[] = [];
   selectedSizes: string[] = [];
   isUploading: boolean = false;
@@ -76,7 +78,13 @@ export class DesignView implements ViewWillEnter, OnInit{
       this.style_id.set(style_id);
     }
 
-    this.fetchDesign();
+    // if design is passed as prop to component don't call api
+    if(this.design) {
+      this.uploadedImageUrls = this.design.images;
+      this.cdr.markForCheck();
+    } else {
+      this.fetchDesign(); // call design from api when not passed as prop
+    }
   }
 
   ngOnInit(): void {
@@ -96,9 +104,7 @@ export class DesignView implements ViewWillEnter, OnInit{
     this.designService.fetchDesign(this.style_id()).subscribe({
       next: (res) => {
         this.design = res.data;
-        console.log(this.design);
         this.selectedSizes = res.data.sizes;
-        console.log(this.selectedSizes);
         this.uploadedImageUrls = res.data.images;
         this.cdr.markForCheck();
       },

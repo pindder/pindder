@@ -2,7 +2,7 @@
     @if(imgPath){<img [src]="imgPath" alt="No data" />}
     @else if(icon) {<ion-icon [name]="icon" size="large"></ion-icon>}
 
-    <h2>{{ title ? title : 'No data yet' }}</h2>
+    <h3>{{ title ? title : 'No data yet' }}</h3>
     <p>{{ desc ? desc : 'There’s nothing to display here.' }}</p>
     <app-create-order-button [buttonText]="buttonText" (click)="clickAction()"></app-create-order-button>
 </div>
