@@ -66,3 +66,9 @@ export enum DataTypes {
     ORDER = "ORDER",
     NOTIFICATION = "NOTIFICATION",
 }
+
+export enum DeliveryMethods {
+    PICKUP = "PICKUP",
+    SHIPPING = "SHIPPING",
+    MEETUP = "MEETUP"
+}

@@ -10,6 +10,7 @@
 </ion-header>
 
 <ion-content color="light" [fullscreen]="true">
+    <!-- Client Information-->
     <ion-list [inset]="true">
         <ion-list-header>
             <ion-label>Client Information</ion-label>
@@ -74,12 +75,22 @@
         }
     </ion-list>
 
+    <!-- Client Measurement-->
+    @if(selectedClient){
+        <ion-list [inset]="true">
+            <ion-item button (click)="openMeasurementModal()">
+                <ion-label>View Measurement</ion-label>
+            </ion-item>
+        </ion-list>
+    }
+
+    <!-- Selected Styles-->
     <ion-list [inset]="true">
         <ion-list-header>
-            <ion-label>Style</ion-label>
+            <ion-label>Styles</ion-label>
         </ion-list-header>
 
-        @if(!selectedDesign){
+        @if(order.styles.length == 0){
         <div class="">
             <app-empty-state 
             [icon]="'color-palette-outline'" 
@@ -111,56 +122,162 @@
                 Search Style
             </ion-button>  -->
         </div>
-        }@else if (selectedDesign) {
-        <div class="flex justify-between items-center px-3 py-2 gap-3">
-            <div class="flex gap-3">
-                <ion-thumbnail>
-                    <img src="{{ selectedDesign.images[0] }}" alt=""/>
-                </ion-thumbnail>
-                <ion-label>
-                    <h2>
-                        {{ selectedDesign.name }} ({{ selectedDesign.type }})
-                    </h2>
-                    @if (selectedDesign.amount) {
-                        <p>{{ selectedDesign.amount.toLocaleString() }}</p>
-                    }
-                </ion-label>
-            </div>
-            <!-- Changed slot="icon-only" to slot="end" and wrapped in a button for better tap target -->
-            <div>
-                <ion-button fill="clear" slot="end" (click)="removeSelectedDesign()">
-                    <ion-icon name="close-circle-outline" color="danger" size="small" slot="end"></ion-icon>
+        }@else {
+            @for(style of order.styles; track style._id){
+                <!-- <div class="flex justify-between items-center px-3 py-2 gap-3">
+                    <div class="flex gap-3">
+                        <ion-thumbnail>
+                            <img src="{{ style.design.images[0] }}" alt=""/>
+                        </ion-thumbnail>
+                        <ion-label>
+                            <h2>
+                                {{ style.design.name }} ({{ style.design.type }})
+                            </h2>
+                            @if (style.design.amount) {
+                                <p>{{ style.design.amount.toLocaleString() }}</p>
+                            }
+                        </ion-label>
+                    </div>
+                    
+                    <div>
+                        <ion-button fill="clear" slot="end" (click)="removeSelectedDesign($index)">
+                            <ion-icon name="close-circle-outline" color="danger" size="small" slot="end"></ion-icon>
+                        </ion-button>
+                    </div>
+                </div> -->
+                <ion-item-sliding>
+                    <!-- <ion-item-options side="start">
+                        @if(style.quantity > 1){
+                            <ion-item-option 
+                            (click)="decrementQuantity($index)" 
+                            color="danger"
+                            >
+                                <ion-icon name="remove-outline"></ion-icon>
+                            </ion-item-option>
+                        }
+                        <ion-item-option 
+                        (click)="incrementQuantity($index)" 
+                        color="success">
+                            <ion-icon name="add-outline"></ion-icon>
+                        </ion-item-option>
+                    </ion-item-options> -->
+                    <ion-item [button]="true">
+                        <ion-avatar aria-hidden="true" slot="start">
+                        <img alt="" src="{{ style.design.images[0] }}" />
+                        </ion-avatar>
+                        <ion-label>
+                            <h2>{{ style.design.name }}</h2>
+                            <p>{{ (style.design.amount * style.quantity).toLocaleString() }}</p>
+                            <p>{{ style.sizes }}</p>
+                            <div class="flex items-center gap-5 border">
+                                <ion-button (click)="decrementQuantity($index)">-</ion-button>
+                                    <p>{{ style.quantity }}</p>
+                                <ion-button (click)="incrementQuantity($index)">+</ion-button>
+                            </div>
+                        </ion-label>
+                    </ion-item>
+                    <ion-item-options slot="end">
+                        <ion-item-option 
+                        (click)="selectSize($index, style.design.sizes)" 
+                        color="secondary">
+                            <ion-icon slot="icon-only" name="bookmarks-outline"></ion-icon>
+                        </ion-item-option>
+                        <ion-item-option 
+                        (click)="viewDesignDetails(style.design)" 
+                        color="primary">
+                            <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+                        </ion-item-option>
+                        <ion-item-option 
+                        color="danger" 
+                        expandable="true" 
+                        (click)="removeSelectedDesign($index)">
+                            <ion-icon slot="icon-only" name="trash"></ion-icon>
+                        </ion-item-option>
+                    </ion-item-options>
+                </ion-item-sliding>
+            }
+        }
+
+        @if(order.styles.length > 0){
+            <div class="p-3">
+                <ion-button 
+                expand="block" 
+                fill="outline"
+                color="primary"
+                (click)="openDesignActionSheet()">
+                    <ion-icon slot="start" name="add-outline"></ion-icon>
+                    Add Style
                 </ion-button>
             </div>
-        </div>
         }
     </ion-list>
 
-    @if(selectedClient && selectedDesign){
+    @if(selectedClient && order.styles.length > 0){
     <ion-list [inset]="true">
         <ion-list-header>
-            <ion-label>Order Details</ion-label>
+            <ion-label>Additional Details</ion-label>
         </ion-list-header>
 
-        <div class="p-3">
-            <ion-datetime 
-            [showDefaultTitle]="true"
-            [(ngModel)]="selectedDate" 
-            (ionChange)="onDateChange($event)"
-            ></ion-datetime>
-            <!-- <ion-datetime-button datetime="datetime"></ion-datetime-button>
+        <form #orderForm="ngForm" (ngSubmit)="submit()" class="p-3">
+            <ion-list lines="true">
+                <ion-item lines="full">
+                    <ion-input 
+                    name="note"
+                    type="text"
+                    [(ngModel)]="order.note" 
+                    label="Note" 
+                    labelPlacement="stacked"
+                    ></ion-input>
+                </ion-item>
 
-            <ion-modal [keepContentsMounted]="true">
-                <ng-template>
-                    <ion-datetime id="datetime"></ion-datetime>
-                </ng-template>
-            </ion-modal> -->
-        </div>
+                <ion-item lines="full">
+                    <ion-input
+                    name="delivery_method"
+                    type="text"
+                    label="Delivery Method"
+                    labelPlacement="stacked"
+                    [(ngModel)]="order.deliveryMethod"
+                    ></ion-input>
+                </ion-item>
+
+                <ion-item lines="full">
+                    <ion-input 
+                    name="address"
+                    label="Address"
+                    type="text" 
+                    labelPlacement="stacked" 
+                    [(ngModel)]="order.address"
+                    ></ion-input>
+                </ion-item>
+
+                <br/>
+                <ion-item>
+                    <ion-datetime
+                    name="deliveryDate"
+                    [showDefaultTitle]="true"
+                    [(ngModel)]="order.deliveryDate" 
+                    (ionChange)="onDateChange($event)"
+                    ></ion-datetime>
+                    <!-- <ion-datetime-button datetime="datetime"></ion-datetime-button>
+
+                    <ion-modal [keepContentsMounted]="true">
+                        <ng-template>
+                            <ion-datetime id="datetime"></ion-datetime>
+                        </ng-template>
+                    </ion-modal> -->
+                </ion-item>
+            </ion-list>
+        </form>
     </ion-list>
     }
 
     <div class="p-3">
-        <ion-button [disabled]="selectedClient == undefined || selectedDesign == undefined" shape="round" expand="block" color="primary">
+        <ion-button 
+        [disabled]="selectedClient == undefined || order.styles.length == 0" 
+        shape="round" 
+        expand="block" 
+        color="primary"
+        (click)="submit()">
             Place Order
         </ion-button>
     </div>

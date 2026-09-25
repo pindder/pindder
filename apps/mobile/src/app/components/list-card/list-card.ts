@@ -1,15 +1,16 @@
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { ViewWillEnter, IonIcon, AlertController, ToastController, IonLabel, IonButtons, IonButton } from '@ionic/angular';
-import { DataTypes, IDesign, IResponse } from '@pindder/contracts';
+import { ViewWillEnter, IonIcon, AlertController, ToastController, IonLabel, 
+  IonButtons, IonButton, IonBadge } from '@ionic/angular';
+import { DataTypes, IDesign, IOrderItem, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DesignService } from '../../services/design.service';
 
 @Component({
   selector: 'app-list-card',
-  imports: [IonLabel, DatePipe, IonIcon, IonButtons, IonButton],
+  imports: [IonLabel, DatePipe, IonIcon, IonButtons, IonButton, IonBadge],
   templateUrl: './list-card.html',
   styleUrl: './list-card.css',
 })
@@ -20,6 +21,7 @@ export class ListCard implements ViewWillEnter{
   @Input() dataType!: DataTypes;
   @Input() client!: any;
   @Input() design!: IDesign;
+  @Input() order!: IOrderItem;
 
   /** Controllers */
   private router = inject(Router);
@@ -84,6 +86,10 @@ export class ListCard implements ViewWillEnter{
 
   viewClient() {
     this.router.navigate(['/app/clients/' + this.client._id ]);
+  }
+
+  viewOrder() {
+    this.router.navigate(['/app/orders/' + this.order._id ]);
   }
 
   deleteClient() {

@@ -10,10 +10,11 @@ import { EmptyState } from "../../components/empty-state/empty-state";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { DataTypes, IClient, IDesign } from '@pindder/contracts';
+import { DataTypes, IClient, IDesign, IResponse } from '@pindder/contracts';
 import { NewOrder } from '../../components/new-order/new-order';
 import { ClientService } from '../../services/client.service';
 import { DesignService } from '../../services/design.service';
+import { ListCard } from '../../components/list-card/list-card';
 
 @Component({
   selector: 'app-orders',
@@ -30,7 +31,9 @@ import { DesignService } from '../../services/design.service';
     IonButtons,
     IonBackButton,
     IonLabel,
-    EmptyState, NewOrder],
+    EmptyState, NewOrder,
+    ListCard
+],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
@@ -50,6 +53,7 @@ export class Orders implements ViewWillEnter, OnInit{
   client!: IClient;
   design!: IDesign;
   dataTypes = DataTypes;
+  orders: any[] = [];
 
   ionViewWillEnter(): void {
     this.presentingElement = document.querySelector('.ion-page');
@@ -72,8 +76,8 @@ export class Orders implements ViewWillEnter, OnInit{
   }
 
   fetchOrders() {
-    this.orderService.fetchOrders().subscribe((val) => {
-      console.log(val);
+    this.orderService.fetchOrders().subscribe((val: IResponse<any>) => {
+      this.orders = val.data;
       this.cdr.markForCheck();
     }, (error: HttpErrorResponse) => {
       console.log(error);
@@ -95,7 +99,7 @@ export class Orders implements ViewWillEnter, OnInit{
   fetchDesign(design_id: string) {
     this.designService.fetchDesign(design_id).subscribe({
       next: (res) => {
-        console.log(res.data);
+        //console.log(res.data);
         this.design = res.data;
         this.openNewOrderModal();
       },
@@ -117,8 +121,8 @@ export class Orders implements ViewWillEnter, OnInit{
     await modal.present();
 
     // Optionally listen for returned data when the modal is dismissed
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'selected') {
+    const { data } = await modal.onWillDismiss();
+    if (data) {
       console.log('Returned data:', data);
     }
   }

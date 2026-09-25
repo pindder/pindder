@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, 
-  IonLabel, ToastController, IonHeader, IonToolbar, IonTitle, 
-  IonButtons, IonIcon, IonListHeader, ModalController, IonThumbnail, 
-  IonDatetime, IonDatetimeButton, IonModal,IonActionSheet  
+import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, IonLabel, 
+  ToastController, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, 
+  IonListHeader, ModalController, IonDatetime, IonActionSheet, IonItemOption, 
+  IonAvatar, IonItemOptions, IonItemSliding
 } from "@ionic/angular";
 import { DataTypes, IClient, IDesign, IOrder } from '@pindder/contracts';
 import { OrderStatus } from '@pindder/contracts';
@@ -13,22 +13,42 @@ import { NewDesign } from '../new-design/new-design';
 import { DesignSelection } from '../design-selection/design-selection';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmptyState } from '../empty-state/empty-state';
-import { CreateOrderButton } from '../create-order-button/create-order-button';
+import { DesignView } from '../../pages/design-view/design-view';
+import { Measurement } from '../measurement/measurement';
+import { CloudinaryModule } from '@cloudinary/ng';
+import { OrderService } from '../../services/order.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { SizesModal } from '../sizes-modal/sizes-modal';
 
 @Component({
   selector: 'app-new-order',
-  imports: [IonActionSheet, IonDatetimeButton, IonModal,
+  imports: [ 
+    IonItemOptions, 
+    IonAvatar, 
+    IonItemOption,
+    IonActionSheet,
     IonDatetime,
-    IonLabel, IonContent,
-    IonList, IonItem, IonButton, FormsModule,
-    IonHeader, IonToolbar,
-    IonButtons, IonIcon, IonTitle,
-    IonListHeader, IonHeader,
+    IonLabel, 
+    IonContent,
+    IonList, 
+    IonItem, 
+    IonButton, 
+    FormsModule,
+    IonHeader, 
+    IonToolbar,
+    IonButtons, 
+    IonIcon, 
+    IonTitle,
+    IonListHeader, 
+    IonHeader,
     IonToolbar,
     IonTitle,
     IonIcon,
-    IonThumbnail,
-    FormsModule, EmptyState, CreateOrderButton],
+    FormsModule,
+    IonItemSliding,
+    EmptyState, 
+    CloudinaryModule
+  ],
   templateUrl: './new-order.html',
   styleUrl: './new-order.css',
 })
@@ -41,20 +61,20 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   private modalCtrl = inject(ModalController);
   private router = inject(Router);
   private ar = inject(ActivatedRoute);
+  private orderService = inject(OrderService);
 
   presentingElement!: HTMLElement | null;
   selectedClient!: any;
-  selectedDesign!: any;
-  selectedDate!: any;
+  styleAvailableSizes: string[] = [];
+  activeAvailableStyleSizesIndex!: number;
 
   order: IOrder = {
-    amount: 0,
+    totalAmount: 0,
     deliveryDate: '',
+    measurement: '',
+    totalItems: 0,
     status: OrderStatus.PENDING,
-    units: 0,
-    productId: '',
-    size: '',
-    style: '',
+    styles: [],
     client: ''
   };
   clients: IClient[] = [];
@@ -105,7 +125,12 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     if(this.client) {
       this.selectedClient = this.client;
     } else if(this.design) {
-      this.selectedDesign = this.design;
+      this.order.styles.push({
+        styleId: this.design._id!,
+        design: this.design,
+        sizes: [],
+        quantity: 1, 
+      });
     }
     this.cdr.markForCheck();
   }
@@ -145,8 +170,8 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     await modal.present();
 
     //Listen for the selected client payload when dismissed
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'selected' && data) {
+    const { data } = await modal.onWillDismiss();
+    if (data) {
       this.selectedClient = data;
       console.log('Selected client for order:', this.selectedClient);
     }
@@ -160,12 +185,19 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
 
     await modal.present();
 
-    //Listen for the selected client payload when dismissed
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'selected' && data) {
-      this.selectedDesign = data;
-      console.log('Selected client for order:', this.selectedClient);
+    //Listen for the created design payload when dismissed
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      this.order.styles.push({
+        styleId: data._id,
+        design: data,
+        sizes: [],
+        quantity: 1, 
+      });
+      this.order.totalAmount += data.amount
     }
+
+    this.cdr.markForCheck();
   }
 
   async openSelectDesignModal() { 
@@ -175,22 +207,41 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
 
     await modal.present();
 
-    //Listen for the selected client payload when dismissed
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'selected' && data) {
-      this.selectedDesign = data;
-      console.log('Selected client for order:', this.selectedClient);
+    //Listen for the selected design payload when dismissed
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      this.order.styles.push({
+        styleId: data._id,
+        design: data,
+        sizes: [],
+        quantity: 1, 
+      });
+
+      this.order.totalAmount += data.amount
     }
 
     this.cdr.markForCheck();
   }
+
+  async viewDesignDetails(design: IDesign) {
+    const modal = await this.modalCtrl.create({
+      component: DesignView,
+      canDismiss: true,
+      componentProps: {
+        design: design
+      }
+    });
+
+    await modal.present();
+  }
+
+
 
   ngOnInit() {
   }
 
   onDateChange(event: CustomEvent) {
     console.log(event.detail.value);
-    console.log(this.selectedDate);
   }
 
   dismissModal() {
@@ -201,8 +252,9 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     this.selectedClient = undefined;
   }
 
-  removeSelectedDesign() {
-    this.selectedDesign = undefined;
+  removeSelectedDesign(index: number) {
+    this.order.styles.splice(index, 1);
+    this.cdr.markForCheck();
   }
 
   presentToast() {
@@ -212,6 +264,42 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
       duration: 4000,
       position: 'top'
     });
+  }
+
+  decrementQuantity(index: number) {
+    this.order.styles[index].quantity--;
+    this.order.totalAmount -= this.order.styles[index].design.amount;
+  }
+
+  incrementQuantity(index: number) {
+    this.order.styles[index].quantity++;
+    this.order.totalAmount += this.order.styles[index].design.amount;
+  }
+
+  async selectSize(index: number, sizes: any) {
+    this.activeAvailableStyleSizesIndex = index;
+    this.styleAvailableSizes = sizes;
+    const modal = await this.modalCtrl.create({
+      component: SizesModal,
+      componentProps: {
+        sizes: this.styleAvailableSizes
+      }
+    });
+
+    await modal.present();
+  }
+
+  async openMeasurementModal() {
+    const modal = await this.modalCtrl.create({
+      component: Measurement,
+      canDismiss: true,
+      handle: true,
+      componentProps: {
+        client_id: this.selectedClient._id
+      }
+    });
+
+    await modal.present();
   }
 
   ngOnDestroy(): void {
@@ -224,7 +312,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     }
 
     this.selectedClient = undefined;
-    this.selectedDesign = undefined;
+
     this.router.navigate([], {
       relativeTo: this.ar,
       queryParams: {
@@ -236,5 +324,21 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     this.cdr.markForCheck();
   }
 
-  submit() {}
+  submit() {
+    this.order.client = this.selectedClient._id;
+    this.order.styles.forEach((item) => {
+      this.order.totalItems += item.quantity
+    });
+
+    console.log(this.order);
+    
+    this.orderService.createOrder(this.order).subscribe({
+      next: (res: any) => {
+        console.log(res);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
+  }
 }

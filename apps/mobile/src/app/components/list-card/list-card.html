@@ -10,6 +10,19 @@
         </div>
     </div>
 } 
+@else if(dataType === dataTypes.ORDER) {
+    <div class="px-3 flex items-center justify-between border border-left-2">
+        <div (click)="viewOrder()" class="">
+            <p class="text-md font-semibold">Client: {{ order.client.fullname! }}</p>
+            <p class="text-sm text-secondary">{{ order.totalItems }} Items</p>
+            <p class="text-sm">Created At: {{ order.createdAt | date}}</p>
+        </div>
+        <div class="flex flex-col items-center">
+            <p class="font-semibold text-lg">{{ order.totalAmount.toLocaleString() }}</p>
+            <ion-badge color="warning">{{ order.status }}</ion-badge>
+        </div>
+    </div>
+}
 @else if(dataType === dataTypes.DESIGN) {
     <div class="flex flex-col gap-2 p-2">
         <img alt="style-img" [src]="design.images[0]" />
