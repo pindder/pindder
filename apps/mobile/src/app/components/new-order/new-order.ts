@@ -1,11 +1,12 @@
-import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, IonLabel, 
   ToastController, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, 
   IonListHeader, ModalController, IonDatetime, IonActionSheet, IonItemOption, 
-  IonAvatar, IonItemOptions, IonItemSliding
+  IonAvatar, IonItemOptions, IonItemSliding, IonTextarea, IonInput, IonNote,
+  IonModal
 } from "@ionic/angular";
-import { DataTypes, IClient, IDesign, IOrder } from '@pindder/contracts';
+import { DataTypes, IClient, IDesign, IOrder, IOrderStyle } from '@pindder/contracts';
 import { OrderStatus } from '@pindder/contracts';
 import { NewClient } from '../new-client/new-client';
 import { ClientSelection } from '../client-selection/client-selection';
@@ -22,39 +23,41 @@ import { SizesModal } from '../sizes-modal/sizes-modal';
 
 @Component({
   selector: 'app-new-order',
-  imports: [ 
-    IonItemOptions, 
-    IonAvatar, 
+  imports: [
+    IonModal, 
+    IonNote, IonInput, IonTextarea,
+    IonItemOptions,
+    IonAvatar,
     IonItemOption,
     IonActionSheet,
     IonDatetime,
-    IonLabel, 
+    IonLabel,
     IonContent,
-    IonList, 
-    IonItem, 
-    IonButton, 
+    IonList,
+    IonItem,
+    IonButton,
     FormsModule,
-    IonHeader, 
+    IonHeader,
     IonToolbar,
-    IonButtons, 
-    IonIcon, 
+    IonButtons,
+    IonIcon,
     IonTitle,
-    IonListHeader, 
+    IonListHeader,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonIcon,
     FormsModule,
     IonItemSliding,
-    EmptyState, 
-    CloudinaryModule
-  ],
+    EmptyState,
+    CloudinaryModule, IonNote],
   templateUrl: './new-order.html',
   styleUrl: './new-order.css',
 })
 export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   @Input() client?: IClient;
   @Input() design?: IDesign;
+  @ViewChild('modal') modalSheet!: IonModal;
 
   private cdr = inject(ChangeDetectorRef);
   private toastCtrl = inject(ToastController);
@@ -65,12 +68,12 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
 
   presentingElement!: HTMLElement | null;
   selectedClient!: any;
-  styleAvailableSizes: string[] = [];
-  activeAvailableStyleSizesIndex!: number;
+  selectedStyleIndex!: number;
+  selectedStyle!: IOrderStyle;
 
   order: IOrder = {
     totalAmount: 0,
-    deliveryDate: '',
+    dueDate: '',
     measurement: '',
     totalItems: 0,
     status: OrderStatus.PENDING,
@@ -126,10 +129,22 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
       this.selectedClient = this.client;
     } else if(this.design) {
       this.order.styles.push({
-        styleId: this.design._id!,
-        design: this.design,
-        sizes: [],
+        amount: this.design.amount,
+        description: this.design.description,
+        dueDate: '',
+        images: this.design.images,
+        type: this.design.type,
+        name:  this.design.name,
+        selectedSizes: [],
+        //design: data,
+        sizes: this.design.sizes,
         quantity: 1, 
+      });
+    }
+
+    if(this.order.styles.length > 0) {
+      this.order.styles.forEach((style: IOrderStyle) => {
+        this.order.totalAmount += (style.amount * style.quantity);
       });
     }
     this.cdr.markForCheck();
@@ -189,9 +204,15 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     const { data } = await modal.onWillDismiss();
     if (data) {
       this.order.styles.push({
-        styleId: data._id,
-        design: data,
-        sizes: [],
+        amount: data.amount,
+        description: data.description,
+        dueDate: '',
+        images: data.images,
+        type: data.type,
+        name:  data.name,
+        selectedSizes: [],
+        //design: data,
+        sizes: data.sizes,
         quantity: 1, 
       });
       this.order.totalAmount += data.amount
@@ -211,31 +232,36 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     const { data } = await modal.onWillDismiss();
     if (data) {
       this.order.styles.push({
-        styleId: data._id,
-        design: data,
-        sizes: [],
+        amount: data.amount,
+        description: data.description,
+        dueDate: '',
+        images: data.images,
+        type: data.type,
+        name:  data.name,
+        selectedSizes: [],
+        //design: data,
+        sizes: data.sizes,
         quantity: 1, 
       });
 
-      this.order.totalAmount += data.amount
+      this.order.totalAmount += data.amount;
     }
 
     this.cdr.markForCheck();
   }
 
-  async viewDesignDetails(design: IDesign) {
+  async viewDesignDetails(design: IOrderStyle) {
     const modal = await this.modalCtrl.create({
       component: DesignView,
       canDismiss: true,
       componentProps: {
-        design: design
+        design: design,
+        dataType: DataTypes.ORDER
       }
     });
 
     await modal.present();
   }
-
-
 
   ngOnInit() {
   }
@@ -257,36 +283,65 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     this.cdr.markForCheck();
   }
 
-  presentToast() {
+  presentToast(msg: string, color?: 'primary' | 'danger' | 'warning', position?: 'top' | 'bottom') {
     this.toastCtrl.create({
-      color: 'primary',
+      color: color ?? 'primary',
       animated: true,
       duration: 4000,
-      position: 'top'
+      position: position ?? 'top',
+      message: msg
     });
   }
 
-  decrementQuantity(index: number) {
-    this.order.styles[index].quantity--;
-    this.order.totalAmount -= this.order.styles[index].design.amount;
+  decrementQuantity(index?: number) {
+    let position;
+
+    if(index) {
+      position = index;
+    } else {
+      position = this.selectedStyleIndex;
+    }
+  
+    this.order.totalAmount -= this.order.styles[position].amount;
+
+    if(this.order.styles[position].quantity == 1) {
+      this.order.styles.splice(position, 1);
+    } else {
+      this.order.styles[position].quantity--;
+    }
+    this.cdr.markForCheck();
   }
 
-  incrementQuantity(index: number) {
-    this.order.styles[index].quantity++;
-    this.order.totalAmount += this.order.styles[index].design.amount;
+  incrementQuantity(index?: number) {
+    let position;
+
+    if(index) {
+      position = index;
+    } else {
+      position = this.selectedStyleIndex;
+    }
+
+    this.order.styles[position].quantity++;
+    this.order.totalAmount += this.order.styles[position].amount;
   }
 
   async selectSize(index: number, sizes: any) {
-    this.activeAvailableStyleSizesIndex = index;
-    this.styleAvailableSizes = sizes;
     const modal = await this.modalCtrl.create({
       component: SizesModal,
       componentProps: {
-        sizes: this.styleAvailableSizes
+        sizes: sizes,
+        selectedSizes: this.order.styles[index].selectedSizes
       }
     });
 
     await modal.present();
+
+    //Listen for the selected sizes payload when dismissed
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      this.order.styles[index].selectedSizes = data;
+      this.cdr.markForCheck();
+    }
   }
 
   async openMeasurementModal() {
@@ -324,17 +379,25 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     this.cdr.markForCheck();
   }
 
+  openModalSheet(index: number, style: IOrderStyle) {
+    this.selectedStyle = style;
+    this.selectedStyleIndex = index;
+
+    this.modalSheet.present();
+  }
+
   submit() {
     this.order.client = this.selectedClient._id;
-    this.order.styles.forEach((item) => {
+    this.order.styles.forEach((item: IOrderStyle) => {
       this.order.totalItems += item.quantity
     });
 
-    console.log(this.order);
+    //console.log(this.order);
     
     this.orderService.createOrder(this.order).subscribe({
       next: (res: any) => {
-        console.log(res);
+        this.presentToast(res.msg);
+        this.router.navigate(['app/orders']);
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);

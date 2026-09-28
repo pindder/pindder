@@ -13,8 +13,8 @@
         @for(size of sizes; track $index;){
         <ion-item>
             <ion-checkbox 
-            [checked]="sizes.includes(size)" 
-            (ionChange)="checkboxChanged($event, size)">
+            [checked]="selectedSizes.includes(size)" 
+            (ionChange)="checkboxChanged(size)">
             {{ size }}<br />
             </ion-checkbox>
         </ion-item>

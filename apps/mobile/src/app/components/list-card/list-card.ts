@@ -3,7 +3,7 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { ViewWillEnter, IonIcon, AlertController, ToastController, IonLabel, 
   IonButtons, IonButton, IonBadge } from '@ionic/angular';
-import { DataTypes, IDesign, IOrderItem, IResponse } from '@pindder/contracts';
+import { DataTypes, IDesign, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DesignService } from '../../services/design.service';
@@ -33,6 +33,7 @@ export class ListCard implements ViewWillEnter{
   private designService = inject(DesignService);
 
   dataTypes = DataTypes;
+  orderStatuses = OrderStatus;
 
   ionViewWillEnter(): void { }
 

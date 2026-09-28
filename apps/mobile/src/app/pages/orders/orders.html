@@ -3,6 +3,11 @@
     <ion-buttons slot="start">
       <ion-back-button default-href="#"></ion-back-button>
     </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="openActionSheet()">
+          <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>Orders</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -14,41 +19,155 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-segment [scrollable]="true" value="call">
-    <ion-segment-button value="call" contentId="first">
-      <ion-label>All</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="globe" contentId="second">
-      <ion-label>Pending</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="basket" contentId="third">
-      <ion-label>Ongoing</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="barbell" contentId="fourth">
-      <ion-label>Completed</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <div class="p-3">
+    <ion-segment 
+    [scrollable]="true" 
+    value="pending"
+    [(ngModel)]="activeSegment" 
+    (ionChange)="onSegmentChanged($event)">
+      <ion-segment-button value="all" contentId="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pending" contentId="pending">
+        <ion-label>Pending</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="cancelled" contentId="cancelled">
+        <ion-label>Cancelled</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="completed" contentId="completed">
+        <ion-label>Completed</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 
   <ion-segment-view>
-    <ion-segment-content class="p-3" id="first">
-      @if(orders.length == 0){
+    <ion-segment-content id="all">
+      @if(!segmentData){
         <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
       } @else{
-        @for(order of orders; track order._id){
-          <app-list-card [dataType]="dataTypes.ORDER" [order]="order"></app-list-card>
+        <ion-searchbar 
+          placeholder="Search orders..." 
+          [debounce]="0" 
+          (ionInput)="onSearchInput($event)"
+        ></ion-searchbar>
+        @for(order of segmentData | async; track order._id){
+          <ion-list inset="true">
+            <app-list-card 
+            [dataType]="dataTypes.ORDER" 
+            [order]="order"
+            >
+            </app-list-card>
+          </ion-list>
         }
       }
+      @if (segmentData | async; as orders) {
+        <ion-searchbar 
+          placeholder="Search orders..." 
+          [debounce]="0" 
+          (ionInput)="onSearchInput($event)"
+        ></ion-searchbar>
+
+        <ion-list inset="true">
+          @for (order of orders; track order._id) {
+            <app-list-card 
+              [dataType]="dataTypes.ORDER" 
+              [order]="order"
+            >
+            </app-list-card>
+          } @empty {
+            <app-empty-state 
+              [parentComponent]="dataTypes.ORDER" 
+              (action)="openNewOrderModal()"
+            >
+            </app-empty-state>
+          }
+        </ion-list>
+      }
     </ion-segment-content>
-    <ion-segment-content class="p-3" id="second">
-      <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
+    <ion-segment-content id="pending">
+      @if (segmentData | async; as orders) {
+        <ion-searchbar 
+          placeholder="Search orders..." 
+          [debounce]="0" 
+          (ionInput)="onSearchInput($event)"
+        ></ion-searchbar>
+
+        <ion-list inset="true">
+          @for (order of orders; track order._id) {
+            <app-list-card 
+              [dataType]="dataTypes.ORDER" 
+              [order]="order"
+            >
+            </app-list-card>
+          } @empty {
+            <app-empty-state 
+              [parentComponent]="dataTypes.ORDER" 
+              (action)="openNewOrderModal()"
+            >
+            </app-empty-state>
+          }
+        </ion-list>
+      }
     </ion-segment-content>
-    <ion-segment-content class="p-3" id="third">
-      <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
+    <ion-segment-content id="cancelled">
+      @if (segmentData | async; as orders) {
+        <ion-searchbar 
+          placeholder="Search orders..." 
+          [debounce]="0" 
+          (ionInput)="onSearchInput($event)"
+        ></ion-searchbar>
+
+        <ion-list inset="true">
+          @for (order of orders; track order._id) {
+            <app-list-card 
+              [dataType]="dataTypes.ORDER" 
+              [order]="order"
+            >
+            </app-list-card>
+          } @empty {
+            <app-empty-state 
+              [parentComponent]="dataTypes.ORDER" 
+              (action)="openNewOrderModal()"
+            >
+            </app-empty-state>
+          }
+        </ion-list>
+      }
     </ion-segment-content>
-    <ion-segment-content class="p-3" id="fourth">
-      <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
+    <ion-segment-content id="completed">
+      @if (segmentData | async; as orders) {
+        <ion-searchbar 
+          placeholder="Search orders..." 
+          [debounce]="0" 
+          (ionInput)="onSearchInput($event)"
+        ></ion-searchbar>
+
+        <ion-list inset="true">
+          @for (order of orders; track order._id) {
+            <app-list-card 
+              [dataType]="dataTypes.ORDER" 
+              [order]="order"
+            >
+            </app-list-card>
+          } @empty {
+            <app-empty-state 
+              [parentComponent]="dataTypes.ORDER" 
+              (action)="openNewOrderModal()"
+            >
+            </app-empty-state>
+          }
+        </ion-list>
+      }
     </ion-segment-content>
   </ion-segment-view>
+
+  <!-- Action sheet menu-->
+   <ion-action-sheet
+    [isOpen]="isActionSheetOpen"
+    header="Quick Actions"
+    [buttons]="actionSheetButtons"
+    (didDismiss)="isActionSheetOpen = false">
+  </ion-action-sheet>
 
   <ion-modal #modal [presentingElement]="presentingElement">
     <ng-template>

@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Query,
   Req,
@@ -27,14 +26,14 @@ export class OrderController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll(@Req() req: any) {
-    return this.orderService.findAll(req.user.sub);
+  findAll(@Query('status') status: string, @Req() req: any) {
+    return this.orderService.findAll(req.user.sub, status);
   }
 
   @UseGuards(AuthGuard)
-  @Get('filter')
-  search(@Query('status') query: string) {
-    return this.orderService.filterByStatus(query);
+  @Get('search')
+  search(@Query('q') query: string) {
+    return this.orderService.search(query);
   }
 
   @UseGuards(AuthGuard)
@@ -48,8 +47,8 @@ export class OrderController {
     return this.orderService.update(+id, updateOrderDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(id);
+  @Patch(':id/cancel')
+  cancel(@Param('id') id: string) {
+    return this.orderService.cancelOrder(id);
   }
 }

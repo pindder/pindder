@@ -16,15 +16,15 @@ import { IonContent, IonItem, IonList,
 })
 export class SizesModal {
   @Input() sizes!: string [];
+  @Input() selectedSizes!: string[];
 
   private modalCtrl = inject(ModalController);
 
-  checkboxChanged($event: CustomEvent, size: string) {
-    this.sizes.push(size);
-    console.log(this.sizes);
+  checkboxChanged(size: string) {
+    this.selectedSizes.push(size);
   }
 
   dismissModal() {
-    this.modalCtrl.dismiss(null, 'cancel');
+    this.modalCtrl.dismiss(this.selectedSizes, 'sizes');
   }
 }

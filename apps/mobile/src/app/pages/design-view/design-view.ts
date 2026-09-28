@@ -2,12 +2,13 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@an
 import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, 
   IonContent, IonButton, IonIcon, IonAlert, ViewWillEnter, IonInput, 
   IonTextarea, IonSelect, IonList, IonSelectOption, IonItem, 
-  IonActionSheet
+  IonActionSheet,
+  ModalController
 } from '@ionic/angular';
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DesignTypes, IDesign, Sizes } from '@pindder/contracts';
+import { DataTypes, DesignTypes, IDesign, Sizes } from '@pindder/contracts';
 import { forkJoin } from 'rxjs';
 import { Camera } from '@capacitor/camera';
 import { FormsModule } from '@angular/forms';
@@ -24,12 +25,14 @@ import { AppService } from '../../services/app.service';
 })
 export class DesignView implements ViewWillEnter, OnInit{
   @Input() design!: IDesign;
+  @Input() dataType!: string;
 
   private designService = inject(DesignService);
   private ar = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private appService = inject(AppService);
   private router = inject(Router);
+  private modalCtrl = inject(ModalController);
 
   style_id = signal<string>("");
   //design!: IDesign;
@@ -68,6 +71,7 @@ export class DesignView implements ViewWillEnter, OnInit{
     },
   ];
 
+  dataTypes = Object.keys(DataTypes);
   designTypes = Object.keys(DesignTypes);
   sizes = Object.keys(Sizes);
 
@@ -116,6 +120,10 @@ export class DesignView implements ViewWillEnter, OnInit{
 
   async openActionSheet() {
     this.isActionSheetOpen.set(true);
+  }
+
+  dismissModal() {
+    this.modalCtrl.dismiss(null, 'cancel');
   }
 
   submit() {}

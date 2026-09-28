@@ -24,13 +24,13 @@
         </div>
     } @else {
         <!-- Results List -->
-        @if (searchResults.length > 0) {
+        @if (searchResults$) {
             <ion-list lines="full">
-                @for (client of searchResults; track client._id) {
+                @for (client of searchResults$ | async; track client._id) {
                     <ion-item button (click)="selectClient(client)">
                         <ion-label>
                             <h2>{{ client.fullname || client.firstname + ' ' + client.lastname }}</h2>
-                            <p>{{ client.phone || client.email }}</p>
+                            <p>{{ client.phoneNo || client.email }}</p>
                         </ion-label>
                         <!-- <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon> -->
                     </ion-item>

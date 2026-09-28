@@ -1,15 +1,20 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton } from "@ionic/angular";
+import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, 
+  IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, 
+  IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton,  
+} from "@ionic/angular";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { IDesign, IOrderItem, IResponse } from '@pindder/contracts';
+import { IDesign, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
 import { ActivatedRoute } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-order-view',
   imports: [IonHeader, IonItemOptions, IonLabel, IonAvatar, IonItemSliding,
     IonIcon, IonItem, IonList, IonButton, IonButtons, IonListHeader,
-    IonTitle, IonToolbar, IonContent, IonItemOption, IonBackButton],
+    IonTitle, IonToolbar, IonContent, IonItemOption, IonBackButton,
+    IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe
+  ],
   templateUrl: './order-view.html',
   styleUrl: './order-view.css',
 })
@@ -21,6 +26,7 @@ export class OrderView implements ViewWillEnter, OnInit{
 
   order!: IOrderItem | any;
   client_id!: string;
+  orderStatuses = OrderStatus;
 
   ionViewWillEnter(): void {
     const client = this.ar.snapshot.paramMap.get('id');
@@ -56,5 +62,14 @@ export class OrderView implements ViewWillEnter, OnInit{
 
   viewDesignDetails(design?: IDesign) {}
 
-  cancelOrder() {}
+  cancelOrder() {
+    this.orderService.cancelOrder(this.order._id).subscribe({
+      next: (res) => {
+        console.log(res.data);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
+  }
 }

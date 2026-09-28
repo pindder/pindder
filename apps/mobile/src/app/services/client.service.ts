@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -44,7 +44,9 @@ export class ClientService {
   }
 
   searchClient(query: string): Observable<any> {
-    return this.http.get<any[]>(`${environment.apiUrl}/clients/search?q=${encodeURIComponent(query)}`);
+    const params = new HttpParams().set('q', query);
+
+    return this.http.get<any[]>(`${environment.apiUrl}/clients/search`, { params });
   }
   removeClient(client_id: string): Observable<IResponse<string>> {
     return this.http.delete<IResponse<string>>(`${environment.apiUrl}/clients/${client_id}`);
