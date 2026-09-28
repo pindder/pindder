@@ -19,15 +19,19 @@
         </div>
         <div class="flex flex-col items-center">
             <p class="font-semibold text-lg">{{ order.totalAmount.toLocaleString() }}</p>
+            @if(order.status == orderStatuses.CANCELLED){
+            <ion-badge color="danger">{{ order.status }}</ion-badge>
+            }@else if(order.status === orderStatuses.PENDING) {
             <ion-badge color="warning">{{ order.status }}</ion-badge>
+            }
         </div>
     </div>
 }
 @else if(dataType === dataTypes.DESIGN) {
     <div class="flex flex-col gap-2 p-2">
-        <img alt="style-img" [src]="design.images[0]" />
+        <img alt="style-img" [src]="design.images[0]" (click)="editDesign()"/>
         <div class="flex justify-between">
-            <ion-label>
+            <ion-label (click)="editDesign()">
                 <h2>{{ design.name }}</h2>
                 <p>{{ design.amount.toLocaleString() }}</p>
             </ion-label>

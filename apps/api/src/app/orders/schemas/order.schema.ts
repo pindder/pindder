@@ -1,42 +1,71 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { Date, HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 //import { Measurement } from "../../measurements/schemas/measurement.schema";
-import { DeliveryMethods, OrderStatus } from "@pindder/contracts";
+import { DeliveryMethods, DesignTypes, OrderStatus, Sizes } from "@pindder/contracts";
 import { Client } from "../../clients/schemas/client.schema";
 import { User } from "../../users/schemas/user.schema";
 import { Tailor } from "../../tailors/schemas/tailor.schema";
-import { Design } from "../../designs/schemas/design.schema";
 
 export type OrderDocument = HydratedDocument<Order>;
 
+@Schema({})
+export class OrderStyle {
+    @Prop({ type: String, required: true })
+    name!: string;
+
+    @Prop({ type: String, maxLength: 1000 })
+    description?: string;
+
+    @Prop({ type: [String], required: true })
+    images!: [string];
+
+    @Prop({ type: String, required: true, enum: DesignTypes })
+    type!: string;
+
+    @Prop({ type: [String], enum: Sizes, required: true })
+    sizes!: [string];
+
+    @Prop({ type: [String], required: true })
+    selectedSizes!: [string];
+
+    @Prop({ type: Date })
+    dueDate!: Date; 
+
+    @Prop({ type: Number })
+    amount!: number;
+
+    @Prop({ type: Number })
+    quantity!: number;
+
+    @Prop({ type: String })
+    note?: string;
+}
+
 @Schema({ timestamps: true })
 export class Order {
+    @Prop({ type: String, required: true})
+    orderId!: string;
+
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Client })
-    client?: Client;
+    client?: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User })
-    user?: User
+    user?: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
-    tailor?: Tailor;
+    tailor?: string;
 
-    @Prop({ type: [Design],  })
-    styles!: Design[];
+    @Prop({ type: [OrderStyle] })
+    styles!: OrderStyle[];
 
     @Prop({ type: mongoose.Schema.Types.Date, required: true })
-    deliveryDate!: Date;
+    dueDate!: Date;
 
     @Prop({ type: String, required: true, enum: DeliveryMethods, default: DeliveryMethods.PICKUP })
     deliveryMethod!: string;
 
     // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Measurement })
     // measurement?: Measurement;
-
-    @Prop({ type: [String], required: true })
-    sizes?: string;
-
-    @Prop({ type: Number, required: true, default: 1 })
-    quantity!: number;
 
     @Prop({ type: String, required: true, enum: Object.values(OrderStatus), default: OrderStatus.PENDING })
     status!: string;

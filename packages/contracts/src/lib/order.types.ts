@@ -1,5 +1,4 @@
 import { IClient } from "./client.types";
-import { IDesign } from "./design.types";
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -9,11 +8,11 @@ export enum OrderStatus {
 }
 
 export interface IOrder {
-  id?: string;
+  _id?: string;
   client: string;
   tailor?: string;
   styles: IOrderStyle[];
-  deliveryDate: string | Date;
+  dueDate: string | Date;
   measurement?: string;
   address?: string;
   deliveryMethod?: string;
@@ -29,7 +28,7 @@ export interface IOrderItem {
   tailor: any;
   user: any;
   styles: IOrderStyle[];
-  deliveryDate: string | Date;
+  dueDate: string | Date;
   measurement?: string;
   address?: string;
   deliveryMethod?: string;
@@ -43,9 +42,14 @@ export interface IOrderItem {
 
 export interface IOrderStyle {
   _id?: string;
-  styleId: string;
-  design: IDesign;
+  name: string;
+  description: string;
+  images: any[];
+  type: string;
+  dueDate: string;
+  amount: number;
   sizes?: string[];
+  selectedSizes: string[];
   quantity: number;
   note?: string;
 }

@@ -1,4 +1,4 @@
-<ion-header>
+@if(!dataType){<ion-header>
     <ion-toolbar>
         <ion-buttons slot="start">
             <ion-back-button default-href="/app/styles"></ion-back-button>
@@ -11,13 +11,25 @@
         <ion-title>Style</ion-title>
     </ion-toolbar>
 </ion-header>
+}@else {
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Style</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+}
 
 <ion-content [fullscreen]="true">
-    <ion-header collapse="condense">
+    @if(!dataType){<ion-header collapse="condense">
         <ion-toolbar>
             <ion-title size="large">style</ion-title>
         </ion-toolbar>
-    </ion-header>
+    </ion-header>}
 
     @if(design){
         <!-- <div class="p-3 image-grid"> -->
