@@ -1,8 +1,5 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, 
-  IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, 
-  IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton,  
-} from "@ionic/angular";
+import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, IonNote } from "@ionic/angular";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IDesign, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
@@ -13,8 +10,7 @@ import { DatePipe } from '@angular/common';
   imports: [IonHeader, IonItemOptions, IonLabel, IonAvatar, IonItemSliding,
     IonIcon, IonItem, IonList, IonButton, IonButtons, IonListHeader,
     IonTitle, IonToolbar, IonContent, IonItemOption, IonBackButton,
-    IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe
-  ],
+    IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe, IonNote],
   templateUrl: './order-view.html',
   styleUrl: './order-view.css',
 })
