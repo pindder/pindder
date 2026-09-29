@@ -28,8 +28,8 @@ export class DesignService {
     return this.http.post<IResponse<IDesign>>(`${environment.apiUrl}/designs`, design);
   }
 
-  fetchDesigns(): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/designs`);
+  fetchDesigns(): Observable<IResponse<any>> {
+    return this.http.get<IResponse<any>>(`${environment.apiUrl}/designs`);
   }
 
   fetchDesign(design_id: string): Observable<any> {
@@ -38,6 +38,10 @@ export class DesignService {
 
   searchDesign(query: string): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/designs/search?q=${query}`);
+  }
+
+  updateDesign(design_id: string, design: IDesign): Observable<IResponse<any>> {
+    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/designs/${design_id}`, design);
   }
 
   removeDesign(design_id: string): Observable<any> {

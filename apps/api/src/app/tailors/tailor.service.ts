@@ -4,6 +4,8 @@ import { UpdateTailorDto } from './dto/update-tailor.dto';
 
 @Injectable()
 export class TailorService {
+  constructor() {}
+  
   create(createTailorDto: CreateTailorDto) {
     return 'This action adds a new tailor';
   }

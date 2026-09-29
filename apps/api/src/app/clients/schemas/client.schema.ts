@@ -1,12 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 import { Tailor } from '../../tailors/schemas/tailor.schema';
+import { randomUUID } from 'crypto';
 
 export type ClientDocument = HydratedDocument<Client>;
 
-@Schema({ timestamps: true })
-export class Client {
+@Schema()
+export class ClientSnapshot {
+    @Prop({ type: String, required: true })
+    _id!: string;
+
     @Prop({ type: String })
     fullname!: string;
 
@@ -16,19 +20,58 @@ export class Client {
     @Prop({ required: true })
     lastname?: string;
 
-    @Prop({ type: String, required: true, unique: true, index: true })
+    @Prop({ type: String, required: true })
     email!: string;
 
     @Prop({ type: String, required: true })
     phoneNo!: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
+    @Prop({ type: String, required: true })
     referee?: string;
 
     @Prop({ type: String, required: true })
     gender!: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User })
+    @Prop({ type: String })
+    user?: string;
+}
+
+@Schema({ timestamps: true })
+export class Client {
+    @Prop({ 
+        type: String, 
+        required: true, 
+        default: () => randomUUID() 
+    })
+    _id!: string;
+
+    @Prop({ type: String })
+    fullname!: string;
+
+    @Prop({ required: true })
+    firstname?: string;
+
+    @Prop({ required: true })
+    lastname?: string;
+
+    @Prop({ 
+        type: String, 
+        required: true, 
+        unique: true, 
+        index: true 
+    })
+    email!: string;
+
+    @Prop({ type: String, required: true })
+    phoneNo!: string;
+
+    @Prop({ type: String, ref: () => Tailor })
+    referee?: string;
+
+    @Prop({ type: String, required: true })
+    gender!: string;
+
+    @Prop({ type: String, ref: () => User })
     user?: string;
 }
 

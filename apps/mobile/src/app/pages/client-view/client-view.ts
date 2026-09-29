@@ -4,12 +4,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonContent, IonList, IonItem, IonInput, 
   ViewWillEnter, IonButton, IonSelect, IonSelectOption, IonButtons, 
   IonTitle, IonBackButton, IonModal, IonSpinner, IonIcon, IonActionSheet, 
-  IonLabel 
+  IonLabel, 
+  ModalController
 } from '@ionic/angular';
-import { Gender, IClient } from '@pindder/contracts';
+import { Gender, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Measurement } from '../../components/measurement/measurement';
+import { PrimaryButton } from '../../components/primary-button/primary-button';
+import { ClientOrders } from '../../components/client-orders/client-orders';
 
 @Component({
   imports: [IonActionSheet, IonIcon, IonSpinner, IonButtons, IonBackButton, IonTitle,
@@ -17,7 +20,7 @@ import { Measurement } from '../../components/measurement/measurement';
     IonList, IonItem, IonInput, FormsModule,
     IonButton, IonSelect, IonSelectOption,
     IonModal, IonSpinner, IonIcon,
-    IonModal, IonIcon, Measurement, IonLabel],
+    IonModal, IonIcon, Measurement, IonLabel, PrimaryButton],
   templateUrl: './client-view.html',
   styleUrl: './client-view.css',
 })
@@ -28,6 +31,7 @@ export class ClientView implements ViewWillEnter, OnInit{
   private cdr = inject(ChangeDetectorRef);
   private clientService = inject(ClientService);
   private router = inject(Router);
+  private modalCtrl = inject(ModalController);
 
   client!: IClient;
   client_id!: string;
@@ -57,9 +61,9 @@ export class ClientView implements ViewWillEnter, OnInit{
       },
     },
     {
-      text: 'Remove Client',
+      text: 'Delete Client',
       icon: 'trash-outline',
-      role: 'destructive',
+      // role: 'destructive',
       handler: () => {
     
       },
@@ -78,10 +82,10 @@ export class ClientView implements ViewWillEnter, OnInit{
 
   fetchClient() {
     this.clientService.fetchClient(this.client_id).subscribe({
-      next: (res) => {
-        this.client = res.client;
-        this.measurements = res.measurements;
-        console.log(res);
+      next: (res: IResponse<any>) => {
+        this.client = res.data;
+        this.measurements = res.data.measurements;
+        //console.log(res.data);
         this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
@@ -98,7 +102,37 @@ export class ClientView implements ViewWillEnter, OnInit{
     this.modal.present();
   }
 
-  submit() {
+  async openOrdersModal() {
+    const modal = await this.modalCtrl.create({
+      component: ClientOrders,
+      componentProps: {
+        client_id: this.client_id
+      }
+    });
 
+    await modal.present();
+
+    //Listen for the dismiss 
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      this.router.navigate(['app/orders/'], {
+        queryParams: {
+          client: data
+        }
+      });
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  submit() {
+    this.clientService.updateClient(this.client._id!, this.client).subscribe({
+      next: (res: IResponse<any>) => {
+        this.client = res.data;
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    });
   }
 }

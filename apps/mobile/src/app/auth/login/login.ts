@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonInput,
- } from "@ionic/angular";
+import { IonInput, IonItem } from "@ionic/angular";
 import { FormsModule } from '@angular/forms';
 import { ILogin } from '@pindder/contracts';
 
@@ -9,6 +8,7 @@ import { ILogin } from '@pindder/contracts';
   imports: [
     IonInput,
     FormsModule,
+    IonItem
 ],
   templateUrl: './login.html',
   styleUrl: './login.css',

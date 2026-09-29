@@ -1,1 +1,31 @@
-<p>client-orders works!</p>
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            Client Orders
+        </ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="p-2">
+        @for(order of orders; track order._id) {
+            <app-list-card 
+                [dataType]="dataTypes.ORDER" 
+                [order]="order"
+                (action)="viewOrder($event)"
+            >
+            </app-list-card>
+        } @empty {
+            <app-empty-state 
+                [parentComponent]="dataTypes.ORDER" 
+                (action)="dismissModal(true)"
+            >
+            </app-empty-state>
+        }
+    </div>
+</ion-content>

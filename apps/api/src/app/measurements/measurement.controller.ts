@@ -48,6 +48,6 @@ export class MeasurementController {
   @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.measurementService.remove(+id);
+    return this.measurementService.remove(id);
   }
 }

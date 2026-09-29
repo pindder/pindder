@@ -45,8 +45,11 @@ export class DesignController {
 
   @UseGuards(AuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDesignDto: UpdateDesignDto) {
-    return this.designService.update(+id, updateDesignDto);
+  update(
+    @Param('id') id: string, 
+    @Body() updateDesignDto: UpdateDesignDto
+  ) {
+    return this.designService.update(id, updateDesignDto);
   }
 
   @UseGuards(AuthGuard)

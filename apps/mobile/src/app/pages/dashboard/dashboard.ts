@@ -178,6 +178,14 @@ export class Dashboard implements ViewWillEnter, OnInit{
     //console.log(this.profile);
   }
 
+  async openModal() {
+    const modal = await this.modalCtrl.create({
+      component: NewClient
+    });
+
+    await modal.present();
+  }
+
   async openActionSheet() {
     this.isActionSheetOpen.set(true);
   }

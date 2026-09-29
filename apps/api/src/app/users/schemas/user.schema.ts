@@ -5,8 +5,41 @@ import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
+@Schema()
+export class UserSnapshot {
+    @Prop({ type: String, required: true })
+    _id!: string;
+    
+    @Prop({ required: true })
+    firstname?: string;
+
+    @Prop({ required: true })
+    lastname?: string;
+
+    @Prop({ type: String, required: true })
+    username!: string;
+
+    @Prop({ type: String, required: true })
+    email!: string;
+
+    @Prop({ type: String, required: true })
+    phoneNo!: string;
+
+    @Prop({ type: String, required: true })
+    gender!: string;
+
+    @Prop({ type: String, required: true })
+    accountType!: string;
+
+    @Prop({ type: String, required: true })
+    status!: string;
+}
+
 @Schema({ timestamps: true })
 export class User {
+  @Prop({ type: String, required: true })
+  _id!: string;
+
   @Prop({ required: true })
   firstname?: string;
 

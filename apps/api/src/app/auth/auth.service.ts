@@ -39,11 +39,11 @@ export class AuthService {
       const hasToken = await this.sharedService.hasValidToken(tailor._id);
 
       if (hasToken) {
-        token = await this.sharedService.updateToken(tailor._id, TokenTypes.CODE);
+        token = await this.sharedService.updateToken(tailor.id, TokenTypes.CODE);
       } else {
         token = await this.sharedService.createToken(
           AccountTypes.TAILOR, 
-          tailor._id, 
+          tailor.id, 
           TokenTypes.CODE
         );
       }
@@ -169,7 +169,7 @@ export class AuthService {
 
       // check for the associated acct on the token against all acctTypes
       if(token.accountType === AccountTypes.TAILOR) {
-        acct = await this.tailorModel.findById(token.tailor);
+        acct = await this.tailorModel.findOne({ _id: token.tailor });
       } 
       else if(token.accountType === AccountTypes.USER) {
         acct = await this.userModel.findById(token.user);

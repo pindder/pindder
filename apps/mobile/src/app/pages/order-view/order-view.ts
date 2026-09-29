@@ -26,7 +26,7 @@ export class OrderView implements ViewWillEnter, OnInit{
 
   ionViewWillEnter(): void {
     const client = this.ar.snapshot.paramMap.get('id');
-    console.log(client);
+    
     if(client) {
       this.client_id = client;
       this.fetchOrder();

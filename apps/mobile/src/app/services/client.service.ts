@@ -14,30 +14,42 @@ export class ClientService {
     return this.http.post<IResponse<IClient>>(`${environment.apiUrl}/clients`, client);
   }
 
-  fetchClients(): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/clients`);
+  fetchClients(): Observable<IResponse<any>> {
+    return this.http.get<IResponse<any>>(`${environment.apiUrl}/clients`);
   }
 
-  fetchClient(client_id: string): Observable<any> {
-    return this.http.get<any>(
-      `${environment.apiUrl}/clients/${client_id}`
-    ).pipe(
-      switchMap((client) => {
-        // Fetch measurements using client.measurementId
-        return this.http.get<any>(`${environment.apiUrl}/measurements/${client._id}`).pipe(
-          map((measurements) => ({
-            client,
-            measurements
+  fetchClient(client_id: string): Observable<IResponse<any>> {
+    return this.http.get<IResponse<any>>(`${environment.apiUrl}/clients/${client_id}`).pipe(
+      switchMap((clientRes: IResponse<any>) => {
+        // Safe check if client payload exists
+        const clientData = clientRes?.data;
+        if (!clientData) {
+          return of(clientRes);
+        }
+
+        // Use client_id or clientData.id (matching your UUID strategy)
+        const targetId = clientData.id || clientData._id || client_id;
+
+        return this.http.get<IResponse<any>>(`${environment.apiUrl}/measurements/${targetId}`).pipe(
+          map((measurementRes: IResponse<any>) => ({
+            ...clientRes,
+            data: {
+              ...clientData,
+              measurements: measurementRes.data ?? null,
+            },
           })),
           catchError((error) => {
-          console.warn('Failed to load measurements for client:', client._id, error);
-          
-          // Return the client with a safe fallback for measurements
-          return of({
-            client,
-            measurements: null // Or { measurements: {} } depending on your schema
-          });
-        })
+            console.warn(`Failed to load measurements for client ${targetId}:`, error);
+
+            // Preserve client payload while falling back cleanly for measurements
+            return of({
+              ...clientRes,
+              data: {
+                ...clientData,
+                measurements: null,
+              },
+            });
+          })
         );
       })
     );
@@ -50,6 +62,10 @@ export class ClientService {
   }
   removeClient(client_id: string): Observable<IResponse<string>> {
     return this.http.delete<IResponse<string>>(`${environment.apiUrl}/clients/${client_id}`);
+  }
+
+  updateClient(client_id: string, client: IClient): Observable<IResponse<any>> {
+    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/clients/${client_id}`, client);
   }
 
   createMeasurement(measurement: IMeasurement): Observable<any> {

@@ -7,10 +7,8 @@ export class CreateMeasurementDto {
     _id?: string;
 
     @IsOptional()
-    @IsMongoId()
     client?: string; 
 
-    @IsMongoId()
     @IsOptional()
     user?: string;
 

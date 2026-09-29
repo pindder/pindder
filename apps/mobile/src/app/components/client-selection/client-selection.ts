@@ -3,11 +3,12 @@ import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angula
 import { IonContent, IonIcon, IonItem, IonList, IonSearchbar, IonSpinner, ModalController, ViewWillEnter,
   IonLabel, IonTitle, IonToolbar, IonButtons, IonButton, IonHeader
 } from '@ionic/angular';
-import { /*catchError, debounceTime, distinctUntilChanged, of, switchMap, tap, Subscription,*/ Observable, shareReplay, Subject, tap, } from 'rxjs';
+import { /*catchError, debounceTime, distinctUntilChanged, of, switchMap, tap, Subscription,*/ catchError, map, Observable, of, shareReplay, Subject, tap, } from 'rxjs';
 import { ClientService } from '../../services/client.service';
-import { IClient } from '@pindder/contracts';
+import { IClient, IResponse } from '@pindder/contracts';
 import { AppService } from '../../services/app.service';
 import { AsyncPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-client-selection',
@@ -35,11 +36,28 @@ export class ClientSelection implements ViewWillEnter, OnInit, OnDestroy{
     // Set up stream ONCE during component creation
     this.searchResults$ = this.appService.createSearchStream<IClient>(
       this.searchSubject,
-      (query) => this.clientService.searchClient(query),
+      (query) => this.clientService.searchClient(query).pipe(
+        map((res: IResponse<any>) => res.data || []),
+        tap((clients) => {
+          this.searchResults$ = of(clients);
+          console.log('Fetched Clients:', this.searchResults$);
+          this.cdr.markForCheck(); // Trigger change detection when new data arrives
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Fetch Orders Error:', error);
+          this.searchResults$ = of([]); // Reset on error
+          this.cdr.markForCheck();
+          return of([]); // Return empty array to keep search stream alive
+        })
+      ),
       (loading) => {
         this.isLoading = loading;
         this.cdr.markForCheck(); // Trigger change detection for loading state updates
-      }
+      },
+      // Triggered when search bar is CLEARED (query is empty)
+      () => this.clientService.fetchClients().pipe(
+        map((res: IResponse<IClient[]>) => res.data || [])
+      )
     )
     .pipe(
       shareReplay(1), // 👈 Share execution across multiple async pipe subscriptions

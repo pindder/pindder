@@ -64,8 +64,8 @@
                     </ion-avatar>
                     <ion-label>
                         <h2>{{ style.name }}</h2>
-                        <p>{{ style.amount.toLocaleString() }}</p>
-                        <p>{{ style.quantity }}</p>    
+                        <p>unit price: {{ style.amount.toLocaleString() }}</p>
+                        <p>quantity: {{ style.quantity }}</p>    
                     </ion-label>
                 </ion-item>
                 <ion-item-options slot="end">
@@ -79,6 +79,7 @@
         }
     </ion-list>
 
+    <!-- Additional Details-->
     <ion-list [inset]="true">
         <ion-list-header>
             <ion-label>Additional Details</ion-label>
@@ -104,6 +105,33 @@
         </ion-item>
 
         <ion-item>
+            <ion-icon slot="start" name="storefront-outline"></ion-icon>
+            <ion-label>
+                <h2 class="font-bold">{{ order.deliveryMethod }}</h2>
+            </ion-label>
+            <ion-note>
+                <p>delivery method</p>
+            </ion-note>
+        </ion-item>
+    </ion-list>
+
+    <!-- Order Invoice-->
+    <ion-list [inset]="true">
+        <ion-list-header>
+            <ion-label>Invoice</ion-label>
+        </ion-list-header>
+
+        <ion-item button (click)="openMeasurementModal()">
+            <ion-icon slot="start" name="attach-outline"></ion-icon>
+            <ion-label>
+                <h2 class="font-bold text-lg">{{ order.orderId }}</h2>
+            </ion-label>
+            <ion-note>
+                <p>Order ID</p>
+            </ion-note>
+        </ion-item>
+
+        <ion-item button (click)="openMeasurementModal()">
             <ion-icon slot="start" name="cash-outline"></ion-icon>
             <ion-label>
                 <h2 class="font-bold text-lg">{{ order.totalAmount.toLocaleString() }}</h2>
