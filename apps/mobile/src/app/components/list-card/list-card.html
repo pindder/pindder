@@ -1,8 +1,8 @@
 @if(dataType === dataTypes.CLIENT && client){
-    <div class="px-3 flex items-center justify-between border border-left-2">
-        <div (click)="viewClient()" class="">
-            <p class="text-md font-semibold">{{ client.firstname + " " + client.lastname }}</p>
-            <p class="text-sm text-secondary">{{ client.phoneNo }}</p>
+    <div class="p-3 flex items-center justify-between border border-left-2">
+        <div (click)="viewClient()" class="flex flex-col gap-1">
+            <span class="text-md font-semibold">{{ client.firstname + " " + client.lastname }}</span>
+            <span class="text-sm text-secondary">{{ client.phoneNo }}</span>
         </div>
         <div class="flex gap-3 items-center">
             <p class="text-secondary text-xs">{{ client.createdAt | date }}</p>
@@ -11,20 +11,28 @@
     </div>
 } 
 @else if(dataType === dataTypes.ORDER) {
-    <div class="px-3 flex items-center justify-between border border-left-2">
-        <div (click)="viewOrder()" class="">
-            <p class="text-md font-semibold">Client: {{ order.client.fullname! }}</p>
-            <p class="text-sm text-secondary">{{ order.totalItems }} Items</p>
-            <p class="text-sm">Created At: {{ order.createdAt | date}}</p>
+    <div (click)="action.emit(order._id)" class="px-3 pb-3 mb-2 flex flex-col border border-left-2">
+        <div class="flex justify-between items-center">
+            <p class="text-md font-bold">{{ order.orderId }}</p>
+            <div>
+                @if(order.status == orderStatuses.CANCELLED){
+                <ion-badge color="danger">{{ order.status }}</ion-badge>
+                }@else if(order.status === orderStatuses.PENDING) {
+                <ion-badge color="warning">{{ order.status }}</ion-badge>
+                }
+            </div>
         </div>
-        <div class="flex flex-col items-center">
-            <p class="font-semibold text-lg">{{ order.totalAmount.toLocaleString() }}</p>
-            @if(order.status == orderStatuses.CANCELLED){
-            <ion-badge color="danger">{{ order.status }}</ion-badge>
-            }@else if(order.status === orderStatuses.PENDING) {
-            <ion-badge color="warning">{{ order.status }}</ion-badge>
-            }
+        <div class="">
+            <span class="text-md font-semibold">{{ order.client.firstname + ' ' + order.client.lastname }}</span>
+            <div class="flex justify-between">
+                <span class="text-sm text-secondary">{{ order.totalItems }} Items</span>
+                <span class="text-sm">
+                    <ion-icon slot="icon-only" name="calendar-outline"></ion-icon> 
+                    Due: {{ order.createdAt | date}}
+                </span>
+            </div>
         </div>
+        
     </div>
 }
 @else if(dataType === dataTypes.DESIGN) {

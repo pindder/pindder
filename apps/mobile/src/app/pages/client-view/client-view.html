@@ -86,7 +86,7 @@
             </ion-item>
         </ion-list>
         <ion-list [inset]="true">
-            <ion-item button="openOrdersModal()">
+            <ion-item button (click)="openOrdersModal()">
                 <ion-label>
                     View Orders
                 </ion-label>
@@ -95,30 +95,11 @@
 
         <!-- Action Buttons-->
         <div class="flex flex-col gap-2 p-3">
-            @if(!measurements){
-            <ion-button 
-                id="open-modal"
-                type="button"
-                shape="round" 
-                expand="block" 
-                color="light"
-            ><ion-icon name="add-outline"></ion-icon> Add Measurement</ion-button>
-            }@else{
-            <ion-button 
-                id="open-modal"
-                type="button"
-                shape="round" 
-                expand="block" 
-                color="light"
-            ><ion-icon name="create-outline"></ion-icon>Edit Measurement</ion-button>
-            }
-            <ion-button 
-                form="editClientForm"
-                type="submit"
-                shape="round" 
-                expand="block" 
-                color="primary"
-            ><ion-icon slot="start" name="save-outline"></ion-icon>Save Changes</ion-button>
+            <app-primary-button
+            [buttonText]="'Save Changes'" 
+            (click)="submit()" 
+            icon="save-outline"
+            ></app-primary-button>
         </div>
 
         <!-- Measurements Modal-->

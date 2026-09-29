@@ -145,12 +145,11 @@
             </ion-list>
 
             <div class="p-3">
-                <ion-button 
-                (click)="submit()"
-                shape="round" 
-                expand="block" 
-                color="primary"
-                ><ion-icon name="save-outline" slot="start"></ion-icon> Save Style</ion-button>
+                <app-primary-button
+                [buttonText]="'Save Style'" 
+                (click)="submit()" 
+                icon="save-outline"
+                ></app-primary-button>
             </div>
         </form>
     }

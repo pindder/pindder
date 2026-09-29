@@ -34,7 +34,13 @@ export class DesignService {
     try {
       const designs = await this.designModel.find({ owner: acct_id });
 
-      return designs;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'List of styles',
+        data: designs
+      }
+
+      return res;
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
     }
@@ -56,7 +62,13 @@ export class DesignService {
         ]
       }).exec();
 
-      return designs;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'List of styles',
+        data: designs
+      }
+
+      return res;
 
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
@@ -79,8 +91,25 @@ export class DesignService {
     }
   }
 
-  update(id: number, updateDesignDto: UpdateDesignDto) {
-    return `This action updates a #${id} design`;
+  async update(id: string, updateDesignDto: UpdateDesignDto) {
+    try {
+      const design = await this.designModel
+      .findByIdAndUpdate(
+        id,
+        updateDesignDto, 
+        { upsert: true, returnDocument: 'after'}
+      );
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Style updated successfully',
+        data: design
+      };
+
+      return res;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
   }
 
   async remove(id: string) {
@@ -89,7 +118,7 @@ export class DesignService {
 
       const res: IResponse<any> = {
         statusCode: 200,
-        msg: `You have successfully deleted the ${design?.name} style.`,
+        msg: `${design?.name} style deleted successfully.`,
         data: design
       }
 

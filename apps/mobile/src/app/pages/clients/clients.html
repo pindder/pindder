@@ -14,17 +14,26 @@
     </ion-toolbar>
   </ion-header>
 
+  <!-- Search bar-->
+  <ion-searchbar 
+    placeholder="Search by name, email, phone..." 
+    [debounce]="0" 
+    (ionInput)="onSearchInput($event)"
+    (ionChange)="onSearchInput($event)"
+  ></ion-searchbar>
+
+  <!-- New Client Button-->
+  <div class="px-2">
+    <app-primary-button
+    [buttonText]="'New Client'" 
+    (click)="openNewClientModal()" 
+    icon="add-outline"
+    ></app-primary-button>
+  </div>
   
-  @if(clients && clients.length > 0) {
-    <div class="p-3">
-      <ion-button 
-      (click)="openNewClientModal()"
-      shape="round" 
-      expand="block" 
-      color="primary"
-      ><ion-icon name="add-outline" slot="start"></ion-icon> New Client</ion-button>
-    </div>
-    <ion-list class="flex flex-col gap-3" inset="true">
+  <!-- Clients list-->
+  @if(clients$ | async; as clients) {
+    <ion-list class="flex flex-col gap-2" inset="true">
       @for(cl of clients; track $index){
         <app-list-card 
         [dataType]="dataTypes.CLIENT" 

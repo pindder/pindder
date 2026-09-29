@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {  IonInput,
+import {  IonInput, IonList, IonItem
   // IonSelect,
   // IonSelectOption
 } from "@ionic/angular";
@@ -8,11 +8,12 @@ import { TailorReg } from '@pindder/contracts';
 
 @Component({
   selector: 'app-register',
-  imports: [
+  imports: [IonList, 
     // IonSelect,
     // IonSelectOption,
     IonInput,
-    FormsModule
+    FormsModule,
+    IonItem
   ],
   templateUrl: './register.html',
   styleUrl: './register.css',

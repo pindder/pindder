@@ -8,18 +8,18 @@ import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataTypes, DesignTypes, IDesign, Sizes } from '@pindder/contracts';
+import { DataTypes, DesignTypes, IDesign, IResponse, Sizes } from '@pindder/contracts';
 import { forkJoin } from 'rxjs';
 import { Camera } from '@capacitor/camera';
 import { FormsModule } from '@angular/forms';
 import { AppService } from '../../services/app.service';
+import { PrimaryButton } from '../../components/primary-button/primary-button';
 
 @Component({
   imports: [IonActionSheet, IonList, IonTextarea, IonInput, IonAlert, IonIcon, IonButton,
     IonHeader, IonToolbar, IonButtons, IonBackButton,
-    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, IonItem, 
-    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule
-  ],
+    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, IonItem,
+    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, PrimaryButton],
   templateUrl: './design-view.html',
   styleUrl: './design-view.css',
 })
@@ -64,7 +64,7 @@ export class DesignView implements ViewWillEnter, OnInit{
     {
       text: 'Remove Style',
       icon: 'trash-outline',
-      role: 'destructive',
+      // role: 'destructive',
       handler: () => {
     
       },
@@ -126,7 +126,17 @@ export class DesignView implements ViewWillEnter, OnInit{
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  submit() {}
+  submit() {
+    this.design.sizes = this.selectedSizes;
+    this.designService.updateDesign(this.design._id!, this.design).subscribe({
+      next: (res: IResponse<any>) => {
+        this.design = res.data;
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    });
+  }
 
   async selectAndUploadMultipleImages() {
     try {

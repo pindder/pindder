@@ -1,15 +1,15 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, 
   IonSegmentButton, IonSegment, IonLabel, IonSegmentView, IonSegmentContent, 
-  ViewWillEnter, IonModal, ModalController, IonList, IonIcon, IonButton, 
+  ViewWillEnter, IonModal, ModalController, IonList, /*IonIcon, IonButton,*/ 
   IonActionSheet,
   IonSearchbar
 } from "@ionic/angular";
 import { EmptyState } from "../../components/empty-state/empty-state";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
-import { DataTypes, IClient, IDesign, IOrder, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DataTypes, IClient, IDesign, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
 import { NewOrder } from '../../components/new-order/new-order';
 import { ClientService } from '../../services/client.service';
 import { DesignService } from '../../services/design.service';
@@ -18,10 +18,12 @@ import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs
 import { FormsModule } from '@angular/forms';
 import { AppService } from '../../services/app.service';
 import { AsyncPipe } from '@angular/common';
+import { PrimaryButton } from '../../components/primary-button/primary-button';
 
 @Component({
   selector: 'app-orders',
-  imports: [IonButton, IonIcon, 
+  imports: [
+    /*IonButton, IonIcon,*/
     FormsModule,
     IonModal,
     IonSegment,
@@ -40,8 +42,9 @@ import { AsyncPipe } from '@angular/common';
     IonList,
     IonActionSheet,
     IonSearchbar,
-    AsyncPipe
-],
+    AsyncPipe, 
+    PrimaryButton
+  ],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
 })
@@ -53,17 +56,15 @@ export class Orders implements ViewWillEnter, OnInit{
   private designService = inject(DesignService);
   private modalCtrl = inject(ModalController);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   private searchSubject = new Subject<string>();
-  //private searchSubscription!: Subscription;
 
   // Set default segment
   activeSegment: string = 'all';
   
   segmentData!: Observable<IOrderItem[]>;
   isLoading: boolean = false;
-  orders$!: Observable<IOrder[]>;
-  searchResults$!: Observable<IOrder[]>;
 
   private ar = inject(ActivatedRoute);
   private appService = inject(AppService);
@@ -106,7 +107,7 @@ export class Orders implements ViewWillEnter, OnInit{
       (query) => this.orderService.searchOrders(query).pipe(
         map((res: IResponse<any>) => res.data || []),
         tap((orders) => {
-          this.segmentData = orders;
+          this.segmentData = of(orders);
           console.log('Fetched Orders:', this.segmentData);
           this.cdr.markForCheck(); // Trigger change detection when new data arrives
         }),
@@ -160,7 +161,7 @@ export class Orders implements ViewWillEnter, OnInit{
 
   fetchOrders(status?: string) {
     this.segmentData = of([]);
-    
+
     this.segmentData = this.orderService.fetchOrders(status)
     .pipe(
       map((res: IResponse<any>) => res.data || []),
@@ -184,10 +185,15 @@ export class Orders implements ViewWillEnter, OnInit{
     // });
   }
 
+  viewOrder(order_id: string) {
+    console.log(order_id);
+    this.router.navigate(['/app/orders/' + order_id ]);
+  }
+
   fetchClient(client_id: string) {
     this.clientService.fetchClient(client_id).subscribe({
-      next: (data) => {
-        this.client = data.client;
+      next: (res: IResponse<any>) => {
+        this.client = res.data;
         this.openNewOrderModal();
       },
       error: (error: HttpErrorResponse) => {

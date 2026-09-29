@@ -6,11 +6,14 @@ import { Order } from './schemas/order.schema';
 import { Model, QueryFilter } from 'mongoose';
 import { IOrderItem, IOrderStyle, IResponse, OrderStatus } from '@pindder/contracts';
 import { Client } from '../clients/schemas/client.schema';
+import { Tailor } from '../tailors/schemas/tailor.schema';
+import { generateCode } from '../shared/helpers';
 // import { OrderStatus } from '@pindder/contracts';
 
 @Injectable()
 export class OrderService {
   constructor(
+    @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     @InjectModel(Client.name) private readonly clientModel: Model<Client>,
     @InjectModel(Order.name) private readonly orderModel: Model<Order>
   ) {}
@@ -20,6 +23,12 @@ export class OrderService {
       const newOrder = new this.orderModel(createOrderDto);
       //console.log(createOrderDto);
 
+      const client = await this.clientModel.findById(createOrderDto.client);
+      const tailor = await this.tailorModel.findById(user_id);
+
+      if(client) newOrder.client = client;
+      if(tailor) newOrder.tailor = tailor;
+
       const styles: any[] = [];
 
       createOrderDto.styles.forEach((style: IOrderStyle) => {
@@ -27,10 +36,16 @@ export class OrderService {
       });
       
       newOrder.styles = styles;
-      newOrder.tailor = user_id;
+      newOrder.orderId = `ORD-${generateCode(12)}`;
       await newOrder.save();
 
-      return newOrder;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Order created successfully',
+        data: newOrder
+      }
+
+      return res;
     } catch(error: any) {
       console.log(error);
       throw new InternalServerErrorException(`${error}`);
@@ -42,9 +57,9 @@ export class OrderService {
       // 1. Build base filter matching user involvement
       const filter: QueryFilter<Order> = {
         $or: [
-          { tailor: user_id },
-          { client: user_id },
-          { user: user_id },
+          { 'tailor._id': user_id },
+          { 'client.id': user_id },
+          { 'user_id': user_id },
         ]
       };
 
@@ -76,32 +91,18 @@ export class OrderService {
       const sanitizedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const searchRegex = new RegExp(sanitizedQuery, 'i');
 
-      // 1. Build base filter matching user involvement
-      const clientFilter: QueryFilter<Client> = {
-        $or: [
-          { firstname: searchRegex },
-          { lastname: searchRegex },
-          { email: searchRegex },
-          { fullname: searchRegex }
-        ]
-      };
-
       const orderFilter: QueryFilter<Order> = {
         $or: [
           { orderId: searchRegex },
           { status: searchRegex },
-          { deliveryMethod: searchRegex }
+          { deliveryMethod: searchRegex },
+          { 'client._id': searchRegex },
+          { 'client.firstname': searchRegex },
+          { 'client.lastname': searchRegex },
+          { 'client.fullname': searchRegex },
+          { 'tailor._id': searchRegex },
         ]
       };
-
-      const client = await this.clientModel.findOne(clientFilter).exec();
-      console.log(client);
-
-      // if client exists add client id to order query filter
-      if(client) {
-        orderFilter.client = client._id.toString();
-      }
-      console.log(orderFilter);
 
       const orders = await this.orderModel
       .find(orderFilter)
@@ -110,8 +111,13 @@ export class OrderService {
       .exec();
       console.log(orders);
 
-      return orders;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'List of orders',
+        data: orders,        
+      }
 
+      return res;
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
     }

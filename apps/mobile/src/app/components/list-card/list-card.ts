@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { ViewWillEnter, IonIcon, AlertController, ToastController, IonLabel, 
   IonButtons, IonButton, IonBadge } from '@ionic/angular';
@@ -14,9 +14,10 @@ import { DesignService } from '../../services/design.service';
   templateUrl: './list-card.html',
   styleUrl: './list-card.css',
 })
-export class ListCard implements ViewWillEnter{
+export class ListCard implements ViewWillEnter, OnInit{
   @Output() updateList = new EventEmitter();
   @Output() edit = new EventEmitter();
+  @Output() action = new EventEmitter();
 
   @Input() dataType!: DataTypes;
   @Input() client!: any;
@@ -37,17 +38,19 @@ export class ListCard implements ViewWillEnter{
 
   ionViewWillEnter(): void { }
 
+  ngOnInit(): void { }
+
   async presentDeleteAlert(dataType: string) {
     const alert = await this.alertCtrl.create({
-      header: `Remove ${dataType == DataTypes.DESIGN ? 'Style' : dataType}`,
-      message: `Are you sure you want to remove this ${dataType == DataTypes.DESIGN ? 'Style' : dataType }?`,
+      header: `Delete ${dataType == DataTypes.DESIGN ? 'Style' : dataType}`,
+      message: `Are you sure you want to delete this ${dataType == DataTypes.DESIGN ? 'Style' : dataType }?`,
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel'
         },
         {
-          text: 'Remove',
+          text: 'Delete',
           role: 'confirm',
           handler: () => {
             switch (dataType) {
@@ -87,10 +90,6 @@ export class ListCard implements ViewWillEnter{
 
   viewClient() {
     this.router.navigate(['/app/clients/' + this.client._id ]);
-  }
-
-  viewOrder() {
-    this.router.navigate(['/app/orders/' + this.order._id ]);
   }
 
   deleteClient() {

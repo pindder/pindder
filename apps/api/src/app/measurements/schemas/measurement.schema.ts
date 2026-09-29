@@ -1,18 +1,18 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { Client } from "../../clients/schemas/client.schema";
+import { ClientSnapshot } from "../../clients/schemas/client.schema";
 import { MeasurementTypes } from "@pindder/contracts";
-import { User } from "../../users/schemas/user.schema";
+import { UserSnapshot } from "../../users/schemas/user.schema";
 
 export type MeasurementDocument = HydratedDocument<Measurement>;
 
 @Schema({ timestamps: true })
 export class Measurement {
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Client })
-    client?: string;
+    @Prop({ type: ClientSnapshot, required: false })
+    client?: ClientSnapshot;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User })
-    user?: string;
+    @Prop({ type: UserSnapshot, required: false })
+    user?: UserSnapshot;
 
     @Prop({ type: String, enum: MeasurementTypes, default: MeasurementTypes.CUSTOM })
     measurementType!: string;

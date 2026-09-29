@@ -14,13 +14,16 @@ export class ClientService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Follow.name) private readonly followModel: Model<Follow>,
-    @InjectModel(Client.name) private readonly clientModel:  Model<Client>,
+    @InjectModel(Client.name) private readonly clientModel:  Model<Client>
   ) {}
 
   async create(createClientDto: CreateClientDto, referee_id?: string) {
     try{
       //check if the email already is in the system
-      const existing_client = await this.clientModel.findOne({ email: createClientDto.email }).select('_id firstname lastname email phoneNo');
+      const existing_client = await this.clientModel
+      .findOne({ email: createClientDto.email })
+      .select('_id firstname lastname email phoneNo')
+      .exec();
       
       const existing_user = await this.userModel.findOne({ email: createClientDto.email }); 
 
@@ -50,12 +53,13 @@ export class ClientService {
       
       const res: IResponse<any> = {
         statusCode: 200,
-        msg: 'Your client was added successfully.',
+        msg: 'Client added successfully.',
         data: client
       };
 
       return res;
     } catch (error: any) {
+      console.error(error);
       throw new InternalServerErrorException(`${error}`);
     }
   }
@@ -80,7 +84,13 @@ export class ClientService {
         ]
       }).exec();
 
-      return clients;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'List of clients',
+        data: clients
+      }
+
+      return res;
 
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
@@ -107,29 +117,62 @@ export class ClientService {
   }
 
   async findAll(acct_id: string) {
-    const clients = await this.clientModel
+    try {
+      const clients = await this.clientModel
       .find({ referee: acct_id })
       .populate('referee', '-_v')
       .exec();
 
-    if(clients.length < 1) {
-      throw new HttpException('No client data found!', HttpStatus.NO_CONTENT);
+      if(clients.length < 1) {
+        throw new HttpException('No client data found!', HttpStatus.NO_CONTENT);
+      }
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'List of clients',
+        data: clients
+      }
+
+      return res;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
     }
-    return clients;
   }
 
   async findOne(id: string) {
-    const client = await this.clientModel.findById(id);
+    try {
+      const client = await this.clientModel.findById(id);
 
-    if(!client) {
-      throw new HttpException('Profile not found!', HttpStatus.NOT_FOUND);
+      if(!client) {
+        throw new HttpException('Profile not found!', HttpStatus.NOT_FOUND);
+      }
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: '',
+        data: client
+      }
+
+      return res;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
     }
-
-    return client;
   }
 
-  update(id: string, updateClientDto: UpdateClientDto) {
-    return `This action updates a #${id} client`;
+  async update(id: string, updateClientDto: UpdateClientDto) {
+    try {
+      const client = await this.clientModel.findByIdAndUpdate(id, updateClientDto, { upsert: true, returnDocument: 'after' });
+      
+      const res: IResponse<any> = {
+        statusCode: 200, 
+        msg: 'Client updated successfully.',
+        data: client
+      }
+
+      return res;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
   }
 
   async remove(id: string) {

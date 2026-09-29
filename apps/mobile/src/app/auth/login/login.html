@@ -1,18 +1,12 @@
-<form #loginForm="ngForm" class="p-3">
-    <ion-input
-    name="email"
-    label-placement="floating" 
-    fill="solid"
-    helperText="Enter your email"
-    [(ngModel)]="loginData.email"
-    ></ion-input>
-
-    <br />
-
-    <!-- <ion-button 
-    (click)="login()"
-    shape="round" 
-    expand="block" 
-    color="primary"
-    >Continue</ion-button> -->
+<form #loginForm="ngForm" class="py-4">
+    <ion-item lines="full">
+        <ion-input
+        name="email"
+        label="email or phone"
+        placeholder="Enter your email/phone"
+        label-placement="floating" 
+        fill="solid"
+        [(ngModel)]="loginData.email"
+        ></ion-input>
+    </ion-item>
 </form>

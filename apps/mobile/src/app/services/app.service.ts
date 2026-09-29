@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { ToastController } from '@ionic/angular';
 import { /* DataTypes,*/ GalleryItem } from '@pindder/contracts';
 import PhotoSwipe from 'photoswipe';
 import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, Subject, switchMap } from 'rxjs';
@@ -8,6 +9,8 @@ import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, o
   providedIn: 'root',
 })
 export class AppService {
+  toastCtrl = inject(ToastController);
+
   /**
    * Creates a reusable, debounced search stream for ANY API request function.
    * 
@@ -88,5 +91,9 @@ export class AppService {
   // Generate payment idempotency key
   generateKey(): string {
     return 'pay_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+  }
+
+  showToast() {
+    
   }
 }

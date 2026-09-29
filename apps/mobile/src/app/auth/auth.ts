@@ -1,16 +1,16 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { IonContent, IonLabel, IonCard, IonButton, IonSegmentButton, 
+import { IonContent, IonLabel, IonCard, IonSegmentButton, 
   IonSegment, IonSegmentView, IonSegmentContent } from "@ionic/angular";
 import { Login } from './login/login';
 import { Register } from './register/register';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { PrimaryButton } from '../components/primary-button/primary-button';
 
 @Component({
   selector: 'app-auth',
   imports: [
-    IonButton, 
     IonSegmentContent,
     IonSegmentView,
     IonSegment,
@@ -19,7 +19,8 @@ import { HttpErrorResponse } from '@angular/common/http';
     IonLabel,
     IonContent,
     Login,
-    Register
+    Register,
+    PrimaryButton
 ],
   templateUrl: './auth.html',
   styleUrl: './auth.css',

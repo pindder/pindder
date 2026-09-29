@@ -1,13 +1,19 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Global, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Token } from '../tokens/schemas/token.schema';
 import { AccountTypes, TokenStatus, TokenTypes } from '@pindder/contracts';
 import { generateCode } from './helpers';
+import { v4 as uuidv4 } from 'uuid';
 
+@Global()
 @Injectable()
 export class SharedService {
     constructor(@InjectModel(Token.name) private readonly tokenModel: Model<Token>) {}
+
+    generateId(): string {
+        return uuidv4();
+    }
 
     async findToken(tokenString?: string) {
         try {

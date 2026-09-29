@@ -113,6 +113,7 @@ export class NewDesign implements ViewWillEnter, OnInit{
       if (!galleryPhotos.photos.length) return;
 
       this.isUploading = true;
+      this.cdr.markForCheck();
 
       // 2. Convert each webPath to a Blob
       const blobPromises = galleryPhotos.photos.map(async (photo) => {

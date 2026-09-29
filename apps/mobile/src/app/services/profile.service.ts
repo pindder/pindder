@@ -15,6 +15,10 @@ export class ProfileService {
   }
 
   updateProfile(profile: IProfile): Observable<IResponse<any>> {
-    return this.http.put<IResponse<any>>(`${environment.apiUrl}/`, profile);
+    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/account/update`, profile);
+  }
+
+  deleteAccount(): Observable<IResponse<any>> {
+    return this.http.delete<IResponse<any>>(`${environment.apiUrl}/account/delete`);
   }
 }

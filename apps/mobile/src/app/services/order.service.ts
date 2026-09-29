@@ -33,9 +33,9 @@ export class OrderService {
     return this.http.patch<IResponse<any>>(`${environment.apiUrl}/orders/${order_id}/cancel`, {});
   }
 
-  searchOrders(query: string) : Observable<IResponse<any>> {
+  searchOrders(query: string) : Observable<IResponse<IOrderItem[]>> {
     const params = new HttpParams().set('q', query);
 
-    return this.http.get<IResponse<any>>(`${environment.apiUrl}/orders/search`, { params });
+    return this.http.get<IResponse<IOrderItem[]>>(`${environment.apiUrl}/orders/search`, { params });
   }
 }

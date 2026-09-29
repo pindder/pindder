@@ -1,27 +1,23 @@
 import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { 
-  IonContent, IonItem, IonInput, IonButton, IonIcon,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonButtons,
-  ModalController
-} from '@ionic/angular';
+import { IonContent, IonItem, IonInput, IonButton, IonIcon, IonHeader, IonTitle, IonToolbar, IonButtons, ModalController, IonFooter } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { trashOutline, addOutline } from 'ionicons/icons';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { PrimaryButton } from '../primary-button/primary-button';
 
 @Component({
   selector: 'app-measurement',
   imports: [
-    CommonModule, ReactiveFormsModule, 
-    IonContent, IonItem, IonInput, 
+    CommonModule, ReactiveFormsModule,
+    IonContent, IonItem, IonInput,
     IonButton, IonIcon, IonHeader,
-    IonTitle, IonToolbar, IonButtons
-  ],
+    IonTitle, IonToolbar, IonButtons,
+    PrimaryButton,
+    IonFooter
+],
   templateUrl: './measurement.html',
   styleUrl: './measurement.css',
 })

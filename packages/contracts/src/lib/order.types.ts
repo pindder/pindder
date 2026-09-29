@@ -23,6 +23,7 @@ export interface IOrder {
 }
 
 export interface IOrderItem {
+  orderId: string;
   _id: string;
   client: IClient;
   tailor: any;

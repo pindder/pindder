@@ -7,16 +7,21 @@ import { Brand, BrandSchema } from '../brands/schemas/brand.schema';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { Follow, FollowSchema } from './schemas/follows.schema';
 import { JwtService } from '@nestjs/jwt';
+import { SharedService } from '../shared/shared.service';
+import { TokenModule } from '../tokens/token.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([
-    { name: Client.name, schema: ClientSchema },
-    { name: Brand.name, schema: BrandSchema },
-    { name: Follow.name, schema: FollowSchema },
-    { name: User.name, schema: UserSchema}
-  ])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Client.name, schema: ClientSchema },
+      { name: Brand.name, schema: BrandSchema },
+      { name: Follow.name, schema: FollowSchema },
+      { name: User.name, schema: UserSchema}
+    ]),
+    TokenModule
+  ],
   controllers: [ClientController],
-  providers: [ClientService, JwtService],
+  providers: [ClientService, JwtService, SharedService],
   exports: [MongooseModule]
 })
 export class ClientModule {}

@@ -4,9 +4,9 @@
       <ion-back-button default-href="#"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="primary">
-      <ion-button (click)="openActionSheet()">
+      <!-- <ion-button (click)="openActionSheet()">
           <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
-      </ion-button>
+      </ion-button> -->
     </ion-buttons>
     <ion-title>Orders</ion-title>
   </ion-toolbar>
@@ -19,59 +19,73 @@
     </ion-toolbar>
   </ion-header>
 
-  <div class="p-3">
-    <ion-segment 
-    [scrollable]="true" 
-    value="pending"
-    [(ngModel)]="activeSegment" 
-    (ionChange)="onSegmentChanged($event)">
-      <ion-segment-button value="all" contentId="all">
-        <ion-label>All</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="pending" contentId="pending">
-        <ion-label>Pending</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="cancelled" contentId="cancelled">
-        <ion-label>Cancelled</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="completed" contentId="completed">
-        <ion-label>Completed</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+  <!-- Searchbar-->
+  <ion-searchbar 
+    placeholder="Search orders..." 
+    [debounce]="0" 
+    (ionInput)="onSearchInput($event)"
+    (ionChange)="onSearchInput($event)"
+  ></ion-searchbar>
+
+  <!-- New Order Button-->
+  <div class="px-2">
+    <app-primary-button
+    [buttonText]="'New Order'" 
+    (click)="openNewOrderModal()" 
+    icon="add-outline"
+    ></app-primary-button>
   </div>
 
-  <ion-segment-view>
-    <ion-segment-content id="all">
-      @if(!segmentData){
-        <app-empty-state [parentComponent]="dataTypes.ORDER" (action)="openNewOrderModal()"></app-empty-state>
-      } @else{
-        <ion-searchbar 
-          placeholder="Search orders..." 
-          [debounce]="0" 
-          (ionInput)="onSearchInput($event)"
-        ></ion-searchbar>
-        @for(order of segmentData | async; track order._id){
+  @if (segmentData | async; as orders) {
+    <!-- Segment view buttons-->
+    <div class="p-3">
+      <ion-segment 
+      [scrollable]="true" 
+      value="pending"
+      [(ngModel)]="activeSegment" 
+      (ionChange)="onSegmentChanged($event)">
+        <ion-segment-button value="all" contentId="all">
+          <ion-label>All</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pending" contentId="pending">
+          <ion-label>Pending</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="cancelled" contentId="cancelled">
+          <ion-label>Cancelled</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="completed" contentId="completed">
+          <ion-label>Completed</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- Segment View-->
+    <ion-segment-view>
+      <ion-segment-content id="all">
           <ion-list inset="true">
-            <app-list-card 
-            [dataType]="dataTypes.ORDER" 
-            [order]="order"
-            >
-            </app-list-card>
+            @for (order of orders; track order._id) {
+              <app-list-card 
+                [dataType]="dataTypes.ORDER" 
+                [order]="order"
+                (action)="viewOrder($event)"
+              >
+              </app-list-card>
+            } @empty {
+              <app-empty-state 
+                [parentComponent]="dataTypes.ORDER" 
+                (action)="openNewOrderModal()"
+              >
+              </app-empty-state>
+            }
           </ion-list>
-        }
-      }
-      @if (segmentData | async; as orders) {
-        <ion-searchbar 
-          placeholder="Search orders..." 
-          [debounce]="0" 
-          (ionInput)="onSearchInput($event)"
-        ></ion-searchbar>
-
+      </ion-segment-content>
+      <ion-segment-content id="pending">
         <ion-list inset="true">
           @for (order of orders; track order._id) {
             <app-list-card 
               [dataType]="dataTypes.ORDER" 
               [order]="order"
+              (action)="viewOrder($event)"
             >
             </app-list-card>
           } @empty {
@@ -82,21 +96,14 @@
             </app-empty-state>
           }
         </ion-list>
-      }
-    </ion-segment-content>
-    <ion-segment-content id="pending">
-      @if (segmentData | async; as orders) {
-        <ion-searchbar 
-          placeholder="Search orders..." 
-          [debounce]="0" 
-          (ionInput)="onSearchInput($event)"
-        ></ion-searchbar>
-
+      </ion-segment-content>
+      <ion-segment-content id="cancelled">
         <ion-list inset="true">
           @for (order of orders; track order._id) {
             <app-list-card 
               [dataType]="dataTypes.ORDER" 
               [order]="order"
+              (action)="viewOrder($event)"
             >
             </app-list-card>
           } @empty {
@@ -107,21 +114,14 @@
             </app-empty-state>
           }
         </ion-list>
-      }
-    </ion-segment-content>
-    <ion-segment-content id="cancelled">
-      @if (segmentData | async; as orders) {
-        <ion-searchbar 
-          placeholder="Search orders..." 
-          [debounce]="0" 
-          (ionInput)="onSearchInput($event)"
-        ></ion-searchbar>
-
+      </ion-segment-content>
+      <ion-segment-content id="completed">
         <ion-list inset="true">
           @for (order of orders; track order._id) {
             <app-list-card 
               [dataType]="dataTypes.ORDER" 
               [order]="order"
+              (action)="viewOrder($event)"
             >
             </app-list-card>
           } @empty {
@@ -132,43 +132,19 @@
             </app-empty-state>
           }
         </ion-list>
-      }
-    </ion-segment-content>
-    <ion-segment-content id="completed">
-      @if (segmentData | async; as orders) {
-        <ion-searchbar 
-          placeholder="Search orders..." 
-          [debounce]="0" 
-          (ionInput)="onSearchInput($event)"
-        ></ion-searchbar>
-
-        <ion-list inset="true">
-          @for (order of orders; track order._id) {
-            <app-list-card 
-              [dataType]="dataTypes.ORDER" 
-              [order]="order"
-            >
-            </app-list-card>
-          } @empty {
-            <app-empty-state 
-              [parentComponent]="dataTypes.ORDER" 
-              (action)="openNewOrderModal()"
-            >
-            </app-empty-state>
-          }
-        </ion-list>
-      }
-    </ion-segment-content>
-  </ion-segment-view>
+      </ion-segment-content>
+    </ion-segment-view>
+  }
 
   <!-- Action sheet menu-->
-   <ion-action-sheet
+  <ion-action-sheet
     [isOpen]="isActionSheetOpen"
     header="Quick Actions"
     [buttons]="actionSheetButtons"
     (didDismiss)="isActionSheetOpen = false">
   </ion-action-sheet>
 
+  <!-- New Order Modal-->
   <ion-modal #modal [presentingElement]="presentingElement">
     <ng-template>
       <ion-content>

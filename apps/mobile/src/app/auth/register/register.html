@@ -1,59 +1,48 @@
-<form #regForm="ngForm" class="p-3">
-    <ion-input 
-    name="fullname"
-    label="Fullname" 
-    label-placement="floating" 
-    fill="solid" 
-    helperText="Enter your fullname" 
-    placeholder="Enter your fullname"
-    [(ngModel)]="registrationData.fullname"
-    ></ion-input>
-
-    <br />
-
-    <ion-input
-    name="email" 
-    label="Email" 
-    label-placement="floating" 
-    fill="solid" 
-    helperText="Enter your email" 
-    placeholder="Enter your email"
-    [(ngModel)]="registrationData.email"
-    ></ion-input>
-
-    <br />
-
-    <ion-input 
-    name="phoneNo"
-    label="Telephone" 
-    label-placement="floating" 
-    fill="solid" 
-    helperText="Enter your phone no" 
-    placeholder="Enter your phoneNo"
-    [(ngModel)]="registrationData.phoneNo"
-    ></ion-input>
-
-    <br/>
-
-    <ion-input 
-    name="referral_code"
-    label="Referral Code" 
-    label-placement="floating" 
-    fill="solid" 
-    helperText="Enter referral code" 
-    placeholder="Enter referral code"
-    [(ngModel)]="registrationData.referralCode"
-    ></ion-input>
-
-    <br/>
-
-    <!-- <ion-select name="gender" [(ngModel)]="registrationData.gender" label="Gender" aria-label="Gender" placeholder="Select gender" label-placement="stacked">
-        <ion-select-option value="Male">Male</ion-select-option>
-        <ion-select-option value="Female">Female</ion-select-option>
-    </ion-select> -->
-    
-    <br/>
-
-    <!-- <ion-button shape="round" expand="block" color="primary">Continue</ion-button> -->
+<form #regForm="ngForm" class="py-3">
+    <ion-list>
+        <ion-item lines="full">
+            <ion-input 
+            name="fullname"
+            label="Fullname" 
+            label-placement="floating" 
+            fill="solid" 
+            placeholder="Enter your fullname"
+            [(ngModel)]="registrationData.fullname"
+            ></ion-input>
+        </ion-item>
+        
+        <ion-item lines="full">
+            <ion-input
+            name="email" 
+            label="Email" 
+            label-placement="floating" 
+            fill="solid" 
+            placeholder="Enter your email"
+            [(ngModel)]="registrationData.email"
+            ></ion-input>
+        </ion-item>
+        
+        <ion-item lines="full">
+            <ion-input 
+            name="phoneNo"
+            label="Telephone" 
+            label-placement="floating" 
+            fill="solid" 
+            placeholder="Enter your phoneNo"
+            [(ngModel)]="registrationData.phoneNo"
+            ></ion-input>
+        </ion-item>
+        
+        <ion-item lines="full">
+            <ion-input 
+            name="referral_code"
+            label="Referral Code" 
+            label-placement="floating" 
+            fill="solid" 
+            placeholder="Enter referral code"
+            [(ngModel)]="registrationData.referralCode"
+            ></ion-input>
+        </ion-item>
+    </ion-list>
 </form>
     

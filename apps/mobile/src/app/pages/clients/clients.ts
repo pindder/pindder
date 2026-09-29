@@ -1,61 +1,123 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { IonTitle, IonHeader, IonToolbar, IonButtons, IonBackButton, IonList, IonContent,
-  IonButton, IonIcon,
-  ModalController
+  IonSearchbar, ModalController
 } from "@ionic/angular";
-import { DataTypes, IClient } from '@pindder/contracts';
+import { DataTypes, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ViewWillEnter } from '@ionic/angular';
 import { ListCard } from '../../components/list-card/list-card';
 import { NewClient } from '../../components/new-client/new-client';
+import { BehaviorSubject, catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
+import { AppService } from '../../services/app.service';
+import { AsyncPipe } from '@angular/common';
+import { PrimaryButton } from '../../components/primary-button/primary-button';
 
 @Component({
   selector: 'app-clients',
   imports: [
-    IonIcon,
-    IonButton, 
-    IonList, 
-    IonContent, 
-    IonBackButton, 
-    IonButtons, 
-    IonToolbar, 
-    IonHeader, 
-    IonTitle, 
-    ListCard, 
+    IonSearchbar,
     IonList,
+    IonContent,
+    IonBackButton,
+    IonButtons,
+    IonToolbar,
+    IonHeader,
+    IonTitle,
+    ListCard,
+    IonList,
+    AsyncPipe, 
+    PrimaryButton
   ],
   templateUrl: './clients.html',
   styleUrl: './clients.css',
 })
-export class Clients implements ViewWillEnter{
+export class Clients implements ViewWillEnter, OnInit{
   private clientService = inject(ClientService);
+  private appService = inject(AppService);
   private cdr = inject(ChangeDetectorRef);
   private modalCtrl = inject(ModalController);
+  private searchSubject = new Subject<string>();
+  private clientsSubject = new BehaviorSubject<IClient[]>([]);
 
-  clients: IClient[] =  [];
+  //clients: IClient[] =  [];
   dataTypes = DataTypes;
+  clients$!: Observable<IClient[]>;
+  isLoading: boolean = false;
 
   ionViewWillEnter() {
     this.fetchClients();
   }
 
-  fetchClients() {
-    this.clientService.fetchClients().subscribe({
-      next: (data) => {
-        console.log(data),
-        this.clients = data;
-        this.cdr.markForCheck();
+  ngOnInit(): void {
+    this.clients$ = this.appService.createSearchStream<IClient>(
+      this.searchSubject,
+      (query) => this.clientService.searchClient(query).pipe(
+        map((res: IResponse<any>) => res.data || []),
+        tap((clients) => {
+          this.clients$ = of(clients);
+          console.log('Fetched Clients:', this.clients$);
+          this.cdr.markForCheck(); // Trigger change detection when new data arrives
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Fetch Orders Error:', error);
+          this.clients$ = of([]); // Reset on error
+          this.cdr.markForCheck();
+          return of([]); // Return empty array to keep search stream alive
+        })
+      ),
+      (loading) => {
+        this.isLoading = loading;
+        this.cdr.markForCheck(); // Trigger change detection for loading state updates
       },
-      error: (error: HttpErrorResponse) => {
-        console.log(error);
-      }
-    });
+      // Triggered when search bar is CLEARED (query is empty)
+      () => this.clientService.fetchClients().pipe(
+        map((res: IResponse<IClient[]>) => res.data || [])
+      )
+    )
+    .pipe(
+      shareReplay(1), // 👈 Share execution across multiple async pipe subscriptions
+      tap(() => this.cdr.markForCheck()) // Force change detection on data emit
+    );
+  }
+
+  fetchClients() {
+    this.clients$ = of([]);
+
+    this.clients$ = this.clientService.fetchClients()
+    .pipe(
+      map((res: IResponse<any>) => res.data || []),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Fetch Orders Error:', error);
+        return of([]); // Return empty array on error to keep stream alive
+      }),
+      tap((clients) => {
+        this.isLoading = false;
+        console.log(clients);
+      })
+    );
+    this.cdr.markForCheck();
+    // this.clientService.fetchClients().subscribe({
+    //   next: (data) => {
+    //     console.log(data),
+    //     this.clients = data;
+    //     this.cdr.markForCheck();
+    //   },
+    //   error: (error: HttpErrorResponse) => {
+    //     console.log(error);
+    //   }
+    // });
   }
 
   updateClientsList(client: IClient) {
-    const index = this.clients.findIndex(cl => cl._id === client._id);
-    this.clients.splice(index, 1);
+    // const index = this.clients.findIndex(cl => cl._id === client._id);
+    // this.clients.splice(index, 1);
+
+    const currentClients = this.clientsSubject.getValue();
+    const updatedClients = currentClients.filter(cl => cl._id !== client._id);
+    
+    this.clientsSubject.next(updatedClients);
+    this.cdr.markForCheck(); // Trigger change detection for OnPush
   }
 
   async openNewClientModal() {
@@ -71,8 +133,17 @@ export class Clients implements ViewWillEnter{
     //Listen for the selected client payload when dismissed
     const { data, role } = await modal.onWillDismiss();
     if (role === 'selected' && data) {
-      this.clients.push(data);
+      //this.clients.push(data);
+      const currentClients = this.clientsSubject.getValue();
+  
+      // Prepend to top (or use [...currentClients, newClient] to append to bottom)
+      this.clientsSubject.next([data, ...currentClients]);
       this.cdr.markForCheck();
     }
+  }
+
+  onSearchInput(event: any) {
+    const value = event.target.value || '';
+    this.searchSubject.next(value);
   }
 }
