@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonContent, IonList, IonItem, IonInput, 
   ViewWillEnter, IonButton, IonSelect, IonSelectOption, IonButtons, 
-  IonTitle, IonBackButton, IonModal, IonSpinner, IonIcon, IonActionSheet, 
+  IonTitle, IonBackButton, IonSpinner, IonIcon, IonActionSheet, 
   IonLabel, 
   ModalController
 } from '@ionic/angular';
@@ -15,18 +15,19 @@ import { PrimaryButton } from '../../components/primary-button/primary-button';
 import { ClientOrders } from '../../components/client-orders/client-orders';
 
 @Component({
-  imports: [IonActionSheet, IonIcon, IonSpinner, IonButtons, IonBackButton, IonTitle,
+  imports: [
+    IonActionSheet, IonIcon, IonSpinner, IonButtons, 
+    IonBackButton, IonTitle,
     IonContent, IonHeader, IonToolbar,
     IonList, IonItem, IonInput, FormsModule,
     IonButton, IonSelect, IonSelectOption,
-    IonModal, IonSpinner, IonIcon,
-    IonModal, IonIcon, Measurement, IonLabel, PrimaryButton],
+    IonSpinner, IonIcon, Measurement,
+    IonIcon, IonLabel, PrimaryButton
+  ],
   templateUrl: './client-view.html',
   styleUrl: './client-view.css',
 })
 export class ClientView implements ViewWillEnter, OnInit{
-  @ViewChild('modal') modal!: IonModal;
-
   private ar = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private clientService = inject(ClientService);
@@ -46,7 +47,7 @@ export class ClientView implements ViewWillEnter, OnInit{
       text: 'Create Measurement',
       icon: 'add-outline',
       handler: () => {
-        this.modal.present();
+        this.openMeasurementModal();
       },
     },
     {
@@ -98,8 +99,16 @@ export class ClientView implements ViewWillEnter, OnInit{
     this.isActionSheetOpen.set(true);
   }
 
-  async openModal() {
-    this.modal.present();
+  async openMeasurementModal() {
+    const modal = await this.modalCtrl.create({
+      component: Measurement,
+      componentProps: {
+        client_id: this.client_id,
+        client_gender: this.client.gender
+      }
+    });
+
+    await modal.present();
   }
 
   async openOrdersModal() {

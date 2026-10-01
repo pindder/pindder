@@ -89,7 +89,7 @@
         <ion-item>
             <ion-icon slot="start" name="document-outline"></ion-icon>
             <ion-label>
-                <p>{{ order.note }}</p>
+                <h2>{{ order.note }}</h2>
             </ion-label>
         </ion-item>
         }
@@ -97,7 +97,7 @@
         <ion-item>
             <ion-icon slot="start" name="calendar-number-outline"></ion-icon>
             <ion-label>
-                <h2 class="font-semibold text-lg">{{ order.dueDate | date }}</h2>
+                <h2>{{ order.dueDate | date }}</h2>
             </ion-label>
             <ion-note>
                 <p>due date</p>
@@ -107,7 +107,7 @@
         <ion-item>
             <ion-icon slot="start" name="storefront-outline"></ion-icon>
             <ion-label>
-                <h2 class="font-bold">{{ order.deliveryMethod }}</h2>
+                <h2>{{ order.deliveryMethod }}</h2>
             </ion-label>
             <ion-note>
                 <p>delivery method</p>
@@ -145,20 +145,19 @@
     <div class="p-3">
         @if(order.status !== orderStatuses.CANCELLED && 
         order.status !== orderStatuses.COMPLETED){
-            <ion-button 
-            shape="round" 
-            expand="block" 
-            color="danger"
-            (click)="cancelOrder()">
-                Cancel Order
-            </ion-button>
+            <app-primary-button
+            [buttonText]="'Cancel Order'"
+            [icon]="'close-outline'"
+            [color]="'danger'"
+            (action)="cancelOrder()"
+            ></app-primary-button>
         } @else {
-            <ion-button 
-            shape="round" 
-            expand="block" 
-            color="danger">
-                Order Cancelled
-            </ion-button>
+            <app-primary-button
+            [buttonText]="'Order Cancelled'"
+            [icon]="'close-outline'"
+            [disabled]="true"
+            [color]="'danger'"
+            ></app-primary-button>
         }
     </div>
 </ion-content>

@@ -12,7 +12,7 @@ import { ListCard } from '../../components/list-card/list-card';
 import { Router } from '@angular/router';
 import { NewDesign } from '../../components/new-design/new-design';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
-import { BehaviorSubject, catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
 import { AppService } from '../../services/app.service';
 import { AsyncPipe } from '@angular/common';
 
@@ -32,7 +32,6 @@ export class Designs implements ViewWillEnter, OnInit{
   private cdr = inject(ChangeDetectorRef);
   private modalCtrl = inject(ModalController);
   private searchSubject = new Subject<string>();
-  private designsSubject = new BehaviorSubject<IDesign[]>([]);
 
   dataTypes = DataTypes;
   designs$!: Observable<IDesign[]>;
@@ -103,13 +102,10 @@ export class Designs implements ViewWillEnter, OnInit{
   }
 
   updateDesignsList(design: IDesign) {
-    // const index = this.designs.findIndex(d => d._id === design._id);
-    // this.designs.splice(index, 1);
-
-    const currentDesigns = this.designsSubject.getValue();
-    const updatedDesigns = currentDesigns.filter(d => d._id !== design._id);
-    
-    this.designsSubject.next(updatedDesigns);
+    this.designs$ = this.designs$.pipe(
+      map((designs: IDesign[]) => designs.filter(d => d._id != design._id))
+    );
+    console.log(this.designs$);
     this.cdr.markForCheck(); // Trigger change detection for OnPush
   }
 
@@ -119,6 +115,17 @@ export class Designs implements ViewWillEnter, OnInit{
     });
 
     await modal.present();
+
+    //Listen for the selected design payload when dismissed
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      this.updateDesignsList(data);
+      this.designs$ = this.designs$.pipe(
+        map((designs: IDesign[]) => [...designs, data])
+      );
+      console.log(this.designs$);
+      this.cdr.markForCheck();
+    }
   }
 
   onSearchInput(event: any) {

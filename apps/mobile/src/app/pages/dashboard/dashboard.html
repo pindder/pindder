@@ -27,15 +27,14 @@
   }
 
   <!-- Referral Block-->
-  <ion-card>
-    <app-referral-block></app-referral-block>
-  </ion-card>
+  <app-referral-block></app-referral-block>
+  
 
   <!-- Data Cards -->
-  <ion-grid class="p-0" [fixed]="true">
-    <ion-row class="p-0">
+  <ion-grid>
+    <ion-row class="">
       @for(tile of tiles; track $index){
-        <ion-col class="p-0" sizeLg="3" sizeMd="3" sizeXs="6">
+        <ion-col class="p-2" sizeLg="3" sizeMd="3" sizeXs="6">
           <app-data-tile [data]="tile"></app-data-tile>
         </ion-col>
       }

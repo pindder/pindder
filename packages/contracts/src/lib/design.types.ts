@@ -6,5 +6,7 @@ export interface IDesign {
     description: string;
     type: string;
     sizes: any;
+    colors: any;
     images: any[];
+    catalogDisplay: boolean;
 }

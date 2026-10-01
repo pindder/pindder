@@ -21,24 +21,32 @@
     (ionInput)="onSearchInput($event)"
     (ionChange)="onSearchInput($event)"
   ></ion-searchbar>
-
-  <!-- New Client Button-->
-  <div class="px-2">
-    <app-primary-button
-    [buttonText]="'New Client'" 
-    (click)="openNewClientModal()" 
-    icon="add-outline"
-    ></app-primary-button>
-  </div>
   
   <!-- Clients list-->
   @if(clients$ | async; as clients) {
+    <!-- New Client Button-->
+    @if(clients.length > 0){
+    <div class="px-2">
+      <app-primary-button
+      [buttonText]="'New Client'" 
+      (click)="openNewClientModal()" 
+      icon="add-outline"
+      ></app-primary-button>
+    </div>
+    }
+
     <ion-list class="flex flex-col gap-2" inset="true">
       @for(cl of clients; track $index){
         <app-list-card 
         [dataType]="dataTypes.CLIENT" 
         [client]="cl" 
         (updateList)="updateClientsList(cl)"></app-list-card>
+      } @empty {
+        <app-empty-state
+        [buttonText]="'New Client'"
+        (action)="openNewClientModal()"
+        >
+        </app-empty-state>
       }
     </ion-list>
   }

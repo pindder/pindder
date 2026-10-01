@@ -229,7 +229,11 @@ export class Orders implements ViewWillEnter, OnInit{
     // Optionally listen for returned data when the modal is dismissed
     const { data } = await modal.onWillDismiss();
     if (data) {
-      console.log('Returned data:', data);
+      this.segmentData = this.segmentData.pipe(
+        map((orders: IOrderItem[]) => [data, ...orders])
+      );
+      console.log(this.segmentData);
+      this.cdr.markForCheck();
     }
   }
 

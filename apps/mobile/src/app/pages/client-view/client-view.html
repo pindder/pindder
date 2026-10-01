@@ -79,7 +79,7 @@
         </form>
 
         <ion-list [inset]="true">
-            <ion-item button (click)="openModal()">
+            <ion-item button (click)="openMeasurementModal()">
                 <ion-label>
                     View Measurement
                 </ion-label>
@@ -101,18 +101,6 @@
             icon="save-outline"
             ></app-primary-button>
         </div>
-
-        <!-- Measurements Modal-->
-        <ion-modal #modal trigger="open-modal" [presentingElement]="presentingElement">
-            <ng-template>
-                <ion-content>
-                    <!-- <div class="p-3">
-                        <ion-label class="p-1">Take your client's measurment data effortlessly.</ion-label>
-                    </div> -->
-                    <app-measurement [client_id]="client_id"></app-measurement>
-                </ion-content>
-            </ng-template>
-        </ion-modal>
     }@else {
         <!-- Optional Loading Spinner -->
         <div class="ion-text-center ion-padding">

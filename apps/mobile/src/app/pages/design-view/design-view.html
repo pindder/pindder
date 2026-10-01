@@ -142,6 +142,12 @@
                     [(ngModel)]="design.amount"
                     ></ion-input>
                 </ion-item>
+
+                <ion-item class="py-3">
+                    <ion-toggle [(ngModel)]="design.catalogDisplay" [checked]="design.catalogDisplay">
+                        Display in Catalogs
+                    </ion-toggle>
+                </ion-item>
             </ion-list>
 
             <div class="p-3">

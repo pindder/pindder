@@ -11,13 +11,13 @@ import { ProfileService } from '../../services/profile.service';
 import { IProfile, IResponse } from '@pindder/contracts';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TokenService } from '../../services/token.service';
+import { PrimaryButton } from '../../components/primary-button/primary-button';
 
 @Component({
   selector: 'app-edit-profile',
   imports: [IonHeader, IonContent, FormsModule, IonToolbar,
     IonTitle, IonBackButton, IonButton, IonButtons, IonList,
-    IonItem,  
-  ],
+    IonItem, PrimaryButton],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
 })
@@ -30,7 +30,7 @@ export class EditProfile implements OnInit, ViewWillEnter{
   profile!: IProfile;
 
   ionViewWillEnter(): void {
-    
+    this.loadProfile();
   }
 
   ngOnInit(): void {
@@ -40,6 +40,7 @@ export class EditProfile implements OnInit, ViewWillEnter{
   async loadProfile() {
     const profile = await this.tokenService.getProfile();
     this.profile = profile ? JSON.parse(profile) : null;
+    console.log(this.profile);
     this.cdr.markForCheck();
   }
 

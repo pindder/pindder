@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -123,8 +123,9 @@ export class ClientService {
       .populate('referee', '-_v')
       .exec();
 
-      if(clients.length < 1) {
-        throw new HttpException('No client data found!', HttpStatus.NO_CONTENT);
+      // 1. Throw directly instead of returning
+      if (!clients || clients.length === 0) {
+        throw new NotFoundException(`No clients found`);
       }
 
       const res: IResponse<any> = {
@@ -135,7 +136,14 @@ export class ClientService {
 
       return res;
     } catch(error: any) {
-      throw new InternalServerErrorException(`${error}`);
+      // 2. If it's already an HTTP exception (like NotFoundException), re-throw it as-is
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      // 3. Pass error.message instead of template stringifying the whole object
+      console.error('Error fetching clients:', error);
+      throw new InternalServerErrorException(error?.message || 'Failed to retrieve clients');
     }
   }
 

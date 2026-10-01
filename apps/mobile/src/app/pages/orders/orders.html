@@ -27,16 +27,18 @@
     (ionChange)="onSearchInput($event)"
   ></ion-searchbar>
 
-  <!-- New Order Button-->
-  <div class="px-2">
-    <app-primary-button
-    [buttonText]="'New Order'" 
-    (click)="openNewOrderModal()" 
-    icon="add-outline"
-    ></app-primary-button>
-  </div>
-
   @if (segmentData | async; as orders) {
+    <!-- New Order Button-->
+    @if(orders.length > 0){
+      <div class="px-2">
+        <app-primary-button
+        [buttonText]="'New Order'" 
+        (click)="openNewOrderModal()" 
+        icon="add-outline"
+        ></app-primary-button>
+      </div>
+    }
+
     <!-- Segment view buttons-->
     <div class="p-3">
       <ion-segment 

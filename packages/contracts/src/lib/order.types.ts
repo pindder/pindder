@@ -51,6 +51,9 @@ export interface IOrderStyle {
   amount: number;
   sizes?: string[];
   selectedSizes: string[];
+  colors?: string[];
+  selectedColors?: string[];
   quantity: number;
   note?: string;
+  catalogDisplay: boolean;
 }

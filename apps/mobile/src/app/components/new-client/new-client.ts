@@ -13,12 +13,13 @@ import { IonContent, IonButton, IonInput, IonSelectOption,
 import { Gender, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { PrimaryButton } from '../primary-button/primary-button';
 
 @Component({
   selector: 'app-new-client',
   imports: [
     IonList,
-    IonItem, 
+    IonItem,
     IonInput,
     IonButton,
     IonSelect,
@@ -29,7 +30,8 @@ import { HttpErrorResponse } from '@angular/common/http';
     IonToolbar,
     IonTitle,
     IonButtons,
-    IonIcon
+    IonIcon,
+    PrimaryButton
 ],
   templateUrl: './new-client.html',
   styleUrl: './new-client.css',
@@ -52,7 +54,7 @@ export class NewClient implements ViewWillEnter{
     address: '',
   };
 
-  genders: string[] = Object.keys(Gender);;
+  genders: string[] = Object.keys(Gender);
 
   ionViewWillEnter(): void { 
     console.log(this.origin)
@@ -65,7 +67,7 @@ export class NewClient implements ViewWillEnter{
   ) {
     const toast = await this.toastController.create({
       message: msg,
-      duration: 1500,
+      duration: 5000,
       position: position,
       color: color,
       animated: true,
@@ -82,7 +84,7 @@ export class NewClient implements ViewWillEnter{
     this.clientService.createClient(this.client).subscribe({
       next: (res: IResponse<IClient>) => {
         this.presentToast(res.msg, 'primary', 'top');
-        console.log(res.data);
+        //console.log(res.data);
         this.modalCtrl.dismiss(res.data, 'selected');
       }, 
       error: (error: HttpErrorResponse) => {

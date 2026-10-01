@@ -8,10 +8,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ViewWillEnter } from '@ionic/angular';
 import { ListCard } from '../../components/list-card/list-card';
 import { NewClient } from '../../components/new-client/new-client';
-import { BehaviorSubject, catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
 import { AppService } from '../../services/app.service';
 import { AsyncPipe } from '@angular/common';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
+import { EmptyState } from '../../components/empty-state/empty-state';
 
 @Component({
   selector: 'app-clients',
@@ -26,9 +27,10 @@ import { PrimaryButton } from '../../components/primary-button/primary-button';
     IonTitle,
     ListCard,
     IonList,
-    AsyncPipe, 
-    PrimaryButton
-  ],
+    AsyncPipe,
+    PrimaryButton,
+    EmptyState
+],
   templateUrl: './clients.html',
   styleUrl: './clients.css',
 })
@@ -38,7 +40,6 @@ export class Clients implements ViewWillEnter, OnInit{
   private cdr = inject(ChangeDetectorRef);
   private modalCtrl = inject(ModalController);
   private searchSubject = new Subject<string>();
-  private clientsSubject = new BehaviorSubject<IClient[]>([]);
 
   //clients: IClient[] =  [];
   dataTypes = DataTypes;
@@ -97,26 +98,13 @@ export class Clients implements ViewWillEnter, OnInit{
       })
     );
     this.cdr.markForCheck();
-    // this.clientService.fetchClients().subscribe({
-    //   next: (data) => {
-    //     console.log(data),
-    //     this.clients = data;
-    //     this.cdr.markForCheck();
-    //   },
-    //   error: (error: HttpErrorResponse) => {
-    //     console.log(error);
-    //   }
-    // });
   }
 
   updateClientsList(client: IClient) {
-    // const index = this.clients.findIndex(cl => cl._id === client._id);
-    // this.clients.splice(index, 1);
-
-    const currentClients = this.clientsSubject.getValue();
-    const updatedClients = currentClients.filter(cl => cl._id !== client._id);
-    
-    this.clientsSubject.next(updatedClients);
+    this.clients$ = this.clients$.pipe(
+      map((clients: IClient[]) => clients.filter(cl => cl._id !== client._id))
+    )
+    console.log(this.clients$);
     this.cdr.markForCheck(); // Trigger change detection for OnPush
   }
 
@@ -131,13 +119,12 @@ export class Clients implements ViewWillEnter, OnInit{
     await modal.present();
 
     //Listen for the selected client payload when dismissed
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'selected' && data) {
-      //this.clients.push(data);
-      const currentClients = this.clientsSubject.getValue();
-  
-      // Prepend to top (or use [...currentClients, newClient] to append to bottom)
-      this.clientsSubject.next([data, ...currentClients]);
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      this.clients$ = this.clients$.pipe(
+        map((clients: IClient[]) => [...clients, data])
+      );
+      console.log(this.clients$)
       this.cdr.markForCheck();
     }
   }

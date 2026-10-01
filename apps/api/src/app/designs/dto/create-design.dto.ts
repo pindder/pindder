@@ -20,5 +20,8 @@ export class CreateDesignDto {
     sizes?: [string];
 
     @IsArray()
+    colors?: [string];
+
+    @IsArray()
     images?: [string];
 }

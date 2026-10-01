@@ -9,8 +9,8 @@
     </ion-toolbar>
 </ion-header>
 <ion-content>
-  <form #loginForm="ngForm" (ngSubmit)="submit()" class="p-3">
-    <ion-list lines="true">
+  <form #loginForm="ngForm" (ngSubmit)="submit()" class="my-2">
+    <ion-list lines="full">
       <ion-item>
         <ion-input 
         name="firstname"
@@ -67,14 +67,12 @@
       </ion-item>
     </ion-list>
 
-    <br/>
-    <div class="mt-4">
-      <ion-button 
-        type="submit"
-        shape="round" 
-        expand="block" 
-        color="primary"
-      >Continue</ion-button>
+    <div class="p-3">
+      <app-primary-button
+        [buttonText]="'Save Client'"
+        [icon]="'save-outline'"
+        (action)="submit()"
+      ></app-primary-button>
     </div>
   </form>
 </ion-content>
