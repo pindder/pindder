@@ -1,16 +1,18 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, IonNote } from "@ionic/angular";
+import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, IonNote, ToastController } from "@ionic/angular";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IDesign, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { PrimaryButton } from '../../components/primary-button/primary-button';
+import { Measurement } from '../../components/measurement/measurement';
 
 @Component({
   imports: [IonHeader, IonItemOptions, IonLabel, IonAvatar, IonItemSliding,
     IonIcon, IonItem, IonList, IonButton, IonButtons, IonListHeader,
     IonTitle, IonToolbar, IonContent, IonItemOption, IonBackButton,
-    IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe, IonNote],
+    IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe, IonNote, PrimaryButton],
   templateUrl: './order-view.html',
   styleUrl: './order-view.css',
 })
@@ -19,6 +21,7 @@ export class OrderView implements ViewWillEnter, OnInit{
   private ar = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private modalCtrl = inject(ModalController);
+  private toastCtrl = inject(ToastController);
 
   order!: IOrderItem | any;
   client_id!: string;
@@ -50,8 +53,6 @@ export class OrderView implements ViewWillEnter, OnInit{
     })
   }
 
-  openMeasurementModal() {}
-
   dismissModal() {
     this.modalCtrl.dismiss(null, 'cancel');
   }
@@ -61,11 +62,39 @@ export class OrderView implements ViewWillEnter, OnInit{
   cancelOrder() {
     this.orderService.cancelOrder(this.order._id).subscribe({
       next: (res) => {
-        console.log(res.data);
+        this.presentToast(res.msg, 'danger', 'top');
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);
       }
     })
+  }
+
+  async presentToast(
+    msg: string,
+    color: 'danger' | 'light' | 'dark' | 'success' | 'primary' | 'secondary', 
+    position: 'top' | 'middle' | 'bottom'
+  ) {
+    const toast = await this.toastCtrl.create({
+      message: msg,
+      duration: 5000,
+      position: position,
+      color: color,
+      animated: true,
+    });
+
+    await toast.present();
+  }
+
+  async openMeasurementModal() {
+    const modal = await this.modalCtrl.create({
+      component: Measurement,
+      componentProps: {
+        client_id: this.order.client._id,
+        client_gender: this.order.client.gender
+      }
+    });
+
+    await modal.present();
   }
 }

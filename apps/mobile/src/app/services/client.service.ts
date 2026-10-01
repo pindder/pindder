@@ -60,6 +60,7 @@ export class ClientService {
 
     return this.http.get<any[]>(`${environment.apiUrl}/clients/search`, { params });
   }
+
   removeClient(client_id: string): Observable<IResponse<string>> {
     return this.http.delete<IResponse<string>>(`${environment.apiUrl}/clients/${client_id}`);
   }
@@ -74,5 +75,9 @@ export class ClientService {
 
   fetchClientMeasurements(client_id: string): Observable<any> {
     return this.http.get(`${environment.apiUrl}/measurements/${client_id}`);
+  }
+
+  updateClientMeasurement(measurement_id: string, measurement: IMeasurement): Observable<IResponse<any>> {
+    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/measurements/${measurement_id}`, measurement);
   }
 }

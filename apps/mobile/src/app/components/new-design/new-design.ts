@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonTextarea, IonButton, IonInput, 
   IonSelectOption, ViewWillEnter, IonSelect, IonSpinner, 
-  IonIcon, IonAlert,
+  IonIcon, IonAlert, IonItem, IonList,
   ToastController,
   IonButtons,
   IonTitle,
@@ -17,31 +17,36 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Camera } from '@capacitor/camera';
 import { forkJoin } from 'rxjs';
 import { OverlayEventDetail } from '@ionic/core';
+import { PrimaryButton } from '../primary-button/primary-button';
 
 @Component({
   selector: 'app-new-design',
   imports: [
-    IonAlert, 
-    IonIcon, 
-    IonSpinner, 
-    IonTextarea, 
-    IonButton, 
-    IonContent, 
-    IonInput, 
-    CloudinaryModule, 
-    FormsModule, 
-    IonSelect, 
-    IonSelectOption, 
+    IonList,
+    IonItem,
+    IonAlert,
+    IonIcon,
+    IonSpinner,
+    IonTextarea,
+    IonButton,
+    IonContent,
+    IonInput,
+    CloudinaryModule,
+    FormsModule,
+    IonSelect,
+    IonSelectOption,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonButtons,
-  ],
+    PrimaryButton
+],
   templateUrl: './new-design.html',
   styleUrl: './new-design.css',
 })
 export class NewDesign implements ViewWillEnter, OnInit{
-  @Output() closeModal = new EventEmitter<string>();
+  @Output() closeModal = new EventEmitter();
+  @Input() parentComponent?: string;  
 
   private designService = inject(DesignService);
   private toastController = inject(ToastController);
@@ -74,12 +79,18 @@ export class NewDesign implements ViewWillEnter, OnInit{
       category: "",
       type: "",
       sizes: [],
-      images: []
+      images: [],
+      colors: [],
+      catalogDisplay: this.parentComponent && this.parentComponent === DataTypes.ORDER ? false : true
     }
   }
 
-  dismissModal() {
-    this.modalCtrl.dismiss(null, 'cancel');
+  dismissModal(style?: IDesign) {
+    if(style) {
+      this.modalCtrl.dismiss(style, 'design');
+    } else{
+      this.modalCtrl.dismiss(null, 'cancel');
+    }
   }
 
   setResult(event: CustomEvent<OverlayEventDetail>) {
@@ -93,7 +104,7 @@ export class NewDesign implements ViewWillEnter, OnInit{
   ) {
     const toast = await this.toastController.create({
       message: msg,
-      duration: 1500,
+      duration: 5000,
       position: position,
       color: color,
       animated: true,
@@ -153,7 +164,7 @@ export class NewDesign implements ViewWillEnter, OnInit{
 
   onSizesChange(size: any) {
     this.selectedSizes = size.detail.value;
-    console.log(this.selectedSizes);
+    //console.log(this.selectedSizes);
   }
 
   submit() {
@@ -164,7 +175,8 @@ export class NewDesign implements ViewWillEnter, OnInit{
     this.designService.createDesign(this.design).subscribe({
       next: (res: IResponse<IDesign>) => {
         this.presentToast(res.msg, 'primary', 'top'); 
-        this.closeModal.emit(DataTypes.DESIGN);
+        this.closeModal.emit(res.data);
+        this.dismissModal(res.data);
       }, 
       error: (error: HttpErrorResponse) => {
         console.log(error);

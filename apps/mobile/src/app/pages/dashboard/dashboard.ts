@@ -2,7 +2,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef, Component, EnvironmentInjector, inject, OnInit, signal } from '@angular/core';
 import { IonContent, IonFabButton, IonFab, 
   IonIcon, IonButton, IonModal, IonItem, IonList, IonAvatar, 
-  IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonCard, IonListHeader,
+  IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonListHeader,
   ViewWillEnter,
   ModalController, 
 } from "@ionic/angular";
@@ -19,7 +19,6 @@ import { DataTypes } from '@pindder/contracts';
 @Component({
   selector: 'app-dashboard',
   imports: [
-    IonCard,
     IonGrid,
     IonRow,
     IonCol,

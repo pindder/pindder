@@ -20,11 +20,17 @@ export class OrderStyleSnapshot {
     @Prop({ type: String, required: true, enum: DesignTypes })
     type!: string;
 
-    @Prop({ type: [String], enum: Sizes, required: true })
-    sizes!: [string];
+    @Prop({ type: [String], enum: Sizes })
+    sizes?: [string];
 
     @Prop({ type: [String], required: true })
-    selectedSizes!: [string];
+    selectedSizes?: [string];
+
+    @Prop({ type: [String] })
+    colors?: [string];
+
+    @Prop({ type: [String ]})
+    selectedColors?: [string];
 
     @Prop({ type: Date })
     dueDate!: Date; 
@@ -37,6 +43,9 @@ export class OrderStyleSnapshot {
 
     @Prop({ type: String })
     note?: string;
+
+    @Prop({ type: Boolean, default: false, required: true })
+    catalogDisplay!: boolean;
 }
 
 @Schema({ timestamps: true })
@@ -59,6 +68,9 @@ export class Design {
     @Prop({ type: [String], enum: Sizes, required: true })
     sizes?: [string];
 
+    @Prop({ type: [String] })
+    colors?: [string];
+
     @Prop({ type: Number })
     productionDuration?: number; 
 
@@ -79,6 +91,9 @@ export class Design {
 
     @Prop({ type: Number })
     percentageDiscount?: number;
+
+    @Prop({ type: Boolean, default: false, required: true })
+    catalogDisplay!: boolean;
 }
 
 export const DesignSchema = SchemaFactory.createForClass(Design);

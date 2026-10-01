@@ -20,11 +20,12 @@ import { CloudinaryModule } from '@cloudinary/ng';
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { SizesModal } from '../sizes-modal/sizes-modal';
+import { PrimaryButton } from '../primary-button/primary-button';
 
 @Component({
   selector: 'app-new-order',
   imports: [
-    IonModal, 
+    IonModal,
     IonNote, IonInput, IonTextarea,
     IonItemOptions,
     IonAvatar,
@@ -50,7 +51,9 @@ import { SizesModal } from '../sizes-modal/sizes-modal';
     FormsModule,
     IonItemSliding,
     EmptyState,
-    CloudinaryModule, IonNote],
+    CloudinaryModule, IonNote,
+    PrimaryButton
+],
   templateUrl: './new-order.html',
   styleUrl: './new-order.css',
 })
@@ -136,6 +139,9 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
         type: this.design.type,
         name:  this.design.name,
         selectedSizes: [],
+        selectedColors: [],
+        colors: [],
+        catalogDisplay: false,
         //design: data,
         sizes: this.design.sizes,
         quantity: 1, 
@@ -196,6 +202,9 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   async openNewDesignModal() { 
     const modal = await this.modalCtrl.create({
       component: NewDesign, // Standalone modal component for searching clients
+      componentProps: {
+        parentComponent: DataTypes.ORDER
+      }
     });
 
     await modal.present();
@@ -211,6 +220,9 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
         type: data.type,
         name:  data.name,
         selectedSizes: [],
+        selectedColors: [],
+        colors: [],
+        catalogDisplay: data.catalogDisplay,
         //design: data,
         sizes: data.sizes,
         quantity: 1, 
@@ -239,6 +251,9 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
         type: data.type,
         name:  data.name,
         selectedSizes: [],
+        selectedColors: [],
+        colors: [],
+        catalogDisplay: data.catalogDisplay,
         //design: data,
         sizes: data.sizes,
         quantity: 1, 
@@ -266,6 +281,22 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   ngOnInit() {
   }
 
+  async presentToast(
+    msg: string,
+    color: 'danger' | 'light' | 'dark' | 'success' | 'primary' | 'secondary', 
+    position: 'top' | 'middle' | 'bottom'
+  ) {
+    const toast = await this.toastCtrl.create({
+      message: msg,
+      duration: 5000,
+      position: position,
+      color: color,
+      animated: true,
+    });
+
+    await toast.present();
+  }
+
   onDateChange(event: CustomEvent) {
     console.log(event.detail.value);
   }
@@ -281,16 +312,6 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   removeSelectedDesign(index: number) {
     this.order.styles.splice(index, 1);
     this.cdr.markForCheck();
-  }
-
-  presentToast(msg: string, color?: 'primary' | 'danger' | 'warning', position?: 'top' | 'bottom') {
-    this.toastCtrl.create({
-      color: color ?? 'primary',
-      animated: true,
-      duration: 4000,
-      position: position ?? 'top',
-      message: msg
-    });
   }
 
   decrementQuantity(index?: number) {
@@ -387,6 +408,8 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   }
 
   submit() {
+    this.order.totalItems = 0;
+
     this.order.client = this.selectedClient._id;
     this.order.styles.forEach((item: IOrderStyle) => {
       this.order.totalItems += item.quantity
@@ -396,8 +419,9 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     
     this.orderService.createOrder(this.order).subscribe({
       next: (res: any) => {
-        this.presentToast(res.msg);
+        this.presentToast(res.msg, 'primary', 'top');
         this.router.navigate(['app/orders']);
+        this.modalCtrl.dismiss(res.data, 'order');
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);

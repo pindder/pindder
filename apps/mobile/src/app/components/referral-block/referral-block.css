@@ -6,8 +6,8 @@
 }
 
 .border {
-  padding: 0 8px;
-  border: .01em solid gray;
+  padding: 8px;
+  border: .01em solid var(--ion-color-primary);
   border-radius: 8px;
 }
 

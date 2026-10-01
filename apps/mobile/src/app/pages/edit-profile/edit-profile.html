@@ -14,7 +14,7 @@
     </ion-header>
 
     @if(profile){
-        <form id="editProfileForm" #editProfileForm="ngForm" (ngSubmit)="submit()" class="">
+        <form #editProfileForm="ngForm" (ngSubmit)="submit()" class="">
             <ion-list lines="full">
                 <ion-item>
                     <ion-input 
@@ -22,7 +22,7 @@
                     type="text"
                     [(ngModel)]="profile.firstname" 
                     label="Firstname" 
-                    labelPlacement="stacked"
+                    label-placement="stacked"
                     ></ion-input>
                 </ion-item>
 
@@ -31,7 +31,7 @@
                     name="lastname"
                     type="text" 
                     label="Lastname"
-                    labelPlacement="stacked"  
+                    label-placement="stacked"  
                     [(ngModel)]="profile.lastname"
                     ></ion-input>
                 </ion-item>
@@ -41,7 +41,7 @@
                     name="email"
                     type="email"
                     label="Email address"
-                    labelPlacement="stacked"
+                    label-placement="stacked"
                     [(ngModel)]="profile.email"
                     ></ion-input>
                 </ion-item>
@@ -51,7 +51,7 @@
                     name="phoneNo"
                     label="Phone No"
                     type="tel" 
-                    labelPlacement="stacked" 
+                    label-placement="stacked" 
                     [(ngModel)]="profile.phoneNo"
                     ></ion-input>
                 </ion-item>
@@ -60,6 +60,10 @@
 
         <!-- Action Buttons-->
         <div class="flex flex-col gap-2 p-3">
+            <app-primary-button
+            []
+            
+            ></app-primary-button>
             <ion-button 
                 form="editProfileForm"
                 type="submit"

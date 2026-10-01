@@ -135,22 +135,23 @@ export class MeasurementService {
   //   return `This action returns a #${id} measurement`;
   // }
 
-  async update(id: number, updateMeasurementDto: UpdateMeasurementDto) {
+  async update(id: string, updateMeasurementDto: UpdateMeasurementDto) {
     try {
-      const { _id, client, user, measurements, notes } = updateMeasurementDto;
-
+      const client = await this.clientModel.findById(updateMeasurementDto.client);
+      const user = await this.userModel.findById(updateMeasurementDto.user);
+      
       // Convert standard JS object to a Map for Mongoose
-      const measurementsMap = new Map(Object.entries(measurements!));
+      const measurementsMap = new Map(Object.entries(updateMeasurementDto.measurements!));
 
       // Atomically update if exists, or insert if new (upsert)
       const updatedRecord = await this.measurementModel.findOneAndUpdate(
-        { _id : _id },
+        { _id : id },
         { 
           $set: { 
             ...(user && { user: user }),
             ...(client && { client: client }),
             measurements: measurementsMap,
-            ...(notes && { notes }),
+            ...(updateMeasurementDto.notes && { updateMeasurementDto }),
           } 
         },
         { returnDocument: "after", upsert: true, runValidators: true }

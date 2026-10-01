@@ -277,14 +277,12 @@
 
     <!-- Create Order Button-->
     <div class="p-3">
-        <ion-button 
-        [disabled]="selectedClient == undefined || order.styles.length == 0" 
-        shape="round" 
-        expand="block" 
-        color="primary"
-        (click)="submit()">
-            Create Order
-        </ion-button>
+        <app-primary-button
+            [buttonText]="'Save Order'"
+            [icon]="'save-outline'"
+            [disabled]="selectedClient == undefined || order.styles.length == 0"
+            (action)="submit()"
+        ></app-primary-button>
     </div>
 
     <!-- Modal sheet for quantity and color selection-->

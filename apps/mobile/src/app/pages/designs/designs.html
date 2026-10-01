@@ -24,6 +24,7 @@
     ></ion-searchbar>
 
     <!-- New Style Button-->
+    @if(designs.length > 0){
     <div class="px-2">
       <app-primary-button
       [buttonText]="'New Style'" 
@@ -31,6 +32,7 @@
       icon="add-outline"
       ></app-primary-button>
     </div>
+    }
     
     <!-- styles grid-->
     <ion-grid>
@@ -48,13 +50,15 @@
       }
       </ion-row>
     </ion-grid>
-  }@else {
-    <app-empty-state 
-    [imgPath]="'/images/add-to-cart.png'"
-    [title]="'No Style Added'" 
-    [desc]="'click the button to add a style to this order.'" 
-    [buttonText]="'New Style'"
-    (action)="openNewDesignModal()"
-    ></app-empty-state>
+
+    @if(designs.length == 0) {     
+      <app-empty-state 
+      [imgPath]="'/images/add-to-cart.png'"
+      [title]="'No Style Added'" 
+      [desc]="'click the button to add a style to this order.'" 
+      [buttonText]="'New Style'"
+      (action)="openNewDesignModal()"
+      ></app-empty-state>
+    }
   }
 </ion-content>

@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@an
 import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, 
   IonContent, IonButton, IonIcon, IonAlert, ViewWillEnter, IonInput, 
   IonTextarea, IonSelect, IonList, IonSelectOption, IonItem, 
-  IonActionSheet,
+  IonActionSheet, IonToggle,
   ModalController
 } from '@ionic/angular';
 import { DesignService } from '../../services/design.service';
@@ -16,7 +16,7 @@ import { AppService } from '../../services/app.service';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
 
 @Component({
-  imports: [IonActionSheet, IonList, IonTextarea, IonInput, IonAlert, IonIcon, IonButton,
+  imports: [IonToggle, IonActionSheet, IonList, IonTextarea, IonInput, IonAlert, IonIcon, IonButton,
     IonHeader, IonToolbar, IonButtons, IonBackButton,
     IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, IonItem,
     IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, PrimaryButton],

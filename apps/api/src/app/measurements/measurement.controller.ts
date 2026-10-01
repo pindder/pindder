@@ -42,7 +42,7 @@ export class MeasurementController {
     @Param('id') id: string,
     @Body() updateMeasurementDto: UpdateMeasurementDto,
   ) {
-    return this.measurementService.update(+id, updateMeasurementDto);
+    return this.measurementService.update(id, updateMeasurementDto);
   }
 
   @UseGuards(AuthGuard)
