@@ -14,7 +14,7 @@
     </ion-header>
 
     @if(profile){
-        <form #editProfileForm="ngForm" (ngSubmit)="submit()" class="">
+        <form #editProfileForm="ngForm" class="my-5">
             <ion-list lines="full">
                 <ion-item>
                     <ion-input 
@@ -55,22 +55,26 @@
                     [(ngModel)]="profile.phoneNo"
                     ></ion-input>
                 </ion-item>
-            </ion-list>
-        </form>
 
-        <!-- Action Buttons-->
-        <div class="flex flex-col gap-2 p-3">
-            <app-primary-button
-            []
-            
-            ></app-primary-button>
-            <ion-button 
-                form="editProfileForm"
-                type="submit"
-                shape="round" 
-                expand="block" 
-                color="primary"
-            >Continue</ion-button>
-        </div>
+                <ion-item>
+                    <ion-input 
+                    name="username"
+                    type="text"
+                    [(ngModel)]="profile.username" 
+                    label="Username" 
+                    label-placement="stacked"
+                    ></ion-input>
+                </ion-item>
+            </ion-list>
+
+            <!-- Action Button-->
+            <div class="p-3">
+                <app-primary-button
+                [buttonText]="'Save Profile'"
+                [icon]="'save-outline'"
+                (action)="submit()"                
+                ></app-primary-button>
+            </div>
+        </form>
     }
 </ion-content>

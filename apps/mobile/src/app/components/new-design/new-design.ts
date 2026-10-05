@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Outp
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonTextarea, IonButton, IonInput, 
   IonSelectOption, ViewWillEnter, IonSelect, IonSpinner, 
-  IonIcon, IonAlert, IonItem, IonList,
+  IonIcon, IonAlert, IonItem, IonList, IonLabel, IonListHeader,
   ToastController,
   IonButtons,
   IonTitle,
@@ -10,7 +10,7 @@ import { IonContent, IonTextarea, IonButton, IonInput,
   IonHeader,
   ModalController,
 } from "@ionic/angular";
-import { DataTypes, DesignTypes, IDesign, IResponse, Sizes } from '@pindder/contracts';
+import { DataTypes, DesignTypes, IColors, IDesign, IResponse, Sizes } from '@pindder/contracts';
 import { CloudinaryModule } from '@cloudinary/ng';
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -18,10 +18,14 @@ import { Camera } from '@capacitor/camera';
 import { forkJoin } from 'rxjs';
 import { OverlayEventDetail } from '@ionic/core';
 import { PrimaryButton } from '../primary-button/primary-button';
+import { AppService } from '../../services/app.service';
+import { Specification } from '../specification/specification';
 
 @Component({
   selector: 'app-new-design',
   imports: [
+    IonListHeader, 
+    IonLabel, 
     IonList,
     IonItem,
     IonAlert,
@@ -49,19 +53,37 @@ export class NewDesign implements ViewWillEnter, OnInit{
   @Input() parentComponent?: string;  
 
   private designService = inject(DesignService);
+  private appService = inject(AppService);
   private toastController = inject(ToastController);
   private modalCtrl = inject(ModalController);
   private cdr = inject(ChangeDetectorRef);
 
+  designType = DesignTypes;
   design!: IDesign;
   designTypes: string[] = [];
   sizes: string[] = [];
   selectedSizes: string[] = [];
+  selectedColors: string[] = [];
+  availableColors: IColors[] = [];
 
   uploadedImageUrls: string[] = [];
   isUploading: boolean = false;
 
-  ionViewWillEnter(): void { }
+  ionViewWillEnter(): void { 
+    this.fetchColors();
+  }
+
+  fetchColors() {
+    this.appService.fetchColors().subscribe({
+      next: (res: IResponse<IColors[]>) => {
+        this.availableColors = res.data || [];
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+        this.presentToast(error.message, 'danger', 'top');
+      }
+    });
+  }
 
   ngOnInit(): void {
     Object.keys(DesignTypes).forEach((v) => {
@@ -79,6 +101,7 @@ export class NewDesign implements ViewWillEnter, OnInit{
       category: "",
       type: "",
       sizes: [],
+      specifications: [],
       images: [],
       colors: [],
       catalogDisplay: this.parentComponent && this.parentComponent === DataTypes.ORDER ? false : true
@@ -158,6 +181,23 @@ export class NewDesign implements ViewWillEnter, OnInit{
     }
   }
 
+  async openSpecificationModal() {
+    const modal = await this.modalCtrl.create({
+      component: Specification,
+      componentProps: {
+        specifications: this.design.specifications,
+      }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if(data) {
+      this.design.specifications = data;
+    }
+  }
+
   removeImage(index: number) {
     this.uploadedImageUrls.splice(index, 1);
   }
@@ -167,10 +207,23 @@ export class NewDesign implements ViewWillEnter, OnInit{
     //console.log(this.selectedSizes);
   }
 
+  onColorChange(color: any) { 
+    console.log(color.detail.value);
+  }
+
   submit() {
     this.design.sizes = this.selectedSizes;
     this.design.images = this.uploadedImageUrls;
-    // console.log(this.design);
+    
+    console.log(this.selectedColors);
+    this.selectedColors.forEach((colorId) => {
+      const color = this.availableColors.find(c => c._id === colorId);
+      if(color) {
+        this.design.colors.push(color);
+      }
+    });
+
+    console.log(this.design);
 
     this.designService.createDesign(this.design).subscribe({
       next: (res: IResponse<IDesign>) => {

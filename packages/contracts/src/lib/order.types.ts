@@ -1,4 +1,5 @@
 import { IClient } from "./client.types";
+import { IColors, ISpecification } from "./design.types";
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -50,10 +51,29 @@ export interface IOrderStyle {
   dueDate: string;
   amount: number;
   sizes?: string[];
-  selectedSizes: string[];
+  specifications: ISpecification[];
+  selections: ISpecification[];
+  selectedSizesAndQuantities: ISizeQuantity[];
   colors?: string[];
-  selectedColors?: string[];
+  selectedColors?: IColors[];
   quantity: number;
   note?: string;
+  totalAmount: number;
+  totalItems: number;
   catalogDisplay: boolean;
+}
+
+export interface ISizeQuantity {
+  size: string;
+  quantity: number;
+  color?: string;
+}
+
+export interface IQuote {
+  _id?: string;
+  note: string;
+  amount: number;
+  tailor: any;
+  customer: any;
+  order: string;
 }

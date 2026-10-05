@@ -17,10 +17,13 @@ export class CreateDesignDto {
     type!: string;
 
     @IsArray()
+    specifications?: [any] 
+
+    @IsArray()
     sizes?: [string];
 
     @IsArray()
-    colors?: [string];
+    colors?: [any];
 
     @IsArray()
     images?: [string];

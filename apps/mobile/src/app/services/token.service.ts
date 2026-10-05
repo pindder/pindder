@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { IProfile } from '@pindder/contracts';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +36,10 @@ export class TokenService {
     });
 
     return value;
+  }
+
+  async setProfile(profile: IProfile) {
+
   }
 
   async isAuthenticated(): Promise<boolean> {

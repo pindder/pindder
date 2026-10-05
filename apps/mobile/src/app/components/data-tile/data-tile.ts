@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IonIcon, IonLabel } from "@ionic/angular";
 //import { IonButton, IonButtons } from "@ionic/angular";
 
@@ -10,6 +10,7 @@ import { IonIcon, IonLabel } from "@ionic/angular";
 })
 export class DataTile implements OnInit{
   @Input() data!:any;
+  @Output() action = new EventEmitter<string>();
   
   ngOnInit(): void {
     console.log(this.data);

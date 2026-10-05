@@ -100,6 +100,7 @@ export class DesignService {
         { upsert: true, returnDocument: 'after'}
       );
 
+      console.log('design', updateDesignDto);
       const res: IResponse<any> = {
         statusCode: 200,
         msg: 'Style updated successfully',

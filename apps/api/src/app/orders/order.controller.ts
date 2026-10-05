@@ -13,6 +13,7 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { CreateQuoteDto } from './dto/create-quote.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -22,6 +23,18 @@ export class OrderController {
   @Post()
   create(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
     return this.orderService.create(createOrderDto, req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/quotes')
+  postQuote(@Param('id') order_id: string, createQuoteDto: CreateQuoteDto) {
+    return this.orderService.createQuote(order_id, createQuoteDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':id/quotes')
+  findOrderQuotes(@Param('id') order_id: string) {
+    return this.orderService.findOrderQuotes(order_id);
   }
 
   @UseGuards(AuthGuard)

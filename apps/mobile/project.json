@@ -87,6 +87,34 @@
         "staticFilePath": "dist/apps/mobile/browser",
         "spa": true
       }
+    },
+    "cap-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx @capacitor/assets generate",
+        "cwd": "apps/mobile"
+      }
+    },
+    "cap-sync": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap sync",
+        "cwd": "apps/mobile"
+      }
+    },
+    "cap-open-android": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap open android",
+        "cwd": "apps/mobile"
+      }
+    },
+    "cap-open-ios": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap open ios",
+        "cwd": "apps/mobile"
+      }
     }
   }
 }

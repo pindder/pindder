@@ -1,12 +1,14 @@
-<div id="container" class="ion-padding profile-row">
-    <ion-avatar slot="start">
-      <img src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
-    </ion-avatar>
-
-    <div class="profile-info">
-      <ion-label>
-        <h2>Bolade Lagundoye <ion-badge slot="start">Basic</ion-badge></h2>
-        <p>boladelag@gmail.com</p>
-      </ion-label>
-    </div>
-</div>
+<ion-item class="pt-4" lines="none">
+  <ion-avatar aria-hidden="true" slot="start">
+    <img [sizes]="" src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
+  </ion-avatar>
+  <ion-label>
+    <h2>{{ profile.firstname + ' ' + profile.lastname }} <ion-badge slot="start">Basic</ion-badge></h2>
+    <p>{{ profile.email }}</p>
+  </ion-label>
+  @if(!hideNotification){
+    <ion-button color="light" size="medium" (click)="action.emit()">
+      <ion-icon name="notifications-outline" size="medium" slot="icon-only"></ion-icon>
+    </ion-button>
+  }
+</ion-item>

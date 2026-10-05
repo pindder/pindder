@@ -8,11 +8,14 @@ import { IOrderItem, IOrderStyle, IResponse, OrderStatus } from '@pindder/contra
 import { Client } from '../clients/schemas/client.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { generateCode } from '../shared/helpers';
+import { Quote } from './schemas/quote.schema';
+import { CreateQuoteDto } from './dto/create-quote.dto';
 // import { OrderStatus } from '@pindder/contracts';
 
 @Injectable()
 export class OrderService {
   constructor(
+    @InjectModel(Quote.name) private readonly quoteModel: Model<Quote>,
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     @InjectModel(Client.name) private readonly clientModel: Model<Client>,
     @InjectModel(Order.name) private readonly orderModel: Model<Order>
@@ -43,6 +46,56 @@ export class OrderService {
         statusCode: 200,
         msg: 'Order created successfully',
         data: newOrder
+      }
+
+      return res;
+    } catch(error: any) {
+      console.log(error);
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
+  async createQuote(order_id: string, createQuoteDto: CreateQuoteDto) {
+    try {
+      const quote = new this.quoteModel(createQuoteDto);
+      
+      await quote.save();
+
+      // const order = await this.orderModel.findByIdAndUpdate(order_id, {
+      //   $push: { quotes: quote._id }
+      // }, { upsert: true, returnDocument: 'after' });
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Quote created successfully',
+        data: quote
+      }
+
+      return res;
+    } catch(error: any) {
+      console.log(error);
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
+  async findOrderQuotes(order_id: string) {
+    try {
+      const quotes = await this.quoteModel.find({ order: order_id }).exec();
+
+      if (!quotes || quotes.length === 0) {
+        const res: IResponse<any> = {
+          statusCode: 404,
+          msg: 'No quotes found for this order',
+          data: []
+        }
+  
+        return res;
+      }
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Order quotes retrieved successfully',
+        data: quotes
       }
 
       return res;

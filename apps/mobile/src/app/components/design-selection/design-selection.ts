@@ -78,6 +78,7 @@ export class DesignSelection implements ViewWillEnter, OnInit{
 
   selectDesign(design: any) {
     // Dismiss and pass client back to app-new-order
+    //console.log('Selected design:', design);
     this.modalCtrl.dismiss(design, 'selected');
   }
 

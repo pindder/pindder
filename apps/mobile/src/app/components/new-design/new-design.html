@@ -8,7 +8,7 @@
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
-<ion-content [fullscreen]="true">
+<ion-content color="light" [fullscreen]="true">
     <form #loginForm="ngForm" class="">
         <div class="image-grid p-3">
         <!-- Existing Uploaded Previews -->
@@ -55,7 +55,11 @@
             </div>
         </div>
 
-        <ion-list lines="full">
+        <ion-list [inset]="true">
+            <ion-list-header>
+                <ion-label>Style Information</ion-label>
+            </ion-list-header>
+
             <ion-item>
                 <ion-input
                 name="name"
@@ -91,33 +95,27 @@
                     @for(type of designTypes; track type){<ion-select-option [value]="type">{{ type }}</ion-select-option>}
                 </ion-select>
             </ion-item>
-        
-
-            <ion-item>
-                <ion-select 
-                name="sizes" 
-                [(ngModel)]="selectedSizes" 
-                (ionChange)="onSizesChange($event)"
-                label="Available Sizes" 
-                aria-label="sizes" 
-                placeholder="Select sizes" 
-                label-placement="stacked"
-                multiple="true"
-                >
-                    @for(size of sizes; track size){<ion-select-option [value]="size">{{ size }}</ion-select-option>}
-                </ion-select>
-            </ion-item>
-
 
             <ion-item>
                 <ion-input
                 name="amount"
                 type="number"
                 fill="solid"
+                label="Amount"
+                [min]="0"
                 placeholder="Enter amount"
                 label-placement="floating"
                 [(ngModel)]="design.amount" 
                 ></ion-input>
+            </ion-item>
+        </ion-list>
+
+        <ion-list [inset]="true">
+            <ion-list-header>
+                <ion-label>Specifications</ion-label>
+            </ion-list-header>
+            <ion-item lines="none" button (click)="openSpecificationModal()">
+                <ion-label>Add Specification</ion-label>
             </ion-item>
         </ion-list>
 

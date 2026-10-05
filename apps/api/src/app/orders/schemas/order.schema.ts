@@ -52,3 +52,59 @@ export class Order {
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
+
+// 1. Keep standard Virtual definition
+OrderSchema.virtual('quotes', {
+    ref: 'Quote',
+    localField: '_id',
+    foreignField: 'order',
+    justOne: false,
+    // get: (quotes: any[]) => {
+    //     if (!Array.isArray(quotes) || quotes.length === 0) return quotes;
+
+    //     // Check if any quote has satisfiedParties === 2
+    //     const satisfiedQuote = quotes.find((q) => q?.satisfiedParties === 2);
+
+    //     // Return array with only the satisfied quote if found, else return all quotes
+    //     return satisfiedQuote ? [satisfiedQuote] : quotes;
+    // },
+});
+
+// 2. Enable virtuals in output
+OrderSchema.set('toJSON', { virtuals: true });
+OrderSchema.set('toObject', { virtuals: true });
+
+// 3. Keep Auto-Populate Pre-Hooks
+function autoPopulateQuotes(this: any) {
+    this.populate('quotes');
+}
+
+OrderSchema.pre('findOne', autoPopulateQuotes);
+OrderSchema.pre('find', autoPopulateQuotes);
+
+// 4. Helper method to apply conditional filtering logic on the quotes array
+function filterQuotesCondition(doc: any) {
+  if (doc && Array.isArray(doc.quotes) && doc.quotes.length > 0) {
+    // Find if any quote has satisfiedParties equal to 2
+    const satisfiedQuote = doc.quotes.find(
+      (q: any) => q.satisfiedParties === 2,
+    );
+
+    if (satisfiedQuote) {
+      // If a satisfied quote exists, return only that one in the quotes array
+      doc.quotes = [satisfiedQuote];
+    }
+    // Otherwise, leave doc.quotes intact (returns all quotes)
+  }
+}
+
+// 5. Post Hooks to filter populated results automatically
+OrderSchema.post('findOne', function (doc) {
+  filterQuotesCondition(doc);
+});
+
+OrderSchema.post('find', function (docs) {
+  if (Array.isArray(docs)) {
+    docs.forEach((doc) => filterQuotesCondition(doc));
+  }
+});

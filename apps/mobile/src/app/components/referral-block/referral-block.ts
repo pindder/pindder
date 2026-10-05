@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonIcon, IonButton, IonLabel, IonItem } from "@ionic/angular";
 
 @Component({
@@ -10,4 +10,7 @@ import { IonIcon, IonButton, IonLabel, IonItem } from "@ionic/angular";
   templateUrl: './referral-block.html',
   styleUrl: './referral-block.css',
 })
-export class ReferralBlock {}
+export class ReferralBlock {
+  @Input() profile: any;
+  @Output() action = new EventEmitter();
+}

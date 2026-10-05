@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SocialButtons } from './social-buttons';
+import { Specification } from './specification';
 
-describe('SocialButtons', () => {
-  let component: SocialButtons;
-  let fixture: ComponentFixture<SocialButtons>;
+describe('Specification', () => {
+  let component: Specification;
+  let fixture: ComponentFixture<Specification>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SocialButtons],
+      imports: [Specification],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SocialButtons);
+    fixture = TestBed.createComponent(Specification);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

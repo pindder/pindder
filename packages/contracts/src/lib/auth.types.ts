@@ -21,4 +21,6 @@ export interface IProfile {
   address?: string;
   email?: string;
   phoneNo?: string;
+  username?: string;
+  status?: string;
 }

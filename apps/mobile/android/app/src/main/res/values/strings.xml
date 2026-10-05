@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pindder</string>
+    <string name="title_activity_main">Pindder</string>
+    <string name="package_name">com.pindder.app</string>
+    <string name="custom_url_scheme">com.pindder.app</string>
+</resources>

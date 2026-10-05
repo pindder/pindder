@@ -1,25 +1,21 @@
 import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@angular/core';
-import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, 
-  IonContent, IonButton, IonIcon, IonAlert, ViewWillEnter, IonInput, 
-  IonTextarea, IonSelect, IonList, IonSelectOption, IonItem, 
-  IonActionSheet, IonToggle,
-  ModalController
-} from '@ionic/angular';
+import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton, IonIcon, IonAlert, ViewWillEnter, IonInput, IonTextarea, IonSelect, IonList, IonSelectOption, IonItem, IonActionSheet, IonToggle, ModalController, ToastController, IonLabel, IonListHeader } from '@ionic/angular';
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataTypes, DesignTypes, IDesign, IResponse, Sizes } from '@pindder/contracts';
+import { DataTypes, DesignTypes, IColors, IDesign, IResponse, Sizes } from '@pindder/contracts';
 import { forkJoin } from 'rxjs';
 import { Camera } from '@capacitor/camera';
 import { FormsModule } from '@angular/forms';
 import { AppService } from '../../services/app.service';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
+import { Specification } from '../../components/specification/specification';
 
 @Component({
   imports: [IonToggle, IonActionSheet, IonList, IonTextarea, IonInput, IonAlert, IonIcon, IonButton,
     IonHeader, IonToolbar, IonButtons, IonBackButton,
     IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, IonItem,
-    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, PrimaryButton],
+    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, PrimaryButton, IonLabel, IonListHeader],
   templateUrl: './design-view.html',
   styleUrl: './design-view.css',
 })
@@ -33,11 +29,14 @@ export class DesignView implements ViewWillEnter, OnInit{
   private appService = inject(AppService);
   private router = inject(Router);
   private modalCtrl = inject(ModalController);
+  private toastController = inject(ToastController);
 
   style_id = signal<string>("");
-  //design!: IDesign;
+  designType = DesignTypes;
   uploadedImageUrls: string[] = [];
   selectedSizes: string[] = [];
+  selectedColors: string[] = [];
+  availableColors: IColors[] = [];
   isUploading: boolean = false;
   isActionSheetOpen = signal<boolean>(false);
   modalContent = signal<string>("");
@@ -76,14 +75,18 @@ export class DesignView implements ViewWillEnter, OnInit{
   sizes = Object.keys(Sizes);
 
   ionViewWillEnter(): void {
+    this.fetchColors();
     const style_id = this.ar.snapshot.paramMap.get('id');
 
     if(style_id) {
       this.style_id.set(style_id);
+    } else {
+      this.design._id = this.ar.snapshot.queryParamMap.get('style') || '';
     }
 
     // if design is passed as prop to component don't call api
     if(this.design) {
+      //console.log(this.design);
       this.uploadedImageUrls = this.design.images;
       this.cdr.markForCheck();
     } else {
@@ -95,6 +98,52 @@ export class DesignView implements ViewWillEnter, OnInit{
     
   }
 
+  async openSpecificationModal() {
+    const modal = await this.modalCtrl.create({
+      component: Specification,
+      componentProps: {
+        specifications: this.design.specifications,
+      }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if(data) {
+      this.design.specifications = data;
+    }
+  }
+
+  fetchColors() {
+    this.appService.fetchColors().subscribe({
+      next: (res: IResponse<IColors[]>) => {
+        this.availableColors = res.data || [];
+        console.log(this.availableColors);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+        this.presentToast(error.message, 'danger', 'top');
+      }
+    });
+  }
+
+  async presentToast(
+    msg: string,
+    color: 'danger' | 'light' | 'dark' | 'success' | 'primary' | 'secondary', 
+    position: 'top' | 'middle' | 'bottom'
+  ) {
+    const toast = await this.toastController.create({
+      message: msg,
+      duration: 5000,
+      position: position,
+      color: color,
+      animated: true,
+    });
+
+    await toast.present();
+  }
+
   async openImage(imageUrl: string) {
     this.appService.openSingle(imageUrl);
   }
@@ -104,12 +153,20 @@ export class DesignView implements ViewWillEnter, OnInit{
     console.log(this.selectedSizes);
   }
 
+  onColorChange(color: CustomEvent) {
+    console.log(color.detail.value);
+  }
+
   fetchDesign() {
     this.designService.fetchDesign(this.style_id()).subscribe({
       next: (res) => {
         this.design = res.data;
         this.selectedSizes = res.data.sizes;
+        res.data.colors.forEach((color: IColors) => {
+          this.selectedColors.push(color._id)
+        });
         this.uploadedImageUrls = res.data.images;
+        console.log(this.selectedColors);
         this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
@@ -127,7 +184,17 @@ export class DesignView implements ViewWillEnter, OnInit{
   }
 
   submit() {
+    this.design.colors = [];
     this.design.sizes = this.selectedSizes;
+
+    this.selectedColors.forEach((colorId) => {
+      const color = this.availableColors.find(c => c._id === colorId);
+      if(color) {
+        this.design.colors.push(color);
+      }
+    });
+
+    console.log(this.design);
     this.designService.updateDesign(this.design._id!, this.design).subscribe({
       next: (res: IResponse<any>) => {
         this.design = res.data;
