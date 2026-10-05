@@ -89,6 +89,7 @@ export class Orders implements ViewWillEnter, OnInit{
     this.presentingElement = document.querySelector('.ion-page');
     const client_id = this.ar.snapshot.queryParamMap.get('client');
     const design_id = this.ar.snapshot.queryParamMap.get('style');
+    const status = this.ar.snapshot.queryParamMap.get('status');
 
     if(client_id) {
       this.client_id.set(client_id);
@@ -96,6 +97,9 @@ export class Orders implements ViewWillEnter, OnInit{
     } else if(design_id) { 
       this.design_id.set(design_id);
       this.fetchDesign(design_id);
+    } else if(status) {
+      this.activeSegment = status.toLocaleLowerCase();
+      this.fetchOrders(status.toLocaleUpperCase());
     } else {
       this.fetchOrders();
     }
@@ -137,6 +141,18 @@ export class Orders implements ViewWillEnter, OnInit{
     const selectedValue = event.detail.value;
     this.activeSegment = selectedValue;
     this.fetchDataForSegment(selectedValue);
+
+    const paramKey = 'status';
+
+    this.router.navigate([], {
+      relativeTo: this.ar,
+      queryParams: {
+        [paramKey]: null
+      },
+      queryParamsHandling: 'merge' 
+    });
+
+    this.cdr.markForCheck();
   }
 
   async fetchDataForSegment(segment: string) {

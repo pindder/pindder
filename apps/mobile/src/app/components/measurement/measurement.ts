@@ -81,7 +81,7 @@ export class Measurement implements OnInit{
         // Populate with common default fields
         this.addMeasurement(this.client_gender === Gender.FEMALE ? 'Bust' : 'Chest', '');
         this.addMeasurement('Waist', '');
-        this.addMeasurement('Tigh', '');
+      
         this.isLoading.set(false);
       }
     });

@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar,
-  IonBackButton,
+import { IonButtons, IonContent, IonHeader, IonTitle, IonToolbar,
+  IonBackButton, IonInput,
   ViewWillEnter,
   ToastController,
   IonList,
@@ -13,10 +13,19 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TokenService } from '../../services/token.service';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
 
+const initialProfile: IProfile = {
+  firstname: '',
+  lastname: '',
+  email: '',
+  address: '',
+  phoneNo: '',
+  username: ''
+};
+
 @Component({
   selector: 'app-edit-profile',
   imports: [IonHeader, IonContent, FormsModule, IonToolbar,
-    IonTitle, IonBackButton, IonButton, IonButtons, IonList,
+    IonTitle, IonBackButton, IonButtons, IonList, IonInput,
     IonItem, PrimaryButton],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
@@ -27,47 +36,54 @@ export class EditProfile implements OnInit, ViewWillEnter{
   private toastCtrl = inject(ToastController);
   private cdr = inject(ChangeDetectorRef);
 
-  profile!: IProfile;
+  profile: IProfile = { ...initialProfile };
 
   ionViewWillEnter(): void {
     this.loadProfile();
   }
 
-  ngOnInit(): void {
-    this.loadProfile();
-  }
+  ngOnInit(): void { }
 
   async loadProfile() {
-    const profile = await this.tokenService.getProfile();
-    this.profile = profile ? JSON.parse(profile) : null;
-    console.log(this.profile);
+    const profileStr = await this.tokenService.getProfile();
+    // Fall back to initialProfile instead of null to prevent template errors
+    this.profile = profileStr ? JSON.parse(profileStr) : { ...initialProfile };
     this.cdr.markForCheck();
   }
 
-  presentToast(
+  async presentToast(
     msg: string,
-    position?: 'top' | 'bottom' | 'middle',
-    color?: 'danger' | 'primary' | 'light' | 'dark' | 'secondary',
+    position: 'top' | 'bottom' | 'middle' = 'top',
+    color: 'danger' | 'primary' | 'light' | 'dark' | 'secondary' = 'light',
     icon?: string,
   ) {
-    this.toastCtrl.create({
-      message: '',
+    const toast = await this.toastCtrl.create({
+      message: msg, // 👈 Assigned passed message
       icon: icon ?? '',
-      color: color ?? 'light',
-      position: position ?? 'top'
+      color,
+      position,
+      duration: 2500, // 👈 Added auto-dismiss duration
     });
+    
+    await toast.present(); // 👈 Must call present() to show
   }
 
   submit() {
+    if (!this.profile) return;
+
     this.profileService.updateProfile(this.profile).subscribe({
       next: (res: IResponse<any>) => {
         this.profile = res.data;
-        this.presentToast(res.msg, 'top', 'primary');
+        // Keep TokenService local storage in sync with updated profile
+        this.tokenService.setProfile(res.data);
+        this.presentToast(res.msg || 'Profile updated successfully!', 'top', 'primary');
+        this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
-        console.log(error);
-        this.presentToast(error.message, 'top', 'danger');
-      }
-    })
+        console.error(error);
+        const errorMsg = error.error?.msg || error.message || 'An error occurred';
+        this.presentToast(errorMsg, 'top', 'danger');
+      },
+    });
   }
 }

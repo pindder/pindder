@@ -1,5 +1,5 @@
-<div class="flex flex-col gap-2 p-2 tile-border">
-    <ion-label>{{ data.title }}</ion-label>
+<div class="flex flex-col gap-2 p-2 tile-border" (click)="action.emit(data.title)">
+    <ion-label>{{ data.title }} Orders</ion-label>
     <div class="flex flex-row gap-2 items-center"> 
         <ion-icon class="circle p-1" [color]="data.color" size="large" slot="icon-only" [name]="data.icon"></ion-icon>    
         <h1>{{ data.count }}</h1> 

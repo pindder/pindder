@@ -162,20 +162,19 @@
                         </ion-avatar>
                         <ion-label>
                             <h2>{{ style.name }}</h2>
-                            <p>{{ (style.amount * style.quantity).toLocaleString() }}</p>
-                            @for(size of style.selectedSizes; track size){
-                                <span class="text-sm">
-                                    {{ size }}{{ $index + 1 == style.selectedSizes.length ? '' : ',' }}
-                                </span>
+                            @if(style.specifications && style.specifications.length == 0){
+                                <p>{{ style.totalAmount.toLocaleString() }}</p>
+                            }
+                            @for(size of style.selectedSizesAndQuantities; track size){
+                                @if(size.quantity > 0){
+                                    <span class="text-sm">
+                                    {{ size.size }}
+                                    </span>
+                                }
                             }
                         </ion-label>
                     </ion-item>
                     <ion-item-options slot="end">
-                        <ion-item-option 
-                        (click)="selectSize($index, style.sizes)" 
-                        color="secondary">
-                            <ion-icon slot="icon-only" name="bookmarks-outline"></ion-icon>
-                        </ion-item-option>
                         <ion-item-option 
                         (click)="viewDesignDetails(style)" 
                         color="primary">
@@ -229,16 +228,20 @@
                 </ion-item>
 
                 <ion-item lines="full">
-                    <ion-input
-                    name="delivery_method"
-                    type="text"
-                    label="Delivery Method"
+                    <ion-select 
+                    name="delivery_method" 
+                    [(ngModel)]="order.deliveryMethod" 
+                    label="Delivery Method" 
+                    aria-label="Delivery Method" 
+                    placeholder="Select delivery method" 
                     labelPlacement="stacked"
-                    [(ngModel)]="order.deliveryMethod"
-                    ></ion-input>
+                    >
+                    @for (dm of deliveryMethods; track dm) {
+                        <ion-select-option [disabled]="dm !== deliveryMethod.PICKUP" [value]="dm">{{ dm }}</ion-select-option>
+                    }
+                    </ion-select> 
                 </ion-item>
 
-                <br/>
                 <ion-item>
                     <ion-datetime
                     name="dueDate"
@@ -260,7 +263,7 @@
     </ion-list>
     }
 
-    @if(order.styles.length > 0) {
+    @if(order.totalAmount > 0) {
         <ion-list [inset]="true">
             <ion-list-header>
                 Cost Breakdown
@@ -286,23 +289,41 @@
     </div>
 
     <!-- Modal sheet for quantity and color selection-->
-    <ion-modal #modal trigger="open-modal" [initialBreakpoint]="0.25" [breakpoints]="[0, 0.25, 0.5, 0.75]">
+    <ion-modal #modal [initialBreakpoint]="0.25" [breakpoints]="[0, 0.25, 0.5, 0.75]">
         <ng-template>
             <ion-content>
                 <ion-list>
                     <ion-list-header>
-                        Quantity & Color
+                        Specifications
                     </ion-list-header>
-                    <ion-item>
-                        <ion-label>
-                            Quantity
-                        </ion-label>
-                        <div class="flex gap-3 items-center">
-                            <ion-button size="small" (click)="decrementQuantity()">-</ion-button>
-                                <p>{{ selectedStyle.quantity }}</p>
-                            <ion-button size="small" (click)="incrementQuantity()">+</ion-button>
-                        </div>
-                    </ion-item>
+                    @if(selectedStyle){
+                        @for(spec of selectedStyle.specifications; track spec; let specIndex = $index;){
+                        <ion-item>
+                            <ion-label>
+                                <p class="text-lg">{{ spec.size }} ({{ spec.amount.toLocaleString() }})</p>
+                                <div class="color-grid">
+                                @for(color of spec.colors; track color._id; let colorIndex = $index){
+                                    <div
+                                        class="color-swatch"
+                                        [style.background-color]="color.hex"
+                                        [class.selected]="isColorSelected(color, specIndex)"
+                                        (click)="toggleColor(color, specIndex)"
+                                    >
+                                        @if(isColorSelected(color, specIndex)){<ion-icon
+                                        name="checkmark"
+                                        [style.color]="getContrastColor(color.hex)"
+                                        ></ion-icon>}
+                                    </div>
+                                }
+                                </div>
+                            </ion-label>
+                            <div class="flex gap-3 items-center">
+                                <ion-button size="small" (click)="decrementQuantity($index)">-</ion-button>
+                                    <p>{{ selectedStyle.selections[specIndex].quantity }}</p>
+                                <ion-button size="small" (click)="incrementQuantity($index)">+</ion-button>
+                            </div>
+                        </ion-item>}
+                    }
                 </ion-list>
             </ion-content>
         </ng-template>

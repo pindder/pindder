@@ -18,6 +18,7 @@ import { SharedModule } from './shared/shared.module';
 import { TokenModule } from './tokens/token.module';
 import { AccountModule } from './accounts/account.module';
 import { PaymentModule } from './payments/payment.module';
+import { ColorsModule } from './colors/colors.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { PaymentModule } from './payments/payment.module';
     TokenModule,
     AccountModule,
     PaymentModule,
+    ColorsModule,
   ],
   controllers: [AppController],
   providers: [AppService, SharedService],

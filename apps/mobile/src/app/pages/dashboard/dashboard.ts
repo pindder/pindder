@@ -1,10 +1,11 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef, Component, EnvironmentInjector, inject, OnInit, signal } from '@angular/core';
 import { IonContent, IonFabButton, IonFab, 
-  IonIcon, IonButton, IonModal, IonItem, IonList, IonAvatar, 
+  IonIcon, IonButton, IonList, 
   IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonListHeader,
   ViewWillEnter,
-  ModalController, 
+  ModalController,
+  ToastController, 
 } from "@ionic/angular";
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
@@ -14,7 +15,8 @@ import { NewOrder } from "../../components/new-order/new-order";
 import { NewDesign } from "../../components/new-design/new-design";
 import { TokenService } from '../../services/token.service';
 import { Router } from '@angular/router';
-import { DataTypes } from '@pindder/contracts';
+import { ProfileCard } from '../../components/profile-card/profile-card';
+import { EmptyState } from '../../components/empty-state/empty-state';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,11 +26,8 @@ import { DataTypes } from '@pindder/contracts';
     IonCol,
     IonActionSheet,
     IonLabel,
-    IonAvatar,
-    IonModal,
     IonButton,
     IonList,
-    IonItem,
     IonIcon,
     IonFab,
     IonFabButton,
@@ -38,9 +37,8 @@ import { DataTypes } from '@pindder/contracts';
     DataTile,
     NotificationTile,
     IonListHeader,
-    NewClient,
-    NewOrder,
-    NewDesign
+    ProfileCard,
+    EmptyState
 ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -50,6 +48,7 @@ export class Dashboard implements ViewWillEnter, OnInit{
   private cdr = inject(ChangeDetectorRef);
   private tokenService = inject(TokenService);
   private modalCtrl = inject(ModalController);
+  private toastCtrl = inject(ToastController);
 
   profile!: any;
   environmentInjector = inject(EnvironmentInjector);
@@ -62,9 +61,12 @@ export class Dashboard implements ViewWillEnter, OnInit{
     {
       text: 'New Client',
       icon: 'person-add-outline',
-      handler: () => {
-        this.modalContent.set("New Client");
-        this.isModalOpen.set(true);
+      handler: async () => {
+        const modal = await this.modalCtrl.create({
+          component: NewClient,
+        });
+
+        await modal.present()
       },
       // role: 'destructive',
       data: {
@@ -74,41 +76,47 @@ export class Dashboard implements ViewWillEnter, OnInit{
     {
       text: 'New Style',
       icon: 'color-palette-outline',
-      handler: () => {
-        this.modalContent.set("New Style");
-        this.isModalOpen.set(true);
+      handler: async () => {
+        const modal = await this.modalCtrl.create({
+          component: NewDesign,
+        });
+
+        await modal.present()
       },
     },
     {
       text: 'New Order',
       icon: 'bag-add-outline',
-      handler: () => {
-        this.modalContent.set("New Order");
-        this.isModalOpen.set(true);
+      handler: async () => {
+        const modal = await this.modalCtrl.create({
+          component: NewOrder,
+        });
+
+        await modal.present()
       },
     },
   ];
   tiles = [
     {
-      title: "Pending Orders",
+      title: "Pending",
       icon: "hourglass-outline",
       count: 24,
       color: "medium"
     },
     {
-      title: "Ongoing Orders",
+      title: "Ongoing",
       icon: "time-outline",
       count: 24,
       color: "warning"
     },
     {
-      title: "Completed Orders",
+      title: "Completed",
       icon: "bag-check-outline",
       count: 24,
       color: "success"
     },
     {
-      title: "Overdue Orders",
+      title: "Overdue",
       icon: "alarm-outline",
       count: 24,
       color: "danger"
@@ -160,6 +168,8 @@ export class Dashboard implements ViewWillEnter, OnInit{
       date: ''
     },
   ];
+  catalog!: string;
+  referralLink!: string;
 
   ngOnInit(): void {
     this.presentingElement = document.querySelector('.ion-page');
@@ -174,47 +184,63 @@ export class Dashboard implements ViewWillEnter, OnInit{
   async loadProfile() {
     const profile = await this.tokenService.getProfile();
     this.profile = profile ? JSON.parse(profile) : null;
-    //console.log(this.profile);
+    this.catalog = `https://pindder.com/${this.profile.username}`;
   }
 
-  async openModal() {
-    const modal = await this.modalCtrl.create({
-      component: NewClient
-    });
+  openNotificationsModal() {}
 
-    await modal.present();
+  clearRecentNotifications() {
+    this.notifications = [];
+  }
+
+  gotoOrder($event: any) {
+    this.router.navigate(['app/orders'], { queryParams: { status: $event }});
   }
 
   async openActionSheet() {
     this.isActionSheetOpen.set(true);
   }
 
-  async closeModal(dataType: string) {
-    console.log('Closing modal payload:', dataType);
+  dismissModal() {
+    this.modalCtrl.dismiss(null, 'cancel');
+  }
 
-    // 1. Update your local state signal
-    this.isModalOpen.set(false);
+  async shareLink(): Promise<void> {
+    const shareData = {
+      title: 'Join me on YourAppName!',
+      text: `Use my referral code ${this.profile.username} to get 10% off your first order!`,
+      url: this.referralLink
+    };
 
-    // 2. Programmatically dismiss the active Ionic overlay
+    // Use Native Web Share API if supported
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User canceled or sharing failed silently
+      }
+    } else {
+      // Fallback: Copy link to clipboard
+      await this.copyToClipboard();
+    }
+  }
+
+  async copyToClipboard(): Promise<void> {
     try {
-      await this.modalCtrl.dismiss();
-    } catch (e) {
-      // In case no modal instance was registered via ModalController
+      await navigator.clipboard.writeText(this.referralLink);
+      await this.showToast('Referral link copied to clipboard!');
+    } catch (err) {
+      await this.showToast('Failed to copy link. Please copy manually.');
     }
+  }
 
-    // 3. Navigate after dismissing
-    if (!dataType) return;
-
-    switch (dataType) {
-      case DataTypes.CLIENT:
-        await this.router.navigate(['/app/clients']);
-        break;
-      case DataTypes.DESIGN:
-        await this.router.navigate(['/app/styles']);
-        break;
-      case DataTypes.ORDER:
-        await this.router.navigate(['/app/orders']);
-        break;
-    }
+  private async showToast(message: string): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color: 'dark'
+    });
+    await toast.present();
   }
 }

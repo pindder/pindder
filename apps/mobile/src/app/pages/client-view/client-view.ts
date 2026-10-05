@@ -21,7 +21,7 @@ import { ClientOrders } from '../../components/client-orders/client-orders';
     IonContent, IonHeader, IonToolbar,
     IonList, IonItem, IonInput, FormsModule,
     IonButton, IonSelect, IonSelectOption,
-    IonSpinner, IonIcon, Measurement,
+    IonSpinner, IonIcon,
     IonIcon, IonLabel, PrimaryButton
   ],
   templateUrl: './client-view.html',

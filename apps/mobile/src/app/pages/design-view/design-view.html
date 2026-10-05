@@ -24,9 +24,9 @@
 </ion-header>
 }
 
-<ion-content [fullscreen]="true">
+<ion-content color="light" [fullscreen]="true">
     @if(!dataType){<ion-header collapse="condense">
-        <ion-toolbar>
+        <ion-toolbar color="light">
             <ion-title size="large">style</ion-title>
         </ion-toolbar>
     </ion-header>}
@@ -72,16 +72,19 @@
             } -->
 
             <!-- Add Images Trigger Card -->
-            <!-- @if(design.images.length < 5){
+            @if(design.images.length == 0){
                 <div class="scroll-item upload-card" (click)="selectAndUploadMultipleImages()">
                     <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
                     <span class="upload-text">Add Images</span>
                 </div>
-            } -->
+            }
         </div>
 
         <form class="">
-            <ion-list lines="full">
+            <ion-list [inset]="true">
+                <ion-list-header>
+                    <ion-label>Style Information</ion-label>
+                </ion-list-header>
                 <ion-item>
                     <ion-input
                     name="name"
@@ -116,37 +119,36 @@
                         }
                     </ion-select>
                 </ion-item>
-                
-                <ion-item>
-                    <ion-select 
-                    name="sizes" 
-                    [(ngModel)]="selectedSizes" 
-                    (ionChange)="onSizesChange($event)"
-                    label="Available Sizes" 
-                    aria-label="sizes" 
-                    placeholder="Select sizes" 
-                    label-placement="stacked"
-                    multiple="true"
-                    >
-                        @for(size of sizes; track size){
-                            <ion-select-option [value]="size">{{ size }}</ion-select-option>
-                        }
-                    </ion-select>
-                </ion-item>
-                
+
                 <ion-item>
                     <ion-input
                     name="amount"
                     type="number"
+                    fill="solid"
+                    label="Amount"
+                    [min]="0"
+                    placeholder="Enter amount"
                     label-placement="floating"
-                    [(ngModel)]="design.amount"
+                    [(ngModel)]="design.amount" 
                     ></ion-input>
                 </ion-item>
-
+                
                 <ion-item class="py-3">
-                    <ion-toggle [(ngModel)]="design.catalogDisplay" [checked]="design.catalogDisplay">
+                    <ion-toggle 
+                    name="catalogDisplay" 
+                    [(ngModel)]="design.catalogDisplay" 
+                    [checked]="design.catalogDisplay">
                         Display in Catalogs
                     </ion-toggle>
+                </ion-item>
+            </ion-list>
+
+            <ion-list [inset]="true">
+                <ion-list-header>
+                    <ion-label>Specifications</ion-label>
+                </ion-list-header>
+                <ion-item lines="none" button (click)="openSpecificationModal()">
+                    <ion-label>View Specification</ion-label>
                 </ion-item>
             </ion-list>
 

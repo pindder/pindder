@@ -121,6 +121,7 @@ export class Clients implements ViewWillEnter, OnInit{
     //Listen for the selected client payload when dismissed
     const { data } = await modal.onWillDismiss();
     if (data) {
+      this.updateClientsList(data);
       this.clients$ = this.clients$.pipe(
         map((clients: IClient[]) => [...clients, data])
       );

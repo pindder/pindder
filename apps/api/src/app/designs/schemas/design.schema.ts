@@ -1,10 +1,50 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { DesignTypes, Sizes } from "@pindder/contracts";
+import { DesignTypes } from "@pindder/contracts";
 import { Tailor } from "../../tailors/schemas/tailor.schema";
 import { User } from "../../users/schemas/user.schema";
+import { ColorSnapshot } from "../../colors/schema/color.schema";
 
 export type DesignDocument = HydratedDocument<Design>;
+
+@Schema({ _id: false })
+export class SpecificationSnapshot {
+    @Prop({ type: String, required: true })
+    size!: string;
+
+    @Prop({ type: Number, required: true, default: 1 })
+    quantity!: number;
+
+    @Prop({ type: [ColorSnapshot], required: true })
+    colors?: ColorSnapshot[];
+
+    @Prop({ type: [ColorSnapshot] })
+    selectedColors?: ColorSnapshot[];
+
+    @Prop({ type: Number, required: true })
+    inStock!: number;
+
+    @Prop({ type: Number, required: true })
+    amount!: number;
+}
+
+@Schema({ _id: false })
+export class Specification {
+    @Prop({ type: String, required: true })
+    size!: string;
+
+    @Prop({ type: String })
+    description?: string;
+
+    @Prop({ type: [ColorSnapshot] })
+    colors?: ColorSnapshot[];
+
+    @Prop({ type: Number, required: true })
+    inStock!: number;
+
+    @Prop({ type: Number, required: true })
+    amount!: number;
+}
 
 @Schema({})
 export class OrderStyleSnapshot {
@@ -20,17 +60,11 @@ export class OrderStyleSnapshot {
     @Prop({ type: String, required: true, enum: DesignTypes })
     type!: string;
 
-    @Prop({ type: [String], enum: Sizes })
-    sizes?: [string];
+    @Prop({ type: [Specification] })
+    specifications?: [Specification];
 
-    @Prop({ type: [String], required: true })
-    selectedSizes?: [string];
-
-    @Prop({ type: [String] })
-    colors?: [string];
-
-    @Prop({ type: [String ]})
-    selectedColors?: [string];
+    @Prop({ type: [SpecificationSnapshot] })
+    selections?: SpecificationSnapshot[];
 
     @Prop({ type: Date })
     dueDate!: Date; 
@@ -43,6 +77,12 @@ export class OrderStyleSnapshot {
 
     @Prop({ type: String })
     note?: string;
+
+    @Prop({ type: Number })
+    totalAmount!: number;
+
+    @Prop({ type: Number })
+    totalItems!: number;
 
     @Prop({ type: Boolean, default: false, required: true })
     catalogDisplay!: boolean;
@@ -65,11 +105,11 @@ export class Design {
     @Prop({ type: String, required: true, enum: DesignTypes })
     type!: string;
 
-    @Prop({ type: [String], enum: Sizes, required: true })
-    sizes?: [string];
+    @Prop({ type: [Specification], required: true })
+    specifications?: [Specification];
 
-    @Prop({ type: [String] })
-    colors?: [string];
+    @Prop({ type: [ColorSnapshot] })
+    colors?: [ColorSnapshot];
 
     @Prop({ type: Number })
     productionDuration?: number; 

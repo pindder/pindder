@@ -1,14 +1,16 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
-import { /* DataTypes,*/ GalleryItem } from '@pindder/contracts';
+import { /* DataTypes,*/ GalleryItem, IColors, IResponse } from '@pindder/contracts';
 import PhotoSwipe from 'photoswipe';
 import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, Subject, switchMap } from 'rxjs';
+import { environment } from '../../environments/environment.production';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppService {
+  private http = inject(HttpClient);
   toastCtrl = inject(ToastController);
 
   /**
@@ -95,5 +97,9 @@ export class AppService {
 
   showToast() {
     
+  }
+
+  fetchColors(): Observable<IResponse<IColors[]>> {
+    return this.http.get<IResponse<IColors[]>>(`${environment.apiUrl}/colors`);
   }
 }
