@@ -62,8 +62,7 @@ export class NewDesign implements ViewWillEnter, OnInit{
   design!: IDesign;
   designTypes: string[] = [];
   sizes: string[] = [];
-  selectedSizes: string[] = [];
-  selectedColors: string[] = [];
+  selectedColors: IColors[] = [];
   availableColors: IColors[] = [];
 
   uploadedImageUrls: string[] = [];
@@ -100,7 +99,6 @@ export class NewDesign implements ViewWillEnter, OnInit{
       amount: 0,
       category: "",
       type: "",
-      sizes: [],
       specifications: [],
       images: [],
       colors: [],
@@ -195,33 +193,25 @@ export class NewDesign implements ViewWillEnter, OnInit{
 
     if(data) {
       this.design.specifications = data;
+      this.cdr.markForCheck();
     }
+
+    console.log(this.design);
   }
 
   removeImage(index: number) {
     this.uploadedImageUrls.splice(index, 1);
   }
 
-  onSizesChange(size: any) {
-    this.selectedSizes = size.detail.value;
-    //console.log(this.selectedSizes);
-  }
-
-  onColorChange(color: any) { 
-    console.log(color.detail.value);
-  }
-
   submit() {
-    this.design.sizes = this.selectedSizes;
     this.design.images = this.uploadedImageUrls;
-    
-    console.log(this.selectedColors);
-    this.selectedColors.forEach((colorId) => {
-      const color = this.availableColors.find(c => c._id === colorId);
-      if(color) {
-        this.design.colors.push(color);
-      }
-    });
+
+    if(this.design.type === DesignTypes.BESPOKE) {
+      this.design.colors = this.selectedColors;
+      this.design.specifications = [];
+    } else {
+      this.design.colors = [];
+    }
 
     console.log(this.design);
 
@@ -236,5 +226,28 @@ export class NewDesign implements ViewWillEnter, OnInit{
         this.presentToast(error.message, 'danger', 'top');
       }
     });
+  }
+
+  isColorSelected(code: string): boolean {
+    return this.selectedColors.some((c) => c.code === code);
+  }
+
+  toggleColor(color: IColors): void {
+    const index = this.selectedColors.findIndex((c) => c.name === color.name);
+    if (index > -1) {
+      this.selectedColors.splice(index, 1);
+    } else {
+      this.selectedColors.push(color);
+    }
+  }
+
+  // Ensures checkmark icon is readable on light vs dark colors
+  getContrastColor(hex: string): string {
+    const cleanHex = hex.replace('#', '');
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 180 ? '#000000' : '#FFFFFF';
   }
 }

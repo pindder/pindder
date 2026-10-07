@@ -1,12 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
+import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
+import { SubscriptionProviders, SubscriptionStatus } from "@pindder/contracts";
 
 export type SubscriptionDocument = HydratedDocument<Subscription>;
 
 @Schema({ timestamps: true })
 export class Subscription {
-    @Prop({ type: String, required: true })
-    name!: string;
+    @Prop({ type: TailorSnapshot, required: true })
+    tailor!: string;
 
     @Prop({ type: [String], required: true })
     featureList!: [string]; 
@@ -14,18 +16,34 @@ export class Subscription {
     @Prop({ })
     amount!: string;
 
-    @Prop({ type: String, required: true })
+    @Prop({ type: String, enum: SubscriptionProviders, default: SubscriptionProviders.paystack, required: true })
+    Provider!: string;
+
+    @Prop({ type: String, enum: SubscriptionStatus, default: SubscriptionStatus.none, required: true })
     status!: string;
 
-    /** What account types are eligible to see this plan */
-    @Prop({ type: [String], required: true })
-    availability!: [string];
+    // Provider-specific references
+    @Prop({ type: String })
+    paystackSubscriptionCode?: string; // e.g. SUB_v42et9284
 
     @Prop({ type: String })
-    duration!: string;
+    paystackEmailToken?: string;
 
-    @Prop({ type: [String] })
-    regions?: [string];
+    @Prop({ type: String })
+    appleOriginalTransactionId?: string; // e.g. 1000000123456789
+
+    // Access control
+    @Prop({ type: String })
+    planId!: string;
+
+    @Prop({ type: mongoose.Schema.Types.Date })
+    currentPeriodStartsAt!: Date;
+
+    @Prop({ type: mongoose.Schema.Types.Date })
+    currentPeriodEndsAt!: Date;
+
+    @Prop({ type: Boolean })
+    cancelAtPeriodEnd!: boolean;
 }
 
 export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);

@@ -6,6 +6,9 @@ const config: CapacitorConfig = {
   // Nx outputs Angular builds to dist/apps/<app-name>
   webDir: '../../dist/apps/mobile/browser',
   plugins: {
+    CapacitorHttp: {
+      enabled: true
+    },
     Keyboard: {
       resize: 'body',
       resizeOnFullScreen: true,

@@ -5,7 +5,6 @@ export interface IDesign {
     amount: number;
     description: string;
     type: string;
-    sizes: any;
     specifications: ISpecification[];
     selections?: ISpecification[];
     colors: any;

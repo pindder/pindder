@@ -1,6 +1,12 @@
 <ion-header>
     <ion-toolbar>
-        <ion-title>New Order</ion-title>
+        <ion-title>{{ isPreview ? 'Order Preview' : 'New Order' }}</ion-title>
+        @if(isPreview){
+        <ion-buttons slot="start">
+            <ion-button (click)="isPreview = false">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>}
         <ion-buttons slot="end">
             <ion-button (click)="dismissModal()">
                 <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
@@ -9,6 +15,11 @@
     </ion-toolbar>
 </ion-header>
 
+@if(isPreview){
+<ion-content color="light" [fullscreen]="true">
+    <app-order-view [order]="completeOrder" [isPreview]="true" (action)="submit()"></app-order-view>
+</ion-content>
+}@else{
 <ion-content color="light" [fullscreen]="true">
     <!-- Client Information-->
     <ion-list [inset]="true">
@@ -25,28 +36,6 @@
             [buttonText]="'Add Client'"
             (action)="openClientActionSheet()"
             ></app-empty-state>
-            <!-- Unique trigger ID for New Client -->
-            <!-- <ion-button 
-                id="open-new-client-modal"
-                type="button"
-                fill="outline"
-                color="primary"
-                (click)="openNewClientModal()"
-            >
-                <ion-icon name="person-add-outline" slot="start"></ion-icon>
-                New Client
-            </ion-button> -->
-            
-            <!-- Unique trigger ID for Select Client Search -->
-            <!-- <ion-button 
-                id="open-select-client-modal"
-                type="button"
-                color="primary"
-                (click)="openSelectClientModal()"
-            >
-                <ion-icon name="search-outline" slot="start"></ion-icon>
-                Exisitng Client
-            </ion-button>  -->
         </div>
         }@else if (selectedClient) {
         <ion-item lines="none">
@@ -62,7 +51,6 @@
             }
             </ion-label>
             
-            <!-- Changed slot="icon-only" to slot="end" and wrapped in a button for better tap target -->
             <ion-button fill="clear" slot="end" (click)="removeSelectedClient()">
                 <ion-icon name="close-circle-outline" color="danger" size="medium"></ion-icon>
             </ion-button>
@@ -94,78 +82,24 @@
             [buttonText]="'Add Style'"
             (action)="openDesignActionSheet()"
             ></app-empty-state>
-            <!-- Unique trigger ID for New Design -->
-            <!-- <ion-button 
-                id="open-new-design-modal"
-                type="button"
-                fill="outline"
-                color="primary"
-                (click)="openNewDesignModal()"
-            >
-                <ion-icon name="color-palette-outline" slot="start"></ion-icon>
-                New Style
-            </ion-button> -->
-            
-            <!-- Unique trigger ID for Select Client Search -->
-            <!-- <ion-button 
-                id="open-select-design-modal"
-                type="button"
-                color="primary"
-                (click)="openSelectDesignModal()"
-            >
-                <ion-icon name="search-outline" slot="start"></ion-icon>
-                Search Style
-            </ion-button>  -->
         </div>
         }@else {
             @for(style of order.styles; track style._id){
-                <!-- <div class="flex justify-between items-center px-3 py-2 gap-3">
-                    <div class="flex gap-3">
-                        <ion-thumbnail>
-                            <img src="{{ style.design.images[0] }}" alt=""/>
-                        </ion-thumbnail>
-                        <ion-label>
-                            <h2>
-                                {{ style.design.name }} ({{ style.design.type }})
-                            </h2>
-                            @if (style.design.amount) {
-                                <p>{{ style.design.amount.toLocaleString() }}</p>
-                            }
-                        </ion-label>
-                    </div>
-                    
-                    <div>
-                        <ion-button fill="clear" slot="end" (click)="removeSelectedDesign($index)">
-                            <ion-icon name="close-circle-outline" color="danger" size="small" slot="end"></ion-icon>
-                        </ion-button>
-                    </div>
-                </div> -->
                 <ion-item-sliding>
-                    <!-- <ion-item-options side="start">
-                        @if(style.quantity > 1){
-                            <ion-item-option 
-                            (click)="decrementQuantity($index)" 
-                            color="danger"
-                            >
-                                <ion-icon name="remove-outline"></ion-icon>
-                            </ion-item-option>
-                        }
-                        <ion-item-option 
-                        (click)="incrementQuantity($index)" 
-                        color="success">
-                            <ion-icon name="add-outline"></ion-icon>
-                        </ion-item-option>
-                    </ion-item-options> -->
                     <ion-item [button]="true" (click)="openModalSheet($index, style)">
                         <ion-avatar aria-hidden="true" slot="start">
                             <img alt="" src="{{ style.images[0] }}" />
                         </ion-avatar>
                         <ion-label>
                             <h2>{{ style.name }}</h2>
-                            @if(style.specifications && style.specifications.length == 0){
+                            @if(style.type === designTypes.BESPOKE){
+                                <p>{{ style.quantity < 1 ? style.amount.toLocaleString() : (style.amount * style.quantity).toLocaleString() }}</p>
+                            } @else if(style.type === designTypes.READYMADE && style.selections.length > 0){
                                 <p>{{ style.totalAmount.toLocaleString() }}</p>
+                            } @else {
+                                <p>{{ style.amount.toLocaleString() }}</p>
                             }
-                            @for(size of style.selectedSizesAndQuantities; track size){
+                            @for(size of style.specifications; track size){
                                 @if(size.quantity > 0){
                                     <span class="text-sm">
                                     {{ size.size }}
@@ -250,13 +184,6 @@
                     [(ngModel)]="order.dueDate" 
                     (ionChange)="onDateChange($event)"
                     ></ion-datetime>
-                    <!-- <ion-datetime-button datetime="datetime"></ion-datetime-button>
-
-                    <ion-modal [keepContentsMounted]="true">
-                        <ng-template>
-                            <ion-datetime id="datetime"></ion-datetime>
-                        </ng-template>
-                    </ion-modal> -->
                 </ion-item>
             </ion-list>
         </form>
@@ -281,27 +208,32 @@
     <!-- Create Order Button-->
     <div class="p-3">
         <app-primary-button
-            [buttonText]="'Save Order'"
-            [icon]="'save-outline'"
+            [buttonText]="'Preview Order'"
+            [icon]="'eye-outline'"
             [disabled]="selectedClient == undefined || order.styles.length == 0"
-            (action)="submit()"
+            (action)="buildOrder()"
         ></app-primary-button>
     </div>
 
     <!-- Modal sheet for quantity and color selection-->
-    <ion-modal #modal [initialBreakpoint]="0.25" [breakpoints]="[0, 0.25, 0.5, 0.75]">
+    <ion-modal #modal 
+    [initialBreakpoint]="0.5" 
+    [breakpoints]="[0.5, 0.75]" 
+    (didDismiss)="closeModalSheet()"
+    [expandToScroll]="false"
+    >
         <ng-template>
             <ion-content>
                 <ion-list>
                     <ion-list-header>
                         Specifications
                     </ion-list-header>
-                    @if(selectedStyle){
+                    @if(selectedStyle.type === designTypes.READYMADE){
                         @for(spec of selectedStyle.specifications; track spec; let specIndex = $index;){
-                        <ion-item>
+                        <ion-item lines="full">
                             <ion-label>
-                                <p class="text-lg">{{ spec.size }} ({{ spec.amount.toLocaleString() }})</p>
-                                <div class="color-grid">
+                                <h2>{{ spec.size }} ({{ spec.amount.toLocaleString() }})</h2>
+                                <div class="py-1 color-grid">
                                 @for(color of spec.colors; track color._id; let colorIndex = $index){
                                     <div
                                         class="color-swatch"
@@ -318,11 +250,40 @@
                                 </div>
                             </ion-label>
                             <div class="flex gap-3 items-center">
-                                <ion-button size="small" (click)="decrementQuantity($index)">-</ion-button>
+                                <ion-button size="small" (click)="decrementQuantity(spec)">-</ion-button>
                                     <p>{{ selectedStyle.selections[specIndex].quantity }}</p>
-                                <ion-button size="small" (click)="incrementQuantity($index)">+</ion-button>
+                                <ion-button size="small" (click)="incrementQuantity(spec)">+</ion-button>
                             </div>
                         </ion-item>}
+                    } @else if(selectedStyle.type === designTypes.BESPOKE){
+                        <ion-item>
+                            <ion-label><p>Quantity</p></ion-label>
+                            <div class="flex gap-3 items-center">
+                                <ion-button size="small" (click)="decrementQuantityBespoke()">-</ion-button>
+                                    <p>{{ selectedStyle.quantity }}</p>
+                                <ion-button size="small" (click)="incrementQuantityBespoke()">+</ion-button>
+                            </div>
+                        </ion-item>
+                        <ion-item>
+                            <ion-label><p>Colors</p></ion-label>
+                            <div class="py-2 color-grid">
+                            @for(color of selectedStyle.colors; track color._id; let colorIndex = $index){
+                                <div
+                                    class="color-swatch"
+                                    [style.background-color]="color.hex"
+                                    [class.selected]="isColorSelected(color)"
+                                    (click)="toggleColor(color)"
+                                >
+                                    @if(isColorSelected(color)){<ion-icon
+                                    name="checkmark"
+                                    [style.color]="getContrastColor(color.hex)"
+                                    ></ion-icon>}
+                                </div>
+                            } @empty {
+                                
+                            }
+                            </div>
+                        </ion-item>
                     }
                 </ion-list>
             </ion-content>
@@ -344,4 +305,4 @@
         [buttons]="designActionSheetButtons"
         (didDismiss)="isDesignActionSheetOpen.set(false)">
     </ion-action-sheet>
-</ion-content>
+</ion-content>}

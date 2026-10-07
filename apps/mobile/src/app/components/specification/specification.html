@@ -15,11 +15,12 @@
             <ion-item lines="full" [button]="true" (click)="editSpecification($index)">
                 <ion-label>
                     <h2>{{ specification.size }}</h2>
-                    <p>In stock: {{ specification.quantity }}</p>
+                    <p>In stock: {{ specification.inStock }}</p>
                 </ion-label>
+                @if(specification.amount){
                 <ion-note>
                     <ion-label>{{ specification.amount.toLocaleString() }}</ion-label>
-                </ion-note>
+                </ion-note>}
             </ion-item>
             <ion-item-options>
                 <ion-item-option (click)="editSpecification($index)">

@@ -30,20 +30,20 @@ export class SpecificationSnapshot {
 
 @Schema({ _id: false })
 export class Specification {
-    @Prop({ type: String, required: true })
+    @Prop({ type: String, required: false })
     size!: string;
 
-    @Prop({ type: String })
+    @Prop({ type: String, required: false})
     description?: string;
 
     @Prop({ type: [ColorSnapshot] })
     colors?: ColorSnapshot[];
 
-    @Prop({ type: Number, required: true })
-    inStock!: number;
+    @Prop({ type: Number, required: false })
+    inStock?: number;
 
-    @Prop({ type: Number, required: true })
-    amount!: number;
+    @Prop({ type: Number, required: false })
+    amount?: number;
 }
 
 @Schema({})
@@ -74,6 +74,12 @@ export class OrderStyleSnapshot {
 
     @Prop({ type: Number })
     quantity!: number;
+
+    @Prop({ type: ColorSnapshot })
+    selectedColors?: ColorSnapshot[]
+
+    @Prop({ type: ColorSnapshot })
+    colors?: ColorSnapshot[]
 
     @Prop({ type: String })
     note?: string;

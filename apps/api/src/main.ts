@@ -8,7 +8,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({
@@ -17,6 +17,8 @@ async function bootstrap() {
       'http://localhost:4200',
       'http://localhost:8100',
       'http://localhost',       // Capacitor Android
+      'http://10.0.2.2:4000',   // Android Emulator to host API
+      'http://10.0.2.2',        // Android Emulator
       'capacitor://localhost',  // Capacitor iOS
       'ionic://localhost',      // Ionic iOS (legacy)
     ],

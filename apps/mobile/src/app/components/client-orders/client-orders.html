@@ -14,6 +14,17 @@
 <ion-content>
     <div class="p-2">
         @for(order of orders; track order._id) {
+            <div class="py-1">
+                <ion-button 
+                (click)="gotoNewOrder()"
+                expand="block"
+                color="primary"
+                fill="outline">
+                    <ion-icon name="add-outline" slot="start"></ion-icon>
+                    New Order
+                </ion-button>
+            </div>
+
             <app-list-card 
                 [dataType]="dataTypes.ORDER" 
                 [order]="order"
@@ -21,11 +32,13 @@
             >
             </app-list-card>
         } @empty {
+        <div class="center">
             <app-empty-state 
                 [parentComponent]="dataTypes.ORDER" 
                 (action)="dismissModal(true)"
             >
             </app-empty-state>
+        </div>
         }
     </div>
 </ion-content>

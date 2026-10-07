@@ -73,8 +73,8 @@ export class ClientService {
     return this.http.post<any>(`${environment.apiUrl}/measurements`, measurement);
   }
 
-  fetchClientMeasurements(client_id: string): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/measurements/${client_id}`);
+  fetchClientMeasurements(client_id: string): Observable<IResponse<any[]>> {
+    return this.http.get<IResponse<any[]>>(`${environment.apiUrl}/measurements/${client_id}`);
   }
 
   updateClientMeasurement(measurement_id: string, measurement: IMeasurement): Observable<IResponse<any>> {

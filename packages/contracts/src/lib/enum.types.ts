@@ -15,6 +15,20 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
 }
 
+export enum SubscriptionStatus {
+    active = 'active', 
+    cancelled = 'cancelled', 
+    'past_due' = 'past_due', 
+    none = 'none',
+    suspended = 'suspended'
+}
+
+export enum SubscriptionProviders {
+    paystack = 'paystack', 
+    'apple_iap' = 'apple_iap', 
+    'google_play' = 'google_play'
+}
+
 export enum Gender {
     MALE = "MALE",
     FEMALE = "FEMALE"

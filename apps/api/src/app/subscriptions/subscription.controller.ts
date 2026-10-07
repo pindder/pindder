@@ -21,6 +21,11 @@ export class SubscriptionController {
     return this.subscriptionService.create(createSubscriptionDto);
   }
 
+  @Post('subscribe')
+  subscribe() {
+    return this.subscriptionService.initializeSubscriptionPayment();
+  }
+
   @Get()
   findAll() {
     return this.subscriptionService.findAll();

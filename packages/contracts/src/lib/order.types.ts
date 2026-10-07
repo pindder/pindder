@@ -26,9 +26,9 @@ export interface IOrder {
 export interface IOrderItem {
   orderId: string;
   _id: string;
-  client: IClient;
-  tailor: any;
-  user: any;
+  client?: IClient;
+  tailor?: any;
+  user?: any;
   styles: IOrderStyle[];
   dueDate: string | Date;
   measurement?: string;
@@ -50,23 +50,15 @@ export interface IOrderStyle {
   type: string;
   dueDate: string;
   amount: number;
-  sizes?: string[];
   specifications: ISpecification[];
   selections: ISpecification[];
-  selectedSizesAndQuantities: ISizeQuantity[];
-  colors?: string[];
-  selectedColors?: IColors[];
+  colors: IColors[];
+  selectedColors: IColors[];
   quantity: number;
   note?: string;
   totalAmount: number;
   totalItems: number;
   catalogDisplay: boolean;
-}
-
-export interface ISizeQuantity {
-  size: string;
-  quantity: number;
-  color?: string;
 }
 
 export interface IQuote {

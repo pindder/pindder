@@ -1,3 +1,4 @@
+@if(!isPreview){
 <ion-header [translucent]="true"> 
     <ion-toolbar>
         <ion-buttons slot="start">
@@ -7,15 +8,16 @@
             <ion-title>Order</ion-title>
         </ion-buttons>
     </ion-toolbar>
-</ion-header>
+</ion-header>}
 
 @if(order){
 <ion-content color="light" [fullscreen]="true">
+    @if(!isPreview){
     <ion-header collapse="condense">
         <ion-toolbar color="light">
             <ion-title size="large">Order</ion-title>
         </ion-toolbar>
-    </ion-header>
+    </ion-header>}
 
     <!-- Client Information-->
     <ion-list [inset]="true">
@@ -58,13 +60,13 @@
 
         @for(style of order.styles; track style._id){
             <ion-item-sliding>
-                <ion-item [button]="true">
+                <ion-item [button]="true" (click)="viewStyleDetail(style)">
                     <ion-avatar aria-hidden="true" slot="start">
                         <img alt="" src="{{ style.images[0] }}" />
                     </ion-avatar>
                     <ion-label>
                         <h2>{{ style.name }}</h2>
-                        <p>unit price: {{ style.amount.toLocaleString() }}</p>
+                        <p>price: {{ style.totalAmount.toLocaleString() }}</p>
                         <p>quantity: {{ style.totalItems }}</p>    
                     </ion-label>
                 </ion-item>
@@ -78,6 +80,45 @@
             </ion-item-sliding>
         }
     </ion-list>
+
+    <!-- Modal sheet for quantity and color selection-->
+    <ion-modal 
+    #modal 
+    [initialBreakpoint]="0.25" 
+    [breakpoints]="[0, 0.25, 0.5, 0.75]"
+    [isOpen]="isModalOpen"
+    (didDismiss)="isModalOpen = false">
+        <ng-template>
+            <ion-content>
+                <ion-list>
+                    <ion-list-header>
+                        Specifications
+                    </ion-list-header>
+                    
+                    @for(spec of selectedStyle.selections; track spec; let specIndex = $index;){
+                    <ion-item>
+                        <ion-label>
+                            <p class="text-lg">{{ spec.size }} ({{ spec.amount.toLocaleString() }})</p>
+                            <p>Qty: {{ selectedStyle.selections[specIndex].quantity }}</p>
+                            <div class="color-grid">
+                            @for(color of spec.colors; track color._id;) {
+                                <div
+                                    class="color-swatch"
+                                    [style.background-color]="color.hex"
+                                >
+                                </div>
+                            }
+                            </div>
+                        </ion-label>
+                        <ion-note>
+                            
+                            <p>Total: {{ selectedStyle.totalAmount }}</p>
+                        </ion-note>
+                    </ion-item>}
+                </ion-list>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
 
     <!-- Additional Details-->
     <ion-list [inset]="true">
@@ -142,6 +183,15 @@
         </ion-item>
     </ion-list>
 
+    @if(isPreview){
+    <div class="p-3">
+        <app-primary-button
+        [buttonText]="'Save Order'"
+        [icon]="'save-outline'"
+        (action)="action.emit()"
+        ></app-primary-button>
+    </div>
+    }@else{
     <div class="p-3">
         @if(order.status !== orderStatuses.CANCELLED && 
         order.status !== orderStatuses.COMPLETED){
@@ -159,6 +209,6 @@
             [color]="'danger'"
             ></app-primary-button>
         }
-    </div>
+    </div>}
 </ion-content>
 }

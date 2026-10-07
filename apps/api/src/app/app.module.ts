@@ -19,6 +19,8 @@ import { TokenModule } from './tokens/token.module';
 import { AccountModule } from './accounts/account.module';
 import { PaymentModule } from './payments/payment.module';
 import { ColorsModule } from './colors/colors.module';
+import { ReferralsModule } from './referrals/referrals.module';
+import { WebhookModule } from './webhooks/webhook.module';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { ColorsModule } from './colors/colors.module';
     AccountModule,
     PaymentModule,
     ColorsModule,
+    ReferralsModule,
+    WebhookModule,
   ],
   controllers: [AppController],
   providers: [AppService, SharedService],

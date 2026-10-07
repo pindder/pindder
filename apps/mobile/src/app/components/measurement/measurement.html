@@ -8,54 +8,140 @@
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
-<ion-content>
-  <form [formGroup]="form">
-    <div formArrayName="measurements">
-      @for (control of measurements.controls; track $index; let i = $index) {
-        <div [formGroupName]="i" class="flex items-center gap-2 my-2">
-          <ion-item class="flex-1" lines="outline">
-            <ion-input
-              formControlName="key"
-              label="Measurement"
-              labelPlacement="stacked"
-              placeholder="e.g. Chest"
-            ></ion-input>
-          </ion-item>
+<ion-content color="light">
+  @if(measurementList.length > 0){
+    <div class="px-3 py-2">
+      <ion-button 
+      (click)="modal.present()"
+      expand="block"
+      color="primary"
+      fill="outline">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          New Measurement
+      </ion-button>
+    </div>  
 
-          <ion-item class="flex-1" lines="outline">
-            <ion-input
-              formControlName="value"
-              label="Value"
-              labelPlacement="stacked"
-              placeholder="e.g. 42 in"
-            ></ion-input>
-          </ion-item>
-
-          <ion-button 
-            color="danger" 
-            fill="clear" 
-            (click)="removeMeasurement(i)"
-            [disabled]="measurements.length === 1"
-          >
-            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-        </div>
-      }
+    <ion-list inset="true">
+    <!-- <ion-list-header>
+      <ion-label>Measurement List</ion-label>
+    </ion-list-header> -->
+    @for(measure of measurementList; track $index;){
+    <ion-item-sliding>
+      <ion-item lines="full" [button]="true" (click)="editMeasurement(measure)">
+          <ion-label>
+              <h2>{{ measure.name }}</h2>
+              <p>{{ measure.description }}</p>
+          </ion-label>
+          <ion-note>
+              <ion-label>{{ measure.measurements.length }}</ion-label>
+          </ion-note>
+      </ion-item>
+      <ion-item-options>
+          <ion-item-option (click)="editMeasurement(measure)">
+              <ion-icon name="pencil-outline" size="large"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="deleteMeasurement($index)">
+              <ion-icon name="trash-outline" size="large"></ion-icon>
+          </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+    }
+    </ion-list>
+  } @else {
+    <div class="center">
+      <app-empty-state
+      [title]="'No Measurements Added'" 
+      [desc]="'click the button to add measurement for this client.'" 
+      [buttonText]="'Add Measurement'"
+      (action)="modal.present()"
+      ></app-empty-state>
     </div>
+  }
 
-    <div class="flex flex-col gap-2 px-2 py-4 mb-5">
-      <app-primary-button
-      [fill]="'outline'"
-      [buttonText]="'Add Custom Field'"
-      [icon]="'add-outline'"
-      (action)="addMeasurement()"
-      ></app-primary-button>
+  <!-- Modal sheet for quantity and color selection-->
+  <ion-modal 
+  #modal 
+  [initialBreakpoint]="0.5" 
+  [breakpoints]="[0.5, 0.75]"
+  (didDismiss)="editingMeasurement = false"
+  [expandToScroll]="false">
+      <ng-template>
+          <ion-content>
+              <ion-list>
+                  <ion-list-header>
+                      New Measurement
+                  </ion-list-header>                
+              
+                  <form [formGroup]="form">
+                    <div>
+                      <ion-item lines="full">
+                        <ion-input
+                          formControlName="name"
+                          label="Name"
+                          labelPlacement="stacked"
+                          placeholder="e.g Paul's Measurement"
+                        ></ion-input>
+                      </ion-item>
 
-      <app-primary-button
-      [buttonText]="'Save Measurements'"
-      [icon]="'save-outline'"
-      (action)="submit()"
-      ></app-primary-button>
-    </div>
-  </form>
+                      <ion-item lines="full">
+                        <ion-input
+                          formControlName="description"
+                          label="Description"
+                          labelPlacement="stacked"
+                          placeholder="e.g Brief details about this measurment"
+                        ></ion-input>
+                      </ion-item>
+                    </div>
+                    <div formArrayName="measurements">
+                      @for (control of measurements.controls; track $index; let i = $index) {
+                      <div [formGroupName]="i" class="flex items-center gap-2 my-2">
+                        <ion-item class="flex-1" lines="outline">
+                          <ion-input
+                            formControlName="key"
+                            label="Measurement"
+                            labelPlacement="stacked"
+                            placeholder="e.g. Chest"
+                          ></ion-input>
+                        </ion-item>
+
+                        <ion-item class="flex-1" lines="outline">
+                          <ion-input
+                            formControlName="value"
+                            label="Value"
+                            labelPlacement="stacked"
+                            placeholder="e.g. 42 in"
+                          ></ion-input>
+                        </ion-item>
+
+                        <ion-button 
+                          color="danger" 
+                          fill="clear" 
+                          (click)="removeMeasurement(i)"
+                          [disabled]="measurements.length === 1"
+                        >
+                          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                        </ion-button>
+                      </div>
+                      }
+                    </div>
+
+                    <div class="flex flex-col gap-2 px-2 py-4 mb-5">
+                      <app-primary-button
+                      [fill]="'outline'"
+                      [buttonText]="'Add Custom Field'"
+                      [icon]="'add-outline'"
+                      (action)="addMeasurement()"
+                      ></app-primary-button>
+
+                      <app-primary-button
+                      [buttonText]="'Save Measurements'"
+                      [icon]="'save-outline'"
+                      (action)="submit()"
+                      ></app-primary-button>
+                    </div>
+                  </form>
+              </ion-list>
+          </ion-content>
+      </ng-template>
+  </ion-modal>
 </ion-content>
