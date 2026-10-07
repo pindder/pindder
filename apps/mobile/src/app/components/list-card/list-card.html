@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="flex flex-col gap-2">
-            <span class="text-md font-semibold">{{ order.client.firstname + ' ' + order.client.lastname }}</span>
+            <span class="text-md font-semibold">{{ order.client?.firstname + ' ' + order.client?.lastname }}</span>
             <div class="flex justify-between">
                 <span class="text-sm text-secondary">{{ order.totalItems }} Items</span>
                 <span class="text-sm text-secondary">
