@@ -34,8 +34,7 @@ export class DesignView implements ViewWillEnter, OnInit{
   style_id = signal<string>("");
   designType = DesignTypes;
   uploadedImageUrls: string[] = [];
-  selectedSizes: string[] = [];
-  selectedColors: string[] = [];
+  selectedColors: IColors[] = [];
   availableColors: IColors[] = [];
   isUploading: boolean = false;
   isActionSheetOpen = signal<boolean>(false);
@@ -120,6 +119,7 @@ export class DesignView implements ViewWillEnter, OnInit{
       next: (res: IResponse<IColors[]>) => {
         this.availableColors = res.data || [];
         console.log(this.availableColors);
+        this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);
@@ -148,23 +148,35 @@ export class DesignView implements ViewWillEnter, OnInit{
     this.appService.openSingle(imageUrl);
   }
 
-  onSizesChange(size: any) {
-    this.selectedSizes = size.detail.value;
-    console.log(this.selectedSizes);
+  isColorSelected(code: string): boolean {
+    return this.selectedColors.some((c) => c.code === code);
   }
 
-  onColorChange(color: CustomEvent) {
-    console.log(color.detail.value);
+  toggleColor(color: IColors): void {
+    const index = this.selectedColors.findIndex((c) => c.name === color.name);
+    if (index > -1) {
+      this.selectedColors.splice(index, 1);
+    } else {
+      this.selectedColors.push(color);
+    }
+  }
+
+  // Ensures checkmark icon is readable on light vs dark colors
+  getContrastColor(hex: string): string {
+    const cleanHex = hex.replace('#', '');
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 180 ? '#000000' : '#FFFFFF';
   }
 
   fetchDesign() {
     this.designService.fetchDesign(this.style_id()).subscribe({
       next: (res) => {
         this.design = res.data;
-        this.selectedSizes = res.data.sizes;
-        res.data.colors.forEach((color: IColors) => {
-          this.selectedColors.push(color._id)
-        });
+        
+        this.selectedColors = res.data.colors;
         this.uploadedImageUrls = res.data.images;
         console.log(this.selectedColors);
         this.cdr.markForCheck();
@@ -185,12 +197,11 @@ export class DesignView implements ViewWillEnter, OnInit{
 
   submit() {
     this.design.colors = [];
-    this.design.sizes = this.selectedSizes;
 
-    this.selectedColors.forEach((colorId) => {
-      const color = this.availableColors.find(c => c._id === colorId);
+    this.selectedColors.forEach((color: IColors) => {
+      const colour = this.availableColors.find(c => c._id === color._id);
       if(color) {
-        this.design.colors.push(color);
+        this.design.colors.push(colour);
       }
     });
 

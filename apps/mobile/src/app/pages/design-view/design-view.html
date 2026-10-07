@@ -132,6 +132,29 @@
                     [(ngModel)]="design.amount" 
                     ></ion-input>
                 </ion-item>
+
+                <ion-item>
+                @if(design.type === designType.BESPOKE){
+                <div class="py-2">
+                    <p class="text-xs">
+                        Select available Colors
+                    </p>
+                    <div class="color-grid">
+                        @for(color of availableColors; track color._id){
+                        <div
+                            class="color-swatch"
+                            [style.background-color]="color.hex"
+                            [class.selected]="isColorSelected(color.code)"
+                            (click)="toggleColor(color)"
+                        >
+                            @if(isColorSelected(color.code)){<ion-icon
+                            name="checkmark"
+                            [style.color]="getContrastColor(color.hex)"
+                            ></ion-icon>}
+                        </div>}
+                    </div>
+                </div>}
+                </ion-item>
                 
                 <ion-item class="py-3">
                     <ion-toggle 
@@ -143,6 +166,7 @@
                 </ion-item>
             </ion-list>
 
+            @if(design.type === designType.READYMADE){
             <ion-list [inset]="true">
                 <ion-list-header>
                     <ion-label>Specifications</ion-label>
@@ -150,7 +174,7 @@
                 <ion-item lines="none" button (click)="openSpecificationModal()">
                     <ion-label>View Specification</ion-label>
                 </ion-item>
-            </ion-list>
+            </ion-list>}
 
             <div class="p-3">
                 <app-primary-button

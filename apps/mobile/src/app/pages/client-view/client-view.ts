@@ -43,28 +43,28 @@ export class ClientView implements ViewWillEnter, OnInit{
   isActionSheetOpen = signal<boolean>(false);
   modalContent = signal<string>("");
   actionSheetButtons = [
-    {
-      text: 'Create Measurement',
-      icon: 'add-outline',
-      handler: () => {
-        this.openMeasurementModal();
-      },
-    },
-    {
-      text: 'Create Order',
-      icon: 'bag-add-outline',
-      handler: () => {
-        this.router.navigate(['app/orders'], {
-          queryParams: {
-            client: this.client_id
-          }
-        })
-      },
-    },
+    // {
+    //   text: 'Create Measurement',
+    //   icon: 'add-outline',
+    //   handler: () => {
+    //     this.openMeasurementModal();
+    //   },
+    // },
+    // {
+    //   text: 'Create Order',
+    //   icon: 'bag-add-outline',
+    //   handler: () => {
+    //     this.router.navigate(['app/orders'], {
+    //       queryParams: {
+    //         client: this.client_id
+    //       }
+    //     })
+    //   },
+    // },
     {
       text: 'Delete Client',
       icon: 'trash-outline',
-      // role: 'destructive',
+      role: 'destructive',
       handler: () => {
     
       },

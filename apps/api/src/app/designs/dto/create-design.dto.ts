@@ -20,9 +20,6 @@ export class CreateDesignDto {
     specifications?: [any] 
 
     @IsArray()
-    sizes?: [string];
-
-    @IsArray()
     colors?: [any];
 
     @IsArray()

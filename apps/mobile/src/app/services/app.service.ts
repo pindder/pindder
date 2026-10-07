@@ -4,7 +4,7 @@ import { ToastController } from '@ionic/angular';
 import { /* DataTypes,*/ GalleryItem, IColors, IResponse } from '@pindder/contracts';
 import PhotoSwipe from 'photoswipe';
 import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, Subject, switchMap } from 'rxjs';
-import { environment } from '../../environments/environment.production';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -86,7 +86,7 @@ export class AppService {
   }
 
   // Quick helper for single image viewing
-  openSingle(src: string, width = 1200, height = 900) {
+  openSingle(src: string, width = 1200, height = 1900) {
     this.open([{ src, w: width, h: height }]);
   }
 

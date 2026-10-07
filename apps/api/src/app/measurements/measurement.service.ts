@@ -58,20 +58,22 @@ export class MeasurementService {
   /**
    * Get measurement by Client ID
    */
-  async findOne(id: string): Promise<IResponse<Measurement>> {
+  async findClientMeasurements(id: string): Promise<IResponse<Measurement[]>> {
     try {
-      const record = await this.measurementModel.findOne({
+      const records = await this.measurementModel.find({
         'client._id': id,
       });
 
-      if (!record) {
+      console.log(records);
+
+      if (!records) {
         throw new NotFoundException(`No measurements found for this client`);
       }
 
-      const res: IResponse<Measurement> = {
+      const res: IResponse<Measurement[]> = {
         statusCode: 200,
         msg: 'Measurement retrieved successfully.',
-        data: record
+        data: records
       }
 
       return res;  

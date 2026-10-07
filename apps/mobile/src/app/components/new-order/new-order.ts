@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, IonLabel, 
-  ToastController, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, 
-  IonListHeader, ModalController, IonDatetime, IonActionSheet, IonItemOption, 
-  IonAvatar, IonItemOptions, IonItemSliding, IonTextarea, IonNote,
-  IonModal, IonSelect, IonSelectOption
+import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, 
+  IonLabel, ToastController, IonHeader, IonToolbar, IonTitle, 
+  IonButtons, IonIcon, IonListHeader, ModalController, IonDatetime, 
+  IonActionSheet, IonItemOption, IonAvatar, IonItemOptions, IonItemSliding, 
+  IonTextarea, IonNote, IonModal, IonSelect, IonSelectOption
 } from "@ionic/angular";
-import { DataTypes, DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderStyle, ISizeQuantity, ISpecification } from '@pindder/contracts';
+import { DataTypes, DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderItem, IOrderStyle, ISpecification } from '@pindder/contracts';
 import { OrderStatus } from '@pindder/contracts';
 import { NewClient } from '../new-client/new-client';
 import { ClientSelection } from '../client-selection/client-selection';
@@ -19,8 +19,8 @@ import { Measurement } from '../measurement/measurement';
 import { CloudinaryModule } from '@cloudinary/ng';
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
-//import { SizesModal } from '../sizes-modal/sizes-modal';
 import { PrimaryButton } from '../primary-button/primary-button';
+import { OrderView } from '../../pages/order-view/order-view';
 
 @Component({
   selector: 'app-new-order',
@@ -53,8 +53,9 @@ import { PrimaryButton } from '../primary-button/primary-button';
     EmptyState,
     CloudinaryModule, IonNote,
     PrimaryButton,
-    IonSelect, IonSelectOption
-],
+    IonSelect, IonSelectOption,
+    OrderView,
+  ],
   templateUrl: './new-order.html',
   styleUrl: './new-order.css',
 })
@@ -70,7 +71,6 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   private ar = inject(ActivatedRoute);
   private orderService = inject(OrderService);
   
-  sizeAndQuantity: ISizeQuantity[] = [];
   presentingElement!: HTMLElement | null;
   selectedClient!: any;
   selectedStyleIndex!: number;
@@ -87,6 +87,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   };
   clients: IClient[] = [];
   designs: IDesign[] = [];
+  completeOrder!: IOrderItem;
 
   isClientActionSheetOpen = signal<boolean>(false);
   isDesignActionSheetOpen = signal<boolean>(false);
@@ -131,17 +132,19 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   deliveryMethod = DeliveryMethods;
   designTypes = DesignTypes;
 
+  isPreview: boolean = false;
+
   ionViewWillEnter(): void {
     // console.log(this.client);
     // console.log(this.design);
     if(this.client) {
       this.selectedClient = this.client;
     } else if(this.design) {
-      let selections: any[] = [];
+      // let selections: any[] = [];
 
-      this.design.specifications.forEach((spec: ISpecification) => {
-        selections.push({...spec, colors: [], quantity: 0 });
-      });
+      // this.design.specifications.forEach((spec: ISpecification) => {
+      //   selections.push({...spec, colors: [], quantity: 0 });
+      // });
 
       this.order.styles.push({
         amount: this.design.amount,
@@ -150,22 +153,23 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
         images: this.design.images,
         type: this.design.type,
         name:  this.design.name,
-        selectedSizesAndQuantities: this.sizeAndQuantity,
         specifications: this.design.specifications,
-        selections: selections ?? [],
-        colors: [],
+        selections: [],
+        colors: this.design.colors ?? [],
+        selectedColors: [],
         catalogDisplay: false,
         //design: data,
-        sizes: this.design.sizes,
-        totalAmount: this.design.sizes > 0 ? 0 : this.design.amount,
-        totalItems: this.design.sizes > 0 ? 0 : 1,
-        quantity: this.design.sizes > 0 ? 0 : 1
+        totalAmount: 0,
+        totalItems: 0,
+        quantity: 0
       });
     }
 
     if(this.order.styles.length > 0) {
       this.order.styles.forEach((style: IOrderStyle) => {
-        this.order.totalAmount += (style.amount * style.quantity);
+        style.selections.forEach((selection: ISpecification) => {
+          selection.quantity > 0 ? this.order.totalAmount += selection.amount : 0
+        });
       });
     }
     this.cdr.markForCheck();
@@ -227,11 +231,11 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     //Listen for the created design payload when dismissed
     const { data } = await modal.onWillDismiss();
     if (data) {
-      let selections: any[] = [];
+      // let selections: any[] = [];
 
-      data.specifications.forEach((spec: ISpecification) => {
-        selections.push({...spec, colors: [], quantity: 0 });
-      });
+      // data.specifications.forEach((spec: ISpecification) => {
+      //   selections.push({...spec, colors: [], quantity: 0 });
+      // });
 
       this.order.styles.push({
         _id: data._id,
@@ -241,16 +245,15 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
         images: data.images,
         type: data.type,
         name:  data.name,
-        selectedSizesAndQuantities: [],
         specifications: data.specifications,
-        selections: selections ?? [],
-        colors: [],
+        selections: [],
+        colors: data.colors ?? [],
+        selectedColors: [],
         catalogDisplay: data.catalogDisplay,
         //design: data,
-        totalAmount: data.sizes > 0 ? 0 : data.amount,
-        totalItems: data.sizes > 0 ? 0 : 1,
-        sizes: data.sizes,
-        quantity: data.sizes > 0 ? 0 : 1
+        totalAmount: 0,
+        totalItems: 0,
+        quantity: 0
       });
     }
 
@@ -267,11 +270,11 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     //Listen for the selected design payload when dismissed
     const { data } = await modal.onWillDismiss();
     if (data) {
-      let selections: any[] = [];
+      // let selections: any[] = [];
 
-      data.specifications.forEach((spec: ISpecification) => {
-        selections.push({...spec, colors: [], quantity: 0 });
-      });
+      // data.specifications.forEach((spec: ISpecification) => {
+      //   selections.push({...spec, colors: [], quantity: 0 });
+      // });
 
       this.order.styles.push({
         _id: data._id,
@@ -281,16 +284,15 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
         images: data.images,
         type: data.type,
         name:  data.name,
-        selectedSizesAndQuantities: this.sizeAndQuantity,
         specifications: data.specifications,
-        selections: selections ?? [],
-        colors: [],
+        selections: [],
+        colors: data.colors ?? [],
+        selectedColors: [],
         catalogDisplay: data.catalogDisplay,
         //design: data,
-        totalAmount: data.sizes > 0 ? 0 : data.amount,
-        totalItems: data.sizes > 0 ? 0 : 1,
-        sizes: data.sizes,
-        quantity: data.sizes > 0 ? 0 : 1, 
+        totalAmount: 0,
+        totalItems: 0,
+        quantity: 0, 
       });
     }
 
@@ -347,51 +349,65 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     this.cdr.markForCheck();
   }
 
-  decrementQuantity(index: number) {
+  decrementQuantity(specification: ISpecification) {
+    const index = this.selectedStyle.specifications.indexOf(specification);
+
     if(this.selectedStyle.selections && this.selectedStyle.selections.length > 0) {
       const selection = this.selectedStyle.selections.find((selection) => selection.size === this.selectedStyle.specifications[index].size);
       if(selection && selection.quantity > 0) {
         selection.inStock! += 1;
         selection.quantity -= 1;
         this.selectedStyle.selections[index] = selection;
-        this.selectedStyle.totalAmount = selection.amount * selection.quantity
+        this.selectedStyle.totalAmount -= selection.amount; 
+        this.order.totalAmount -= selection.amount;
       }
 
     }
-    console.log(this.selectedStyle.selections);
-    
-    this.order.totalAmount += this.selectedStyle.amount;
-
+    //console.log(this.selectedStyle.selections);
     this.cdr.markForCheck();
   }
 
-  incrementQuantity(index: number) {
-    if(this.selectedStyle.selections && this.selectedStyle.selections.length > 0) {
-      const selection = this.selectedStyle.selections.find((selection) => selection.size === this.selectedStyle.specifications[index].size);
+  incrementQuantityBespoke() {
+    this.selectedStyle.quantity++;
+    this.order.totalAmount += this.selectedStyle.amount;
+  }
+
+  decrementQuantityBespoke() {
+    if(this.selectedStyle.quantity > 0) {
+      this.selectedStyle.quantity--;
+      this.order.totalAmount -= this.selectedStyle.amount;
+    }
+  }
+
+  incrementQuantity(specification: ISpecification) {
+    const specIndex = this.selectedStyle.specifications.indexOf(specification!);
+    if(this.selectedStyle.selections.length > 0) {
+      const selection = this.selectedStyle.selections.find((selection) => selection.size === this.selectedStyle.specifications[specIndex].size);
+      
       if(selection) {
         selection.inStock! -= 1;
         selection.quantity += 1;
-        this.selectedStyle.selections[index] = selection;
-        this.selectedStyle.totalAmount = selection.amount * selection.quantity
+        this.selectedStyle.selections[specIndex] = selection;
+        this.selectedStyle.totalAmount += selection.amount;
+        this.order.totalAmount += selection.amount;
       } else {
         this.selectedStyle.selections.push({ 
-          ...this.selectedStyle.specifications![index], 
-          inStock: this.selectedStyle.specifications![index].quantity - 1, 
+          ...this.selectedStyle.specifications[specIndex], 
+          inStock: this.selectedStyle.specifications[specIndex].quantity - 1, 
           quantity: 1 
         });
       }
     }else {
-      this.selectedStyle.selections = [];
       this.selectedStyle.selections.push({ 
-        ...this.selectedStyle.specifications![index], 
-        inStock: this.selectedStyle.specifications![index].quantity - 1, 
+        ...this.selectedStyle.specifications[specIndex], 
+        inStock: this.selectedStyle.specifications[specIndex].quantity - 1, 
         quantity: 1 
       });
     }
-    console.log(this.selectedStyle.selections);
-    
-    this.order.totalAmount += this.selectedStyle.amount;
+    //console.log(this.selectedStyle);
 
+    
+    //console.log(this.order);
     this.cdr.markForCheck();
   }
 
@@ -433,40 +449,90 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   openModalSheet(index: number, style: IOrderStyle) {
     this.selectedStyle = style;
     this.selectedStyleIndex = index;
-    //console.log(this.selectedStyle);
+
+    if(this.selectedStyle.selections.length == 0) {
+      let selections: any[] = [];
+
+      this.selectedStyle.specifications.forEach((spec: ISpecification) => {
+        selections.push({...spec, colors: [], quantity: 0 });
+      });
+      this.selectedStyle.selections = selections;
+    }
+    
     this.modalSheet.present();
-    // if(style.sizes && style.sizes?.length > 0) {
-    //   this.modalSheet.present();
-    // } else {
-    //   this.viewDesignDetails(style);
-    // }
   }
 
-  submit() {
+  closeModalSheet() {
+    if(this.selectedStyle.totalAmount == 0){
+      this.selectedStyle.selections = [];
+      this.cdr.markForCheck();
+    }
+    return
+  }
+
+  buildOrder() {
+    this.order.totalItems = 0;
+    this.order.totalAmount = 0;
     this.order.totalItems = 0;
 
     this.order.client = this.selectedClient._id;
+    
     this.order.styles.forEach((item: IOrderStyle) => {
-      this.order.totalItems += item.totalItems;
-      if(item.selections.length == 0) {
-        this.presentToast('Please select at least one item to proceed', 'danger', 'top');
-        return;  
-      }
+      if(item.type === DesignTypes.BESPOKE) {
+        this.order.totalItems = item.quantity;
+        this.order.totalAmount += (item.amount * item.quantity);
+      } else {
+        item.selections.forEach((selection: ISpecification, index: number) => {
+          if(selection.quantity == 0) {
+            //this.presentToast('Please select at least one item to proceed', 'danger', 'bottom');
+            //return;  
 
+            if(item.amount > 0) {
+              item.totalAmount = item.amount;
+            }
+            item.selections.splice(index, 1);
+          } else {
+            this.order.totalItems += selection.quantity;
+            item.totalItems += selection.quantity;
+            item.totalAmount += selection.amount;
+          }
+        });
+      }
     });
 
     if(this.order.totalItems === 0) {
-      this.presentToast('Please select at least one item to proceed', 'danger', 'top');
+      if(this.order)
+      this.presentToast('Please select at least one item to proceed', 'danger', 'bottom');
       return;
     }
 
     if(!this.order.dueDate) {
-      this.presentToast('Please select a due date for the order', 'danger', 'top');
+      this.presentToast('Please select a due date for the order', 'danger', 'bottom');
       return;
     }
 
-    //console.log(this.order);
-    
+    this.completeOrder = {
+      _id: this.order._id!,
+      client: this.selectedClient,
+      orderId: '',
+      styles: this.order.styles,
+      totalAmount: this.order.totalAmount,
+      totalItems: this.order.totalItems,
+      measurement: this.order.measurement,
+      deliveryMethod: this.order.deliveryMethod,
+      dueDate: this.order.dueDate,
+      status: OrderStatus.PENDING,
+      createdAt: Date.now().toLocaleString(),
+      updatedAt: Date.now().toLocaleString(),
+      note: this.order.note,
+    }
+    this.isPreview = !this.isPreview;
+    console.log(this.order);
+    console.log(this.completeOrder);
+    this.cdr.markForCheck();
+  }
+
+  submit() {
     this.orderService.createOrder(this.order).subscribe({
       next: (res: any) => {
         this.presentToast(res.msg, 'primary', 'top');
@@ -479,24 +545,34 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     })
   }
 
-  isColorSelected(color: IColors, specIndex: number): boolean {
-    return this.selectedStyle.selections[specIndex].colors.some((c) => c._id === color._id);
+  isColorSelected(color: IColors, specIndex?: number): boolean {
+    if(specIndex) {
+      return this.selectedStyle.selections[specIndex].colors.some((c) => c._id === color._id);
+    } else {
+      return this.selectedStyle.selectedColors.some((c) => c._id === color._id);
+    }
   }
 
-  toggleColor(color: IColors, specIndex: number): void {
-    const colorIndex = this.selectedStyle.selections[specIndex].colors.findIndex((c) => c.name === color.name);
-    // if (index > -1) {
-    //   this.selectedStyle.selections[specIndex].colors.splice(index, 1);  
-    // } else {
-    //   this.selectedStyle.selections[specIndex].colors.push(color);
-    // }
-    if(this.isColorSelected(color, specIndex)) {
-      this.selectedStyle.selections[specIndex].colors.splice(colorIndex, 1);  
+  toggleColor(color: IColors, specIndex?: number): void {
+    let colorIndex;
+
+    if(specIndex) {
+      colorIndex = this.selectedStyle.selections[specIndex].colors.findIndex((c) => c.name === color.name);
+
+      if(this.isColorSelected(color, specIndex)) {
+        this.selectedStyle.selections[specIndex].colors.splice(colorIndex, 1);  
+      } else {
+        this.selectedStyle.selections[specIndex].colors.push(color);
+      }
     } else {
-      this.selectedStyle.selections[specIndex].colors.push(color);
+      colorIndex = this.selectedStyle.colors.findIndex((c) => c._id === color._id);
+
+      if(this.isColorSelected(color)) {
+        this.selectedStyle.selectedColors.splice(colorIndex, 1);
+      } else {
+        this.selectedStyle.selectedColors.push(color);
+      }
     }
-    
-    console.log(this.selectedStyle.selections[specIndex]);
   }
   
   // Ensures checkmark icon is readable on light vs dark colors

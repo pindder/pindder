@@ -16,6 +16,8 @@ export interface IClient {
 
 export interface IMeasurement {
     _id?: string;
+    name: string;
+    description?: string;
     client?: string;
     User?: string;
     measurements: any;

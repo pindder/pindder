@@ -9,7 +9,9 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-client-orders',
-  imports: [IonIcon, ListCard, EmptyState, IonHeader, IonContent, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon],
+  imports: [IonIcon, ListCard, EmptyState, IonHeader, IonContent, 
+    IonToolbar, IonTitle, IonButtons, IonButton, IonIcon
+  ],
   templateUrl: './client-orders.html',
   styleUrl: './client-orders.css',
 })
@@ -58,5 +60,13 @@ export class ClientOrders implements ViewWillEnter, OnInit{
   viewOrder(order_id: string) {
     this.router.navigate(['/app/orders/' + order_id ]);
     this.dismissModal();
+  }
+
+  gotoNewOrder() {
+    this.router.navigate(['app/orders'], {
+      queryParams: {
+        client: this.client_id
+      }
+    });
   }
 }

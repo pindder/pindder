@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonInput, IonToolbar, ModalController, IonModal, IonSelect, IonSelectOption, IonItemSliding, IonItemOption, IonItemOptions, IonNote } from '@ionic/angular';
 import { ViewWillEnter } from '@ionic/angular/common';
-import { IColors, IResponse, ISpecification, Sizes } from '@pindder/contracts';
+import { IClient, IColors, IDesign, IResponse, ISpecification, Sizes } from '@pindder/contracts';
 import { AppService } from '../../services/app.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PrimaryButton } from '../primary-button/primary-button';
@@ -18,6 +18,8 @@ import { PrimaryButton } from '../primary-button/primary-button';
 export class Specification implements OnInit, ViewWillEnter {
   @ViewChild('modal') modal!: IonModal;
   @Input() specifications: ISpecification[] = [];
+  @Input() client!: IClient;
+  @Input() design!: IDesign;
 
   private appService = inject(AppService);
 
@@ -78,12 +80,15 @@ export class Specification implements OnInit, ViewWillEnter {
   }
 
   toggleColor(color: IColors): void {
-    const index = this.selectedColors.findIndex((c) => c.name === color.name);
+    const index = this.selectedColors.findIndex((c) => c.code === color.code);
+    console.log(index);
     if (index > -1) {
       this.selectedColors.splice(index, 1);
     } else {
       this.selectedColors.push(color);
     }
+
+    console.log(this.selectedColors);
   }
 
   // Ensures checkmark icon is readable on light vs dark colors
@@ -106,6 +111,7 @@ export class Specification implements OnInit, ViewWillEnter {
       this.specification.colors = this.selectedColors;
       this.specifications[this.activeIndex] = this.specification;
     }else {
+      this.specification.colors = this.selectedColors;
       this.specifications.push(this.specification);
       this.selectedColors = [];
     }

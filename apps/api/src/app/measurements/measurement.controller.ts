@@ -33,7 +33,7 @@ export class MeasurementController {
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.measurementService.findOne(id);
+    return this.measurementService.findClientMeasurements(id);
   }
 
   @UseGuards(AuthGuard)
