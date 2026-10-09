@@ -7,14 +7,16 @@ import { Model } from 'mongoose';
 import { Follow } from './schemas/follows.schema';
 import { User } from '../users/schemas/user.schema';
 import { ClientAssociationDto } from './dto/client-association.dto';
-import { IResponse } from '@pindder/contracts';
+import { DataTypes, DataTypesIcon, IResponse, NotificationActions } from '@pindder/contracts';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable()
 export class ClientService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Follow.name) private readonly followModel: Model<Follow>,
-    @InjectModel(Client.name) private readonly clientModel:  Model<Client>
+    @InjectModel(Client.name) private readonly clientModel:  Model<Client>,
+    private readonly notificationService: NotificationService
   ) {}
 
   async create(createClientDto: CreateClientDto, referee_id?: string) {
@@ -50,6 +52,19 @@ export class ClientService {
       });
 
       await new_follow.save();
+
+      await this.notificationService.create({
+        client: client,
+        tailor: client.referee,
+        type: DataTypes.CLIENT,
+        action: NotificationActions.CLIENT_CREATED,
+        icon: DataTypesIcon.CLIENT,
+        title: 'New Client',
+        message: `Client #${client.fullname} has been created.`,
+        data: {
+          ...client
+        },
+      });
       
       const res: IResponse<any> = {
         statusCode: 200,
@@ -120,6 +135,7 @@ export class ClientService {
     try {
       const clients = await this.clientModel
       .find({ referee: acct_id })
+      .sort({ createdAt: -1 })
       .populate('referee', '-_v')
       .exec();
 

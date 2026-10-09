@@ -1,22 +1,59 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { CreateDesignDto } from './dto/create-design.dto';
 import { UpdateDesignDto } from './dto/update-design.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Design } from './schemas/design.schema';
 import { Model } from 'mongoose';
-import { IResponse } from '@pindder/contracts';
+import { AccountTypes, DataTypes, DataTypesIcon, IResponse, NotificationActions } from '@pindder/contracts';
+import { NotificationService } from '../notifications/notification.service';
+import { Tailor } from '../tailors/schemas/tailor.schema';
+import { User } from '../users/schemas/user.schema';
 
 @Injectable()
 export class DesignService {
   constructor(
-    @InjectModel(Design.name) private readonly designModel: Model<Design>
+    @InjectModel(Design.name) private readonly designModel: Model<Design>,
+    @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    private readonly notificationService: NotificationService
   ) {}
-  async create(createDesignDto: CreateDesignDto, acct_id: string) {
+  async create(createDesignDto: CreateDesignDto, user: any) {
+    console.log(user);
     try {
       const newDesign = new this.designModel(createDesignDto);
-      newDesign.owner = acct_id;
+
+      if(user.acctType === AccountTypes.TAILOR) {
+        const tailor = await this.tailorModel.findById(user.sub);
+        
+        if(tailor) {
+          newDesign.owner = await tailor;
+        }
+        else {
+          throw new UnauthorizedException();
+        }
+      } else if(user.acctType === AccountTypes.USER) {
+        const customer = await this.userModel.findById(user.sub);
+        
+        if(customer) {
+          newDesign.owner = customer;
+        } else {
+          throw new UnauthorizedException();
+        }
+      }
 
       await newDesign.save();
+
+      await this.notificationService.create({
+        tailor: newDesign.owner,
+        type: DataTypes.DESIGN,
+        action: NotificationActions.STYLE_CREATED,
+        icon: DataTypesIcon.DESIGN,
+        title: 'New Style',
+        message: `${newDesign.name} has been created.`,
+        data: {
+          ...newDesign,
+        },
+      });
 
       const res: IResponse<any> = {
         statusCode: 200,
@@ -32,7 +69,7 @@ export class DesignService {
 
   async findAll(acct_id: string) {
     try {
-      const designs = await this.designModel.find({ owner: acct_id });
+      const designs = await this.designModel.find({ 'owner._id': acct_id }).sort({ createdAt: -1 });
 
       const res: IResponse<any> = {
         statusCode: 200,
@@ -57,7 +94,7 @@ export class DesignService {
         ],
         $and: [
           {
-            owner: user_id
+            'owner._id': user_id
           }
         ]
       }).exec();

@@ -12,6 +12,12 @@ export class CreateMeasurementDto {
     @IsOptional()
     user?: string;
 
+    @IsString()
+    @IsNotEmpty()
+    name!: string;
+
+    @IsString()
+    description?: string;
 //   @IsNotEmpty()
 //   @IsEnum(MeasurementTypes)
 //   measurementType!: string;

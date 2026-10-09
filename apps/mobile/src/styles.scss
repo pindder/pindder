@@ -19,6 +19,10 @@
   --secondary-text-color: #00000080;
 }
 
+p {
+    color: var(--secondary-text-color);
+}
+
 .ion-padding {
     padding: 16px;
 }
@@ -252,14 +256,6 @@
     margin-right: 16px;
 }
 
-.text-primary {
-    color: var(--ion-color-primary);
-}
-
-.text-xl {
-    font-size: 48px;
-}
-
 .font-semibold {
     font-weight: 500;
 }
@@ -291,6 +287,10 @@ img {
     color: var(--secondary-text-color);
 }
 
+.text-primary {
+    color: var(--ion-color-primary);
+}
+
 .text-xs {
     font-size: 12px;
 }
@@ -305,6 +305,10 @@ img {
 
 .text-lg {
     font-size: 20px;
+}
+
+.text-xl {
+    font-size: 24px;
 }
 
 .center {

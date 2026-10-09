@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonInput, IonToolbar, ModalController, IonModal, IonSelect, IonSelectOption, IonItemSliding, IonItemOption, IonItemOptions, IonNote } from '@ionic/angular';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonInput, IonToolbar, ModalController, IonModal, IonSelect, IonSelectOption, IonItemSliding, IonItemOption, IonItemOptions, IonNote, IonListHeader } from '@ionic/angular';
 import { ViewWillEnter } from '@ionic/angular/common';
 import { IClient, IColors, IDesign, IResponse, ISpecification, Sizes } from '@pindder/contracts';
 import { AppService } from '../../services/app.service';
@@ -11,7 +11,7 @@ import { PrimaryButton } from '../primary-button/primary-button';
   imports: [IonInput, IonModal, IonSelect, IonSelectOption, FormsModule,
     IonHeader, IonToolbar, IonButtons, IonTitle, IonContent, IonButton,
     IonIcon, IonList, IonItem, IonLabel, PrimaryButton, IonItemSliding, IonItemOptions,
-    IonIcon, IonList, IonItem, IonLabel, PrimaryButton, IonItemSliding, IonItemOption, IonNote],
+    IonIcon, IonList, IonItem, IonLabel, PrimaryButton, IonItemSliding, IonItemOption, IonNote, IonListHeader],
   templateUrl: './specification.html',
   styleUrl: './specification.css',
 })
@@ -104,6 +104,8 @@ export class Specification implements OnInit, ViewWillEnter {
   dismissModal() {
     this.modalCtrl.dismiss(this.specifications, 'data');
   }
+
+  closeModalSheet() {}
 
   saveSpecification() {
     console.log(this.activeIndex)

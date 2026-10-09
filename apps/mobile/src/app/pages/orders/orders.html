@@ -52,11 +52,17 @@
         <ion-segment-button value="pending" contentId="pending">
           <ion-label>Pending</ion-label>
         </ion-segment-button>
+        <ion-segment-button value="ongoing" contentId="ongoing">
+          <ion-label>Ongoing</ion-label>
+        </ion-segment-button>
         <ion-segment-button value="cancelled" contentId="cancelled">
           <ion-label>Cancelled</ion-label>
         </ion-segment-button>
         <ion-segment-button value="completed" contentId="completed">
           <ion-label>Completed</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="overdue" contentId="overdue">
+          <ion-label>Overdue</ion-label>
         </ion-segment-button>
       </ion-segment>
     </div>
@@ -99,6 +105,24 @@
           }
         </ion-list>
       </ion-segment-content>
+      <ion-segment-content id="ongoing">
+        <ion-list inset="true">
+          @for (order of orders; track order._id) {
+            <app-list-card 
+              [dataType]="dataTypes.ORDER" 
+              [order]="order"
+              (action)="viewOrder($event)"
+            >
+            </app-list-card>
+          } @empty {
+            <app-empty-state 
+              [parentComponent]="dataTypes.ORDER" 
+              (action)="openNewOrderModal()"
+            >
+            </app-empty-state>
+          }
+        </ion-list>
+      </ion-segment-content>
       <ion-segment-content id="cancelled">
         <ion-list inset="true">
           @for (order of orders; track order._id) {
@@ -118,6 +142,24 @@
         </ion-list>
       </ion-segment-content>
       <ion-segment-content id="completed">
+        <ion-list inset="true">
+          @for (order of orders; track order._id) {
+            <app-list-card 
+              [dataType]="dataTypes.ORDER" 
+              [order]="order"
+              (action)="viewOrder($event)"
+            >
+            </app-list-card>
+          } @empty {
+            <app-empty-state 
+              [parentComponent]="dataTypes.ORDER" 
+              (action)="openNewOrderModal()"
+            >
+            </app-empty-state>
+          }
+        </ion-list>
+      </ion-segment-content>
+      <ion-segment-content id="overdue">
         <ion-list inset="true">
           @for (order of orders; track order._id) {
             <app-list-card 

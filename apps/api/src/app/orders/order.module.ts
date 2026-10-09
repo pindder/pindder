@@ -7,9 +7,11 @@ import { JwtService } from '@nestjs/jwt';
 import { Client, ClientSchema } from '../clients/schemas/client.schema';
 import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
 import { Quote, QuoteSchema } from './schemas/quote.schema';
+import { NotificationModule } from '../notifications/notification.module';
 
 @Module({
   imports: [
+    NotificationModule,
     MongooseModule.forFeature([
       { name: Order.name, schema: OrderSchema },
       { name: Client.name, schema: ClientSchema },

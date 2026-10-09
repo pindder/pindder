@@ -3,7 +3,7 @@ import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent,
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataTypes, DesignTypes, IColors, IDesign, IResponse, Sizes } from '@pindder/contracts';
+import { DataTypes, DesignTypes, GalleryItem, IColors, IDesign, IResponse, Sizes } from '@pindder/contracts';
 import { forkJoin } from 'rxjs';
 import { Camera } from '@capacitor/camera';
 import { FormsModule } from '@angular/forms';
@@ -144,8 +144,20 @@ export class DesignView implements ViewWillEnter, OnInit{
     await toast.present();
   }
 
-  async openImage(imageUrl: string) {
-    this.appService.openSingle(imageUrl);
+  async openImage() {
+    //this.appService.openSingle(imageUrl);
+    
+    let images: GalleryItem[] =  [];
+    
+    this.design.images.map((image) => {
+      let imgObj = {
+        src: image,
+        w: 1200,
+        h: 1400
+      }
+      images.push(imgObj);
+    })
+    this.appService.open(images);
   }
 
   isColorSelected(code: string): boolean {
@@ -205,13 +217,16 @@ export class DesignView implements ViewWillEnter, OnInit{
       }
     });
 
-    console.log(this.design);
+    this.design.images = this.uploadedImageUrls;
+
     this.designService.updateDesign(this.design._id!, this.design).subscribe({
       next: (res: IResponse<any>) => {
         this.design = res.data;
+        this.presentToast(res.msg, 'primary', 'top');
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);
+        this.presentToast(error.error.msg, 'danger', 'bottom');
       }
     });
   }

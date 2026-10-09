@@ -6,16 +6,25 @@ import { BrandModule } from '../brands/brand.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Design, DesignSchema } from './schemas/design.schema';
 import { JwtService } from '@nestjs/jwt';
+import { NotificationService } from '../notifications/notification.service';
+import { NotificationModule } from '../notifications/notification.module';
+import { Notification, NotificationSchema } from '../notifications/schema/notification.schema';
+import { User, UserSchema } from '../users/schemas/user.schema';
+import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Design.name, schema: DesignSchema }
+      { name: Design.name, schema: DesignSchema },
+      { name: Notification.name, schema: NotificationSchema },
+      { name: User.name, schema: UserSchema },
+      { name: Tailor.name, schema: TailorSchema }
     ]),
     ClientModule, 
-    BrandModule
+    BrandModule,
+    NotificationModule
   ],
   controllers: [DesignController],
-  providers: [DesignService, JwtService],
+  providers: [DesignService, JwtService, NotificationService],
 })
 export class DesignModule {}

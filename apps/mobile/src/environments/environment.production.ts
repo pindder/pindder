@@ -1,7 +1,7 @@
-//import { Capacitor } from '@capacitor/core';
+// import { Capacitor } from '@capacitor/core';
 
-//const isAndroid = Capacitor.getPlatform() === 'android';
-//const baseHost = isAndroid ? '10.0.2.2' : 'localhost';
+// const isAndroid = Capacitor.getPlatform() === 'android';
+// const baseHost = isAndroid ? '10.0.2.2' : 'localhost';
 
 export const environment = {
   production: true,

@@ -1,12 +1,8 @@
 import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
-import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, 
-  IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, 
-  IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, 
-  IonNote, ToastController, IonModal 
-} from "@ionic/angular";
+import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, IonNote, ToastController, IonModal, IonItemGroup, IonItemDivider } from "@ionic/angular";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { IDesign, IOrderItem, IOrderStyle, IResponse, OrderStatus } from '@pindder/contracts';
+import { DesignTypes, IDesign, IOrderItem, IOrderStyle, IResponse, OrderStatus } from '@pindder/contracts';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
@@ -18,9 +14,11 @@ import { Measurement } from '../../components/measurement/measurement';
     IonHeader, IonItemOptions, IonLabel, IonAvatar, IonItemSliding,
     IonIcon, IonItem, IonList, IonButton, IonButtons, IonListHeader,
     IonTitle, IonToolbar, IonContent, IonItemOption, IonBackButton,
-    IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe, 
-    IonNote, PrimaryButton, IonModal, IonNote
-  ],
+    IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe,
+    IonNote, PrimaryButton, IonModal, IonNote,
+    IonItemGroup,
+    IonItemDivider
+],
   templateUrl: './order-view.html',
   styleUrl: './order-view.css',
 })
@@ -43,7 +41,10 @@ export class OrderView implements ViewWillEnter, OnInit{
   selectedStyleIndex!: number;
   selectedStyle!: IOrderStyle;
 
+  designTypes = DesignTypes;
+
   ionViewWillEnter(): void {
+    console.log(this.order);
     const client = this.ar.snapshot.paramMap.get('id');
     
     if(client) {
@@ -116,7 +117,7 @@ export class OrderView implements ViewWillEnter, OnInit{
 
   async viewStyleDetail(style: IOrderStyle) {
     this.selectedStyle = style;
-    console.log(this.selectedStyle);
+    //console.log(this.selectedStyle);
     this.isModalOpen = true;
   }
   

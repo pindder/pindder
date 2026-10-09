@@ -62,7 +62,7 @@ export class MeasurementService {
     try {
       const records = await this.measurementModel.find({
         'client._id': id,
-      });
+      }).sort({ createdAt: -1 });
 
       console.log(records);
 
@@ -153,10 +153,13 @@ export class MeasurementService {
             ...(user && { user: user }),
             ...(client && { client: client }),
             measurements: measurementsMap,
-            ...(updateMeasurementDto.notes && { updateMeasurementDto }),
+            name: updateMeasurementDto.name,
+            description: updateMeasurementDto.description,
+            notes: updateMeasurementDto.notes,
+            // ...(updateMeasurementDto.name && { updateMeasurementDto }),
           } 
         },
-        { returnDocument: "after", upsert: true, runValidators: true }
+        { returnDocument: "after", upsert: true }
       );
 
       const res: IResponse<any> = {

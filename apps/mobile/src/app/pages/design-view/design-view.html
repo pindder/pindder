@@ -37,7 +37,7 @@
             <!-- Existing Uploaded Previews -->
             @for (imgUrl of uploadedImageUrls; track imgUrl; let i = $index) {
                 <div class="scroll-item">
-                    <img (click)="openImage(imgUrl)" [src]="imgUrl" alt="Uploaded preview" />
+                    <img (click)="openImage()" [src]="imgUrl" alt="Uploaded preview" />
                     <ion-button 
                     [id]="'present-alert' + i"
                     color="danger" 

@@ -3,14 +3,16 @@ import { IColors, ISpecification } from "./design.types";
 
 export enum OrderStatus {
   PENDING = 'PENDING',
+  ONGOING = 'ONGOING',
   PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',
+  OVERDUE = 'OVERDUE',
   CANCELLED = 'CANCELLED',
 }
 
 export interface IOrder {
   _id?: string;
-  client: string;
+  client: string | null;
   tailor?: string;
   styles: IOrderStyle[];
   dueDate: string | Date;

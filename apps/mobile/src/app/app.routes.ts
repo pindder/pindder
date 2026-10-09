@@ -20,4 +20,9 @@ export const appRoutes: Route[] = [
         component: AppLayout,
         loadChildren: () => import('./pages/pages.routes').then((m) => m.pagesRoutes),
     },
+    {
+        path: 'notifications',
+        canActivate: [authGuard],
+        loadComponent: () => import('./pages/notifications/notification').then((m) => m.Notification),
+    }
 ];

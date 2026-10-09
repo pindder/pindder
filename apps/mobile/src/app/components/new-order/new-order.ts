@@ -1,12 +1,11 @@
-import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnDestroy, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, 
-  IonLabel, ToastController, IonHeader, IonToolbar, IonTitle, 
-  IonButtons, IonIcon, IonListHeader, ModalController, IonDatetime, 
-  IonActionSheet, IonItemOption, IonAvatar, IonItemOptions, IonItemSliding, 
-  IonTextarea, IonNote, IonModal, IonSelect, IonSelectOption
-} from "@ionic/angular";
-import { DataTypes, DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderItem, IOrderStyle, ISpecification } from '@pindder/contracts';
+import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, IonLabel, 
+  ToastController, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, 
+  IonListHeader, ModalController, IonDatetime, IonActionSheet, IonItemOption, 
+  IonAvatar, IonItemOptions, IonItemSliding, IonTextarea, IonNote, IonModal, 
+  IonSelect, IonSelectOption, IonItemGroup, IonItemDivider } from "@ionic/angular";
+import { DataTypes, DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderItem, IOrderStyle, IResponse, ISpecification } from '@pindder/contracts';
 import { OrderStatus } from '@pindder/contracts';
 import { NewClient } from '../new-client/new-client';
 import { ClientSelection } from '../client-selection/client-selection';
@@ -24,7 +23,7 @@ import { OrderView } from '../../pages/order-view/order-view';
 
 @Component({
   selector: 'app-new-order',
-  imports: [
+  imports: [IonItemDivider,
     IonModal,
     IonNote, IonTextarea,
     IonItemOptions,
@@ -55,11 +54,13 @@ import { OrderView } from '../../pages/order-view/order-view';
     PrimaryButton,
     IonSelect, IonSelectOption,
     OrderView,
+    IonItemGroup, 
+    IonItemDivider
   ],
   templateUrl: './new-order.html',
   styleUrl: './new-order.css',
 })
-export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
+export class NewOrder implements ViewWillEnter, OnDestroy{
   @Input() client?: IClient;
   @Input() design?: IDesign;
   @ViewChild('modal') modalSheet!: IonModal;
@@ -72,7 +73,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   private orderService = inject(OrderService);
   
   presentingElement!: HTMLElement | null;
-  selectedClient!: any;
+  selectedClient!: IClient | null;
   selectedStyleIndex!: number;
   selectedStyle!: IOrderStyle;
 
@@ -83,7 +84,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     totalItems: 0,
     status: OrderStatus.PENDING,
     styles: [],
-    client: ''
+    client: this.client?._id ?? null
   };
   clients: IClient[] = [];
   designs: IDesign[] = [];
@@ -132,7 +133,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   deliveryMethod = DeliveryMethods;
   designTypes = DesignTypes;
 
-  isPreview: boolean = false;
+  isPreview = false;
 
   ionViewWillEnter(): void {
     // console.log(this.client);
@@ -168,7 +169,11 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     if(this.order.styles.length > 0) {
       this.order.styles.forEach((style: IOrderStyle) => {
         style.selections.forEach((selection: ISpecification) => {
-          selection.quantity > 0 ? this.order.totalAmount += selection.amount : 0
+          if(selection.quantity > 0) {
+            this.order.totalAmount = this.order.totalAmount + selection.amount;
+          } else {
+            this.order.totalAmount = 0;
+          }
         });
       });
     }
@@ -313,9 +318,6 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     await modal.present();
   }
 
-  ngOnInit() {
-  }
-
   async presentToast(
     msg: string,
     color: 'danger' | 'light' | 'dark' | 'success' | 'primary' | 'secondary', 
@@ -341,7 +343,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   }
 
   removeSelectedClient() {
-    this.selectedClient = undefined;
+    this.selectedClient = null;
   }
 
   removeSelectedDesign(index: number) {
@@ -380,7 +382,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   }
 
   incrementQuantity(specification: ISpecification) {
-    const specIndex = this.selectedStyle.specifications.indexOf(specification!);
+    const specIndex = this.selectedStyle.specifications.indexOf(specification);
     if(this.selectedStyle.selections.length > 0) {
       const selection = this.selectedStyle.selections.find((selection) => selection.size === this.selectedStyle.specifications[specIndex].size);
       
@@ -417,7 +419,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
       canDismiss: true,
       handle: true,
       componentProps: {
-        client_id: this.selectedClient._id
+        client_id: this.selectedClient?._id
       }
     });
 
@@ -433,7 +435,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
       paramKey = 'style'
     }
 
-    this.selectedClient = undefined;
+    this.selectedClient = null;
 
     this.router.navigate([], {
       relativeTo: this.ar,
@@ -451,7 +453,7 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
     this.selectedStyleIndex = index;
 
     if(this.selectedStyle.selections.length == 0) {
-      let selections: any[] = [];
+      const selections: ISpecification[] = [];
 
       this.selectedStyle.specifications.forEach((spec: ISpecification) => {
         selections.push({...spec, colors: [], quantity: 0 });
@@ -471,40 +473,31 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
   }
 
   buildOrder() {
-    this.order.totalItems = 0;
-    this.order.totalAmount = 0;
-    this.order.totalItems = 0;
-
-    this.order.client = this.selectedClient._id;
+    let totalAmount = 0; 
+    let totalItems = 0
     
     this.order.styles.forEach((item: IOrderStyle) => {
+      item.totalAmount = 0;
+      item.totalItems = 0;
       if(item.type === DesignTypes.BESPOKE) {
-        this.order.totalItems = item.quantity;
-        this.order.totalAmount += (item.amount * item.quantity);
+        item.totalItems = item.quantity;
+        item.totalAmount = item.amount * item.quantity;
+        totalAmount += (item.amount * item.quantity);
+        totalItems += item.quantity;
       } else {
-        item.selections.forEach((selection: ISpecification, index: number) => {
+        item.selections.forEach((selection: ISpecification) => {
           if(selection.quantity == 0) {
-            //this.presentToast('Please select at least one item to proceed', 'danger', 'bottom');
-            //return;  
-
-            if(item.amount > 0) {
-              item.totalAmount = item.amount;
-            }
-            item.selections.splice(index, 1);
-          } else {
-            this.order.totalItems += selection.quantity;
-            item.totalItems += selection.quantity;
-            item.totalAmount += selection.amount;
+            this.presentToast('Please select at least one item to proceed', 'danger', 'bottom');
+            return;  
           }
+          
+          item.totalItems += selection.quantity;
+          item.totalAmount += (selection.amount * selection.quantity);
+          totalAmount += (selection.amount * selection.quantity);
+          totalItems += selection.quantity;
         });
       }
     });
-
-    if(this.order.totalItems === 0) {
-      if(this.order)
-      this.presentToast('Please select at least one item to proceed', 'danger', 'bottom');
-      return;
-    }
 
     if(!this.order.dueDate) {
       this.presentToast('Please select a due date for the order', 'danger', 'bottom');
@@ -513,28 +506,29 @@ export class NewOrder implements ViewWillEnter, OnInit, OnDestroy{
 
     this.completeOrder = {
       _id: this.order._id!,
-      client: this.selectedClient,
+      client: this.selectedClient!,
       orderId: '',
       styles: this.order.styles,
-      totalAmount: this.order.totalAmount,
-      totalItems: this.order.totalItems,
+      totalAmount: totalAmount,
+      totalItems: totalItems,
       measurement: this.order.measurement,
       deliveryMethod: this.order.deliveryMethod,
       dueDate: this.order.dueDate,
       status: OrderStatus.PENDING,
-      createdAt: Date.now().toLocaleString(),
-      updatedAt: Date.now().toLocaleString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       note: this.order.note,
     }
     this.isPreview = !this.isPreview;
-    console.log(this.order);
-    console.log(this.completeOrder);
+    
     this.cdr.markForCheck();
   }
 
   submit() {
+    this.order.totalAmount = this.completeOrder.totalAmount;
+    this.order.totalItems = this.completeOrder.totalItems;
     this.orderService.createOrder(this.order).subscribe({
-      next: (res: any) => {
+      next: (res: IResponse<IOrderItem>) => {
         this.presentToast(res.msg, 'primary', 'top');
         this.router.navigate(['app/orders']);
         this.modalCtrl.dismiss(res.data, 'order');

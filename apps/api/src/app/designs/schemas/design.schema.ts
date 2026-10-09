@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import { DesignTypes } from "@pindder/contracts";
-import { Tailor } from "../../tailors/schemas/tailor.schema";
-import { User } from "../../users/schemas/user.schema";
+import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
+import { UserSnapshot } from "../../users/schemas/user.schema";
 import { ColorSnapshot } from "../../colors/schema/color.schema";
 
 export type DesignDocument = HydratedDocument<Design>;
@@ -75,10 +75,10 @@ export class OrderStyleSnapshot {
     @Prop({ type: Number })
     quantity!: number;
 
-    @Prop({ type: ColorSnapshot })
+    @Prop({ type: [ColorSnapshot] })
     selectedColors?: ColorSnapshot[]
 
-    @Prop({ type: ColorSnapshot })
+    @Prop({ type: [ColorSnapshot] })
     colors?: ColorSnapshot[]
 
     @Prop({ type: String })
@@ -96,8 +96,8 @@ export class OrderStyleSnapshot {
 
 @Schema({ timestamps: true })
 export class Design {
-    @Prop({ type: String, ref: () => User || Tailor })
-    owner!: string;
+    @Prop({ type: TailorSnapshot || UserSnapshot })
+    owner!: TailorSnapshot | UserSnapshot;
 
     @Prop({ type: String, required: true })
     name!: string;

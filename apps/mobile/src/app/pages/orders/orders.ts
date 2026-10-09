@@ -166,11 +166,17 @@ export class Orders implements ViewWillEnter, OnInit{
       case 'pending':
         this.fetchOrders(OrderStatus.PENDING);
         break;
+      case 'ongoing':
+        this.fetchOrders(OrderStatus.ONGOING);
+        break;
       case 'cancelled':
         this.fetchOrders(OrderStatus.CANCELLED);
         break;
       case 'completed':
         this.fetchOrders(OrderStatus.COMPLETED);
+        break;
+      case 'overdue':
+        this.fetchOrders(OrderStatus.OVERDUE);
         break;
     }
   }

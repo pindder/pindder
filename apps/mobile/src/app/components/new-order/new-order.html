@@ -217,8 +217,8 @@
 
     <!-- Modal sheet for quantity and color selection-->
     <ion-modal #modal 
-    [initialBreakpoint]="0.5" 
-    [breakpoints]="[0.5, 0.75]" 
+    [initialBreakpoint]="0.75" 
+    [breakpoints]="[0.75]" 
     (didDismiss)="closeModalSheet()"
     [expandToScroll]="false"
     >
@@ -228,33 +228,48 @@
                     <ion-list-header>
                         Specifications
                     </ion-list-header>
+
+                    <ion-item lines="none">
+                        <ion-avatar aria-hidden="true" slot="start">
+                            <img alt="" src="{{ selectedStyle.images[0] }}" />
+                        </ion-avatar>
+                        <ion-label>
+                            <h2>{{ selectedStyle.name }}</h2> 
+                            <p>unit price: {{ selectedStyle.amount.toLocaleString() }}</p>
+                        </ion-label>
+                    </ion-item>
+
                     @if(selectedStyle.type === designTypes.READYMADE){
                         @for(spec of selectedStyle.specifications; track spec; let specIndex = $index;){
-                        <ion-item lines="full">
-                            <ion-label>
-                                <h2>{{ spec.size }} ({{ spec.amount.toLocaleString() }})</h2>
-                                <div class="py-1 color-grid">
-                                @for(color of spec.colors; track color._id; let colorIndex = $index){
-                                    <div
-                                        class="color-swatch"
-                                        [style.background-color]="color.hex"
-                                        [class.selected]="isColorSelected(color, specIndex)"
-                                        (click)="toggleColor(color, specIndex)"
-                                    >
-                                        @if(isColorSelected(color, specIndex)){<ion-icon
-                                        name="checkmark"
-                                        [style.color]="getContrastColor(color.hex)"
-                                        ></ion-icon>}
+                        <ion-item-group>
+                            <ion-item-divider>
+                                <ion-label>{{ spec.size }} ({{ spec.amount.toLocaleString() }})</ion-label>
+                            </ion-item-divider>
+                            <ion-item lines="full">
+                                <ion-label>
+                                    <div class="py-1 color-grid">
+                                    @for(color of spec.colors; track color._id; let colorIndex = $index){
+                                        <div
+                                            class="color-swatch"
+                                            [style.background-color]="color.hex"
+                                            [class.selected]="isColorSelected(color, specIndex)"
+                                            (click)="toggleColor(color, specIndex)"
+                                        >
+                                            @if(isColorSelected(color, specIndex)){<ion-icon
+                                            name="checkmark"
+                                            [style.color]="getContrastColor(color.hex)"
+                                            ></ion-icon>}
+                                        </div>
+                                    }
                                     </div>
-                                }
+                                </ion-label>
+                                <div class="flex gap-3 items-center">
+                                    <ion-button size="small" (click)="decrementQuantity(spec)">-</ion-button>
+                                        <p>{{ selectedStyle.selections[specIndex].quantity }}</p>
+                                    <ion-button size="small" (click)="incrementQuantity(spec)">+</ion-button>
                                 </div>
-                            </ion-label>
-                            <div class="flex gap-3 items-center">
-                                <ion-button size="small" (click)="decrementQuantity(spec)">-</ion-button>
-                                    <p>{{ selectedStyle.selections[specIndex].quantity }}</p>
-                                <ion-button size="small" (click)="incrementQuantity(spec)">+</ion-button>
-                            </div>
-                        </ion-item>}
+                            </ion-item>
+                        </ion-item-group>}
                     } @else if(selectedStyle.type === designTypes.BESPOKE){
                         <ion-item>
                             <ion-label><p>Quantity</p></ion-label>

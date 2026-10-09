@@ -108,6 +108,7 @@ export class Measurement implements OnInit{
 
   editMeasurement(measure: IMeasurement, index?: number) {
     this.editingMeasurement = true;
+    this.measurement = measure;
 
     this.initForm();
 
@@ -201,7 +202,7 @@ export class Measurement implements OnInit{
 
     console.log('Sending Payload:', formattedPayload);
 
-    if(this.measurement) {
+    if(this.editingMeasurement) {
       this.clientService.updateClientMeasurement(this.measurement._id!, formattedPayload).subscribe({
         next: (res: IResponse<any>) => {
           this.presentToast(res.msg, 'primary', 'top');

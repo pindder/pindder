@@ -22,7 +22,7 @@ export class DesignController {
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createDesignDto: CreateDesignDto, @Req() req: any) {
-    return this.designService.create(createDesignDto, req.user.sub);
+    return this.designService.create(createDesignDto, req.user);
   }
 
   @UseGuards(AuthGuard)
