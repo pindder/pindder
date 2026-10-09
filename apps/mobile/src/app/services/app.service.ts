@@ -86,7 +86,7 @@ export class AppService {
   }
 
   // Quick helper for single image viewing
-  openSingle(src: string, width = 1200, height = 1900) {
+  openSingle(src: string, width = 1200, height = 1400) {
     this.open([{ src, w: width, h: height }]);
   }
 

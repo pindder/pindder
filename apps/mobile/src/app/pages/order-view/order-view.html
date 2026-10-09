@@ -84,37 +84,87 @@
     <!-- Modal sheet for quantity and color selection-->
     <ion-modal 
     #modal 
-    [initialBreakpoint]="0.25" 
-    [breakpoints]="[0, 0.25, 0.5, 0.75]"
+    [initialBreakpoint]="0.5" 
+    [breakpoints]="[0.5, 0.75]"
     [isOpen]="isModalOpen"
-    (didDismiss)="isModalOpen = false">
+    (didDismiss)="isModalOpen = false"
+    [expandToScroll]="false">
         <ng-template>
             <ion-content>
-                <ion-list>
+                <ion-list lines="full">
                     <ion-list-header>
                         Specifications
                     </ion-list-header>
-                    
-                    @for(spec of selectedStyle.selections; track spec; let specIndex = $index;){
-                    <ion-item>
+
+                    <ion-item class="">
+                        <ion-avatar aria-hidden="true" slot="start">
+                            <img alt="" src="{{ selectedStyle.images[0] }}" />
+                        </ion-avatar>
                         <ion-label>
-                            <p class="text-lg">{{ spec.size }} ({{ spec.amount.toLocaleString() }})</p>
-                            <p>Qty: {{ selectedStyle.selections[specIndex].quantity }}</p>
+                            <h2>{{ selectedStyle.name }}</h2> 
+                            <p>unit price: {{ selectedStyle.amount.toLocaleString() }}</p>
+                        </ion-label>
+                    </ion-item>
+                    
+                    @if(selectedStyle.type === designTypes.READYMADE){
+                    @for(spec of selectedStyle.selections; track spec; let specIndex = $index;){
+                    <ion-item-group>
+                        <ion-item-divider>
+                            <ion-label>{{ spec.size }}</ion-label>
+                        </ion-item-divider>
+
+                        @if(spec.colors.length > 0){
+                        <ion-item>
+                            <ion-label><p>selected colors:</p></ion-label>
                             <div class="color-grid">
-                            @for(color of spec.colors; track color._id;) {
+                                @for(color of spec.colors; track color._id;) {
+                                    <div
+                                        class="color-swatch"
+                                        [style.background-color]="color.hex"
+                                    >
+                                    </div>
+                                }
+                            </div>
+                        </ion-item>}
+
+                        <ion-item>
+                            <ion-label>
+                                <p class="text-lg">Price: {{ spec.amount.toLocaleString() }}</p>
+                                <p>Qty: {{ selectedStyle.selections[specIndex].quantity }}</p>
+                            </ion-label>
+                            <ion-note>
+                                
+                                <p>Total: {{ (spec.amount * spec.quantity).toLocaleString() }}</p>
+                            </ion-note>
+                        </ion-item>
+                    </ion-item-group>}
+                    }
+                    @else{
+                        <ion-item>
+                            <ion-label><p>Quantity</p></ion-label>
+                            <ion-note>
+                                <p>{{ selectedStyle.quantity }}</p>
+                            </ion-note>
+                        </ion-item>
+                        <ion-item>
+                            <ion-label><p>Selected Colors</p></ion-label>
+                            <div class=" color-grid">
+                            @for(color of selectedStyle.selectedColors; track color._id; let colorIndex = $index){
                                 <div
                                     class="color-swatch"
-                                    [style.background-color]="color.hex"
+                                    [style.background-color]="color.hex"    
                                 >
                                 </div>
+                            } @empty {
+                                
                             }
                             </div>
-                        </ion-label>
-                        <ion-note>
-                            
-                            <p>Total: {{ selectedStyle.totalAmount }}</p>
-                        </ion-note>
-                    </ion-item>}
+                        </ion-item>
+                        <ion-item>
+                            <ion-label><p>Total</p></ion-label>
+                            <ion-note>{{ (selectedStyle.amount * selectedStyle.quantity).toLocaleString() }}</ion-note>
+                        </ion-item>
+                    }
                 </ion-list>
             </ion-content>
         </ng-template>
@@ -162,7 +212,8 @@
             <ion-label>Invoice</ion-label>
         </ion-list-header>
 
-        <ion-item button (click)="openMeasurementModal()">
+        @if(!isPreview){
+        <ion-item button>
             <ion-icon slot="start" name="attach-outline"></ion-icon>
             <ion-label>
                 <h2 class="font-bold text-lg">{{ order.orderId }}</h2>
@@ -170,9 +221,19 @@
             <ion-note>
                 <p>Order ID</p>
             </ion-note>
+        </ion-item>}
+
+        <ion-item button>
+            <ion-icon slot="start" name="cash-outline"></ion-icon>
+            <ion-label>
+                <h2 class="font-bold text-lg">{{ order.totalItems.toLocaleString() }}</h2>
+            </ion-label>
+            <ion-note>
+                <p>total items</p>
+            </ion-note>
         </ion-item>
 
-        <ion-item button (click)="openMeasurementModal()">
+        <ion-item button>
             <ion-icon slot="start" name="cash-outline"></ion-icon>
             <ion-label>
                 <h2 class="font-bold text-lg">{{ order.totalAmount.toLocaleString() }}</h2>

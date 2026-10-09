@@ -4,12 +4,13 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order } from './schemas/order.schema';
 import { Model, QueryFilter } from 'mongoose';
-import { IOrderItem, IOrderStyle, IResponse, OrderStatus } from '@pindder/contracts';
+import { DataTypes, DataTypesIcon, IOrderItem, IOrderStyle, IResponse, NotificationActions, OrderStatus } from '@pindder/contracts';
 import { Client } from '../clients/schemas/client.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { generateCode } from '../shared/helpers';
 import { Quote } from './schemas/quote.schema';
 import { CreateQuoteDto } from './dto/create-quote.dto';
+import { NotificationService } from '../notifications/notification.service';
 // import { OrderStatus } from '@pindder/contracts';
 
 @Injectable()
@@ -18,7 +19,8 @@ export class OrderService {
     @InjectModel(Quote.name) private readonly quoteModel: Model<Quote>,
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     @InjectModel(Client.name) private readonly clientModel: Model<Client>,
-    @InjectModel(Order.name) private readonly orderModel: Model<Order>
+    @InjectModel(Order.name) private readonly orderModel: Model<Order>,
+    private readonly notificationService: NotificationService
   ) {}
 
   async create(createOrderDto: CreateOrderDto, user_id: any) {
@@ -41,6 +43,19 @@ export class OrderService {
       newOrder.styles = styles;
       newOrder.orderId = `ORD-${generateCode(12)}`;
       await newOrder.save();
+
+      await this.notificationService.create({
+        client: newOrder.client,
+        tailor: newOrder.tailor,
+        type: DataTypes.ORDER,
+        action: NotificationActions.ORDER_CREATED,
+        title: 'New Order',
+        icon: DataTypesIcon.ORDER,
+        message: `Order #${newOrder.orderId} has been created.`,
+        data: {
+          ...newOrder
+        },
+      });
 
       const res: IResponse<any> = {
         statusCode: 200,
@@ -123,6 +138,7 @@ export class OrderService {
 
       const orders = await this.orderModel
       .find(filter)
+      .sort({ createdAt: -1 })
       .populate('client')
       .populate('tailor')
       .exec();

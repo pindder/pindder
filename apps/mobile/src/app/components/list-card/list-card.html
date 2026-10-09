@@ -44,7 +44,7 @@
         }
         <div class="flex justify-between">
             <ion-label (click)="editDesign()">
-                <h2>{{ design.name }}</h2>
+                <h2>{{ design.name.substring(0, 8) }} {{ design.name.length > 8 ? '.....' : '' }}</h2>
                 <p>{{ design.amount.toLocaleString() }}</p>
             </ion-label>
             <ion-buttons>

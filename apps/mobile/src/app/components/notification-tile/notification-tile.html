@@ -24,7 +24,9 @@
           <h2 class="text-primary">{{ notification.type }}</h2>
           <p>{{ notification.message }}</p>
         </ion-label>
-        <ion-icon class="sm-icon" color="danger" name="ellipse" slot="end"></ion-icon>
+        @if(notification.status === notificationStatus.UNREAD){
+          <ion-icon class="sm-icon" color="danger" name="ellipse" slot="end"></ion-icon>
+        }
     </ion-item>
 
     <ion-item-options side="end">

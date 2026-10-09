@@ -1,5 +1,5 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { ChangeDetectorRef, Component, EnvironmentInjector, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, EnvironmentInjector, inject, signal } from '@angular/core';
 import { IonContent, IonFabButton, IonFab, 
   IonIcon, IonButton, IonList, 
   IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonListHeader,
@@ -17,6 +17,10 @@ import { TokenService } from '../../services/token.service';
 import { Router } from '@angular/router';
 import { ProfileCard } from '../../components/profile-card/profile-card';
 import { EmptyState } from '../../components/empty-state/empty-state';
+import { INotification } from '@pindder/contracts';
+import { NotificationService } from '../../services/notification.service';
+import { SseService } from '../../services/sse.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -43,12 +47,16 @@ import { EmptyState } from '../../components/empty-state/empty-state';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements ViewWillEnter, OnInit{
+export class Dashboard implements ViewWillEnter{
+  private notificationService = inject(NotificationService);
+  private sseService = inject(SseService);
+
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private tokenService = inject(TokenService);
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
+  private sseSubscription?: Subscription;
 
   profile!: any;
   environmentInjector = inject(EnvironmentInjector);
@@ -122,72 +130,53 @@ export class Dashboard implements ViewWillEnter, OnInit{
       color: "danger"
     }
   ];
-  notifications = [
-    {
-      id: 'ncaiojmcnio',
-      type: 'Order',
-      message: 'Someone has placed an order',
-      amount: '',
-      icon: 'bag-handle-outline',
-      color: '',
-      date: ''
-    },
-    {
-      id: 'abjhdioadnao',
-      type: 'Catalog',
-      message: 'Someone viewed your catalog',
-      icon: 'albums-outline',
-      color: '',
-      date: ''
-    },
-    {
-      id: 'bacahiochaiu',
-      type: 'Review',
-      message: 'Someone has left you a review',
-      rating: '',
-      icon: 'star-half-outline',
-      color: '',
-      date: ''
-    },
-    {
-      id: 'jndkanidoklqnk',
-      type: 'Security',
-      message: 'You logged in successfully at',
-      amount: '',
-      icon: 'shield-checkmark-outline',
-      color: '',
-      date: ''
-    },
-    {
-      id: '',
-      type: 'Transaction',
-      message: 'Withdrawal request initiated',
-      amount: '',
-      icon: '',
-      color: '',
-      date: ''
-    },
-  ];
+  notifications: INotification[] = [];
   catalog!: string;
   referralLink!: string;
-
-  ngOnInit(): void {
-    this.presentingElement = document.querySelector('.ion-page');
-  }
   
   ionViewWillEnter(): void {
-    this.presentingElement = document.querySelector('.ion-page');
     this.loadProfile();
-    this.cdr.markForCheck();
   }
 
   async loadProfile() {
     const profile = await this.tokenService.getProfile();
     this.profile = profile ? JSON.parse(profile) : null;
     this.catalog = `https://pindder.com/${this.profile.username}`;
+    this.cdr.markForCheck();
+    this.fetchNotifications();
+    this.connectNotifications(this.profile._id);
   }
 
-  openNotificationsModal() {}
+  fetchNotifications() {
+    this.notificationService.getRecentNotifications(this.profile._id).subscribe({
+      next: (res) => {
+        this.notifications = res.data;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private connectNotifications(userId: string) {
+    // Prevent duplicate connections if already connected
+    if (this.sseSubscription) return;
+
+    this.sseSubscription = this.sseService
+      .connectToNotificationStream(userId)
+      .subscribe({
+        next: (notification) => {
+          console.log('New notification received:', notification);
+          // Show toast alert, trigger local notification badge count, etc.
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('SSE Connection Error:', err);
+        },
+      });
+  }
+
+  openNotifications() {
+    this.router.navigate(['notifications']);
+  }
 
   clearRecentNotifications() {
     this.notifications = [];

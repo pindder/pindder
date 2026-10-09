@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { 
   IonItem,
   IonLabel, 
@@ -8,6 +8,7 @@ import {
   IonItemOptions, 
   IonItemOption 
 } from "@ionic/angular";
+import { INotification, NotificationStatus } from '@pindder/contracts';
 
 @Component({
   selector: 'app-notification-tile',
@@ -24,7 +25,10 @@ import {
   styleUrl: './notification-tile.css',
 })
 export class NotificationTile implements OnInit{
-  @Input() notification!: any;
+  @Input() notification!: INotification;
+  @Output() action = new EventEmitter();
+
+  notificationStatus = NotificationStatus;
 
   ngOnInit(): void {
     console.log(this.notification);  

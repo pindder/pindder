@@ -9,6 +9,9 @@ import { Follow, FollowSchema } from './schemas/follows.schema';
 import { JwtService } from '@nestjs/jwt';
 import { SharedService } from '../shared/shared.service';
 import { TokenModule } from '../tokens/token.module';
+import { NotificationService } from '../notifications/notification.service';
+import { NotificationModule } from '../notifications/notification.module';
+import { Notification, NotificationSchema } from '../notifications/schema/notification.schema';
 
 @Module({
   imports: [
@@ -16,12 +19,14 @@ import { TokenModule } from '../tokens/token.module';
       { name: Client.name, schema: ClientSchema },
       { name: Brand.name, schema: BrandSchema },
       { name: Follow.name, schema: FollowSchema },
-      { name: User.name, schema: UserSchema}
+      { name: User.name, schema: UserSchema},
+      { name: Notification.name, schema: NotificationSchema }
     ]),
-    TokenModule
+    TokenModule,
+    NotificationModule
   ],
   controllers: [ClientController],
-  providers: [ClientService, JwtService, SharedService],
+  providers: [ClientService, JwtService, SharedService, NotificationService],
   exports: [MongooseModule]
 })
 export class ClientModule {}
