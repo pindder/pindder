@@ -1,13 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import { CreateTailorDto } from './dto/create-tailor.dto';
 import { UpdateTailorDto } from './dto/update-tailor.dto';
+import { AuthGuard } from '../auth/auth.guard';
+import { InjectModel } from '@nestjs/mongoose';
+import { Tailor } from './schemas/tailor.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TailorService {
-  constructor() {}
+  constructor(
+    @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>
+  ) {}
   
-  create(createTailorDto: CreateTailorDto) {
-    return 'This action adds a new tailor';
+  @UseGuards(AuthGuard)
+  async create(createTailorDto: CreateTailorDto) {
+    
+    const tailor = await this.tailorModel.create(createTailorDto);
+    return tailor;
   }
 
   findAll() {

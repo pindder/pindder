@@ -47,6 +47,12 @@
           "buildTarget": "api:build:production"
         }
       }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx tsx --tsconfig apps/api/tsconfig.app.json apps/api/seed.ts"
+      }
     }
   }
 }

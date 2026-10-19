@@ -61,10 +61,10 @@ export class Orders implements ViewWillEnter, OnInit{
   private searchSubject = new Subject<string>();
 
   // Set default segment
-  activeSegment: string = 'all';
+  activeSegment = 'all';
   
   segmentData!: Observable<IOrderItem[]>;
-  isLoading: boolean = false;
+  isLoading = false;
 
   private ar = inject(ActivatedRoute);
   private appService = inject(AppService);
@@ -74,7 +74,7 @@ export class Orders implements ViewWillEnter, OnInit{
   client!: IClient;
   design!: IDesign;
   dataTypes = DataTypes;
-  isActionSheetOpen: boolean = false;
+  isActionSheetOpen = false;
   actionSheetButtons = [
     {
       text: 'New Order',
@@ -254,9 +254,11 @@ export class Orders implements ViewWillEnter, OnInit{
       this.segmentData = this.segmentData.pipe(
         map((orders: IOrderItem[]) => [data, ...orders])
       );
-      console.log(this.segmentData);
-      this.cdr.markForCheck();
+      //console.log(this.segmentData);
+    } else {
+      this.fetchOrders()
     }
+    this.cdr.markForCheck();
   }
 
   openActionSheet() {

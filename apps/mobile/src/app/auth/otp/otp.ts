@@ -2,9 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonContent, IonHeader, IonInputOtp, 
   IonBackButton, IonToolbar, IonButtons, IonTitle, 
-  IonLabel 
+  IonLabel,
 } from '@ionic/angular';
-import { IVerification } from '@pindder/contracts';
+import { AccountTypes, IVerification } from '@pindder/contracts';
 import { AuthService } from '../auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -34,7 +34,8 @@ export class Otp implements OnInit{
   private router = inject(Router);
 
   verificationData!: IVerification;
-  
+  acctType = AccountTypes.TAILOR;
+
   ngOnInit(): void {
     this.verificationData = {
       code: ''
@@ -56,10 +57,10 @@ export class Otp implements OnInit{
   }
 
   async resendOtp() {
-    let value = await this.tokenService.getPreferenceValue('email');
-
+    const value = await this.tokenService.getPreferenceValue('email');
+    
     if(value) {
-      this.authService.resendCode(value).subscribe({
+      this.authService.resendCode(value, this.acctType).subscribe({
         next: (val) => {
           console.log(val);
         }, 

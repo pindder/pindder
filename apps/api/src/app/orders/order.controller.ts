@@ -22,7 +22,7 @@ export class OrderController {
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
-    return this.orderService.create(createOrderDto, req.user.sub);
+    return this.orderService.create(createOrderDto, req.user);
   }
 
   @UseGuards(AuthGuard)

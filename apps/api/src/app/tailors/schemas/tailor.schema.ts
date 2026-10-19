@@ -7,41 +7,35 @@ export type TailorDocument = HydratedDocument<Tailor>;
 
 @Schema()
 export class TailorSnapshot {
-    @Prop({ type: String, required: true })
+    @Prop({ type: String })
     _id!: string;
 
-    @Prop({ type: String, required: true })
-    fullname!: string;
-
-    @Prop({ required: false })
-    firstname?: string;
-
-    @Prop({ required: false })
-    lastname?: string;
-
-    @Prop({ required: true })
-    username!: string;
-
-    @Prop({ required: true })
-    email!: string;
-
-    @Prop({ required: true })
-    phoneNo!: string;
-
-    @Prop({ required: false })
-    mobile?: string;
+    @Prop({ type: String })
+    fullname?: string;
 
     @Prop({ type: String })
-    catalog?: string;
+    firstname?: string;
 
-    @Prop({ type: String, required: true })
+    @Prop({ type: String })
+    lastname?: string;
+
+    @Prop({ type: String })
+    username!: string;
+
+    @Prop({ type: String })
+    email!: string;
+
+    @Prop({ type: String })
+    countryCode!: string;
+
+    @Prop({ type: String })
+    tel?: string;
+
+    @Prop({ type: String })
     accountType!: string;
 
     @Prop({ type: String })
     profileImg?: string;
-
-    @Prop({ type: String, required: true })
-    status!: string;
 }
 
 @Schema({ timestamps: true })
@@ -55,29 +49,32 @@ export class Tailor {
     @Prop({ type: String, required: true })
     fullname!: string;
 
-    @Prop({ required: false })
+    @Prop({ type: String, required: false })
     firstname?: string;
 
-    @Prop({ required: false })
+    @Prop({ type: String, required: false })
     lastname?: string;
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     username!: string;
 
-    @Prop({ required: true, unique: true, index: true })
+    @Prop({ type: String, required: true, unique: true, index: true })
     email!: string;
 
-    @Prop({ required: true })
-    phoneNo!: string;
+    @Prop({ type: String, required: true })
+    countryCode!: string;
 
-    @Prop({ required: false })
-    mobile?: string;
+    @Prop({ type: String, required: true })
+    tel?: string;
 
     @Prop({ type: String })
     catalog?: string;
 
     @Prop({ type: String })
     oneTimeLoginCode?: string;
+
+    @Prop({ type: String, required: true, unique: true, index: true })
+    referralCode!: string;
 
     @Prop({ type: String })
     website?: string;
@@ -88,8 +85,27 @@ export class Tailor {
     @Prop({ type: String })
     profileImg?: string;
 
-    @Prop({ required: true, enum: AccountStatus, default: AccountStatus.PENDING })
+    @Prop({ type: String, required: true, enum: AccountStatus, default: AccountStatus.PENDING })
     status!: string;
 }
 
 export const TailorSchema = SchemaFactory.createForClass(Tailor);
+
+// 1. Keep standard Virtual definition
+TailorSchema.virtual('subscription', {
+    ref: 'Subscription',
+    localField: '_id',
+    foreignField: 'tailor._id',
+});
+
+// 2. Enable virtuals in output
+TailorSchema.set('toJSON', { virtuals: true });
+TailorSchema.set('toObject', { virtuals: true });
+
+// 3. Keep Auto-Populate Pre-Hooks
+function autoPopulateSubscription(this: any) {
+    this.populate('subscription');
+}
+
+TailorSchema.pre('findOne', autoPopulateSubscription);
+TailorSchema.pre('find', autoPopulateSubscription);

@@ -1,4 +1,138 @@
-<ion-content [fullscreen]="true">
+<ion-content class="ion-padding" color="light">
+  <div class="auth-container">
+    
+    <!-- App Logo & Header -->
+    <div class="flex items-center gap-2 flex-col header-section">
+      <ion-icon name="shield-checkmark-outline" class="app-logo"></ion-icon>
+       <img src="images/logo.png" alt="" />
+      <h2>{{ isSignUp ? 'Create Account' : 'Welcome Back' }}</h2>
+      <p>{{ isSignUp ? 'Sign up to get started with Pindder, helping tailors stay organized.' : 'Enter your email to sign in with an OTP' }}</p>
+    </div>
+
+    <!-- Segment Switcher (Sign In vs Sign Up) -->
+    <ion-segment [(ngModel)]="authMode" (ionChange)="segmentChanged()" mode="ios" class="auth-segment">
+      <ion-segment-button value="signin">
+        <ion-label>Sign In</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="signup">
+        <ion-label>Sign Up</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- ================= SIGN UP FORM ================= -->
+    @if(isSignUp){
+    <form (ngSubmit)="onSignUp()">
+      
+      <!-- Full Name Field -->
+      <ion-item lines="none" fill="outline" class="custom-input">
+        <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
+        <ion-input 
+          label="Full Name" 
+          label-placement="stacked" 
+          type="text" 
+          [(ngModel)]="signupData.fullName" 
+          name="fullName"
+          placeholder="John Doe" 
+          required>
+        </ion-input>
+      </ion-item>
+
+      <!-- Email Field -->
+      <ion-item lines="none" fill="outline" class="custom-input">
+        <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
+        <ion-input 
+          label="Email Address" 
+          label-placement="stacked" 
+          type="email" 
+          [(ngModel)]="signupData.email" 
+          name="email"
+          placeholder="name@example.com" 
+          required>
+        </ion-input>
+      </ion-item>
+
+      <!-- Phone Field -->
+      <ion-item lines="none" fill="outline" class="custom-input">
+        <ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon>
+        <ion-input 
+          label="Phone Number" 
+          label-placement="stacked" 
+          type="tel" 
+          [(ngModel)]="signupData.phone" 
+          name="phoneNo"
+          placeholder="+234 800 000 0000" 
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-button expand="block" type="submit" class="submit-btn">
+        Create Account
+      </ion-button>
+    </form>}
+
+
+    <!-- ================= SIGN IN (OTP) FORM ================= -->
+    @if(!isSignUp){
+    <form (ngSubmit)="onSignInSubmit()">
+      
+      <!-- STEP 1: Email Input (Before OTP is sent) -->
+      @if(!otpSent){
+      <ng-container>
+        <ion-item lines="none" fill="outline" class="custom-input">
+          <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-input 
+            label="Email Address" 
+            label-placement="stacked" 
+            type="email" 
+            [(ngModel)]="signinEmail" 
+            name="email"
+            placeholder="name@example.com" 
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" class="submit-btn">
+          Send OTP
+        </ion-button>
+      </ng-container>}
+
+      <!-- STEP 2: OTP Input (After OTP is sent) -->
+      @if(otpSent){
+      <ng-container>
+        <div class="otp-notice">
+          <p>We've sent a 6-digit code to <strong>{{ signinEmail }}</strong></p>
+        </div>
+
+        <ion-item fill="outline" class="custom-input otp-input-box">
+          <ion-icon name="key-outline" slot="start" aria-hidden="true"></ion-icon>
+          <ion-input 
+            label="Enter Verification Code" 
+            label-placement="stacked" 
+            type="text" 
+            maxlength="6"
+            [(ngModel)]="otpCode" 
+            name="otpCode"
+            placeholder="123456" 
+            class="ion-text-center"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" class="submit-btn">
+          Verify & Sign In
+        </ion-button>
+
+        <div class="resend-container">
+          <button type="button" class="text-button" (click)="resendOtp()">Didn't get code? Resend</button>
+          <button type="button" class="text-button change-email" (click)="otpSent = false">Change Email</button>
+        </div>
+      </ng-container>}
+
+    </form>}
+
+  </div>
+</ion-content>
+<!-- <ion-content [fullscreen]="true">
     <div class="page-container">
         <div class="flex justify-center p-3">
             <img src="images/logo.png" alt="" />
@@ -38,4 +172,4 @@
             </ion-segment-view>
         </ion-card>
     </div>
-</ion-content>
+</ion-content> -->

@@ -9,23 +9,23 @@ export type DesignDocument = HydratedDocument<Design>;
 
 @Schema({ _id: false })
 export class SpecificationSnapshot {
-    @Prop({ type: String, required: true })
-    size!: string;
+    @Prop({ type: String })
+    size?: string;
 
-    @Prop({ type: Number, required: true, default: 1 })
-    quantity!: number;
+    @Prop({ type: Number })
+    quantity?: number;
 
-    @Prop({ type: [ColorSnapshot], required: true })
+    @Prop({ type: () => [ColorSnapshot] })
     colors?: ColorSnapshot[];
 
-    @Prop({ type: [ColorSnapshot] })
+    @Prop({ type: () => [ColorSnapshot] })
     selectedColors?: ColorSnapshot[];
 
-    @Prop({ type: Number, required: true })
-    inStock!: number;
+    @Prop({ type: Number })
+    inStock?: number;
 
-    @Prop({ type: Number, required: true })
-    amount!: number;
+    @Prop({ type: Number })
+    amount?: number;
 }
 
 @Schema({ _id: false })
@@ -36,7 +36,7 @@ export class Specification {
     @Prop({ type: String, required: false})
     description?: string;
 
-    @Prop({ type: [ColorSnapshot] })
+    @Prop({ type: () => [ColorSnapshot] })
     colors?: ColorSnapshot[];
 
     @Prop({ type: Number, required: false })
@@ -60,10 +60,10 @@ export class OrderStyleSnapshot {
     @Prop({ type: String, required: true, enum: DesignTypes })
     type!: string;
 
-    @Prop({ type: [Specification] })
+    @Prop({ type: () => [Specification] })
     specifications?: [Specification];
 
-    @Prop({ type: [SpecificationSnapshot] })
+    @Prop({ type: () => [SpecificationSnapshot] })
     selections?: SpecificationSnapshot[];
 
     @Prop({ type: Date })
@@ -73,12 +73,18 @@ export class OrderStyleSnapshot {
     amount!: number;
 
     @Prop({ type: Number })
+    productionDuration?: number; 
+
+    @Prop({ type: Number })
+    deliveryDuration?: number; 
+
+    @Prop({ type: Number })
     quantity!: number;
 
-    @Prop({ type: [ColorSnapshot] })
+    @Prop({ type: () => [ColorSnapshot] })
     selectedColors?: ColorSnapshot[]
 
-    @Prop({ type: [ColorSnapshot] })
+    @Prop({ type: () => [ColorSnapshot] })
     colors?: ColorSnapshot[]
 
     @Prop({ type: String })
@@ -96,7 +102,7 @@ export class OrderStyleSnapshot {
 
 @Schema({ timestamps: true })
 export class Design {
-    @Prop({ type: TailorSnapshot || UserSnapshot })
+    @Prop({ type: () => TailorSnapshot || UserSnapshot })
     owner!: TailorSnapshot | UserSnapshot;
 
     @Prop({ type: String, required: true })
@@ -111,10 +117,10 @@ export class Design {
     @Prop({ type: String, required: true, enum: DesignTypes })
     type!: string;
 
-    @Prop({ type: [Specification], required: true })
+    @Prop({ type: () => [Specification], required: true })
     specifications?: [Specification];
 
-    @Prop({ type: [ColorSnapshot] })
+    @Prop({ type: () => [ColorSnapshot] })
     colors?: [ColorSnapshot];
 
     @Prop({ type: Number })
@@ -137,6 +143,12 @@ export class Design {
 
     @Prop({ type: Number })
     percentageDiscount?: number;
+
+    @Prop({ type: Number })
+    productionDurationInDays?: number;
+
+    @Prop({ type: Number })
+    maxDaysToDeliver?: number;
 
     @Prop({ type: Boolean, default: false, required: true })
     catalogDisplay!: boolean;

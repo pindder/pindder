@@ -19,6 +19,8 @@ export interface IOrder {
   measurement?: string;
   address?: string;
   deliveryMethod?: string;
+  paymentMethod: string;
+  paid?: boolean;
   status: OrderStatus;
   note?: string;
   totalAmount: number;
@@ -37,11 +39,30 @@ export interface IOrderItem {
   address?: string;
   deliveryMethod?: string;
   status: OrderStatus;
+  paid: boolean;
+  paymentMethod: string;
   note?: string;
   totalAmount: number;
   totalItems: number;
   createdAt: string | Date;
   updatedAt: string | Date;
+  quotes?: any[];
+}
+
+export interface IPayment {
+  currency?: string;
+  idempotencyKey?: string;
+  orderId?: string;
+  plan_id?: number;
+  amount?: number;
+  callbackUrl: string; 
+  startDate?: string;
+  authorization?: string;
+}
+
+export interface IOrderWithPayment {
+  order?: IOrderItem;
+  payment?: IPayment[];
 }
 
 export interface IOrderStyle {

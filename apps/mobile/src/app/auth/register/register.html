@@ -1,4 +1,107 @@
-<form #regForm="ngForm" class="py-3">
+<ion-content class="ion-padding ion-text-center" color="light">
+    <div class="login-container">
+        <!-- App Logo / Header -->
+        <div class="flex flex-col gap-2 items-center header-section">
+            <ion-icon size="medium" name="lock-closed-outline" class="app-logo"></ion-icon>
+            <img src="images/logo.png" alt="" />
+            <h2>Create Account</h2>
+            <p>Sign up to get started with Pindder, helping tailors stay organized.</p>
+        </div>
+
+        <!-- Login Form -->
+        <form (ngSubmit)="onSignUp()">
+            <!-- Full Name Field -->
+            <ion-item lines="none" fill="outline" class="custom-input">
+                <ion-icon name="person-outline" slot="start" aria-hidden="true"></ion-icon>
+                <ion-input 
+                label="Full Name" 
+                label-placement="stacked" 
+                type="text" 
+                [(ngModel)]="registrationData.fullname" 
+                name="fullName"
+                placeholder="John Doe" 
+                required>
+                </ion-input>
+            </ion-item>
+
+            <!-- Email Field -->
+            <ion-item lines="none" fill="outline" class="custom-input">
+                <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
+                <ion-input 
+                label="Email Address" 
+                label-placement="stacked" 
+                type="email" 
+                [(ngModel)]="registrationData.email" 
+                name="signupEmail"
+                placeholder="name@example.com" 
+                required>
+                </ion-input>
+            </ion-item>
+
+            <!-- Phone Field -->
+            <!-- Phone Number Group (Country Code + Digits) -->
+            <ion-item lines="none" fill="outline" class="custom-input phone-container-item">
+                <ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon>
+                <div class="flex flex-col">
+                    <ion-text class="text-xs pt-2" [color]="'dark'" slot="start">Phone No</ion-text>
+                    <div class="phone-input-wrapper">
+                        <!-- Country Code Selector -->
+                        <ion-select 
+                        [(ngModel)]="registrationData.countryCode" 
+                        name="countryCode" 
+                        [interfaceOptions]="customModalOptions" 
+                        interface="modal" 
+                        [toggleIcon]="'chevron-down-outline'"
+                        class="country-code-select"
+                        aria-label="Country Code">
+                            @for(c of countries; track c.name) {
+                                <ion-select-option [value]="c.code">
+                                    {{ c.flag }} {{ c.code }}
+                                </ion-select-option>
+                            }
+                        </ion-select>
+
+                        <!-- Phone Digits Input -->
+                        <ion-input 
+                        label-placement="stacked" 
+                        type="tel" 
+                        [(ngModel)]="registrationData.tel" 
+                        name="tel"
+                        placeholder="800 000 0000" 
+                        class="phone-digits-input"
+                        required>
+                        </ion-input>
+                    </div>
+                </div>
+            </ion-item>
+
+            <!-- Referral Field -->
+            <ion-item lines="none" fill="outline" class="custom-input">
+                <ion-icon name="repeat-outline" slot="start" aria-hidden="true"></ion-icon>
+                <ion-input 
+                label="Referral Code (Optional)" 
+                label-placement="stacked" 
+                type="referral" 
+                [(ngModel)]="registrationData.referralCode" 
+                name="referral"
+                placeholder="000000" 
+                required>
+                </ion-input>
+            </ion-item>
+
+            <ion-button expand="block" type="submit" class="submit-btn">
+                Create Account
+            </ion-button>
+        </form>
+
+        <!-- Footer Register Link -->
+        <div class="footer-section">
+            <p>Already have an account? <span routerLink="/auth/login" class="signup-link">Sign In</span></p>
+        </div>
+
+    </div>
+</ion-content>
+<!-- <form #regForm="ngForm" class="py-3">
     <ion-list>
         <ion-item lines="full">
             <ion-input 
@@ -44,5 +147,5 @@
             ></ion-input>
         </ion-item>
     </ion-list>
-</form>
+</form> -->
     

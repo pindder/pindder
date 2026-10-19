@@ -8,22 +8,22 @@ export class Admin {
     @Prop({ type: String })
     fullname?: string;
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     firstname!: string;
     
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     lastname!: string;
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     email!: string;
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     phoneNo!: string;
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     role!: string;
 
-    @Prop({ required: true, enum: [] })
+    @Prop({ type: String, required: true, enum: [] })
     status!: string;
 
     @Prop({ type: String })
@@ -35,7 +35,7 @@ export class Admin {
     @Prop({ type: String })
     postalCode?: string;
 
-    @Prop({ required: true, minLength: 12, maxLength: 32 })
+    @Prop({ type: String, required: true, minLength: 12, maxLength: 32 })
     password!: string;
 }
 

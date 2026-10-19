@@ -1,14 +1,16 @@
 import {
+  Get,
   Body,
   Controller,
   Post,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CreateBrandDto } from '../brands/dto/create-brand.dto';
 import { CreateTailorDto } from '../tailors/dto/create-tailor.dto';
-import { IVerification } from '@pindder/contracts';
+import { IResponse, IVerification } from '@pindder/contracts';
 
 @Controller('auth')
 export class AuthController {
@@ -47,5 +49,21 @@ export class AuthController {
   @Post('verify-code')
   verifyCode(@Body() verificationDto: IVerification) {
     return this.authService.verifyOneTimeLoginCode(verificationDto);
+  }
+
+  @Get('resend-token') 
+  async resendToken(@Query('email') email: string, @Query('acctType') acctType: string) {
+    const res: IResponse<any> = {
+      statusCode: 200,
+      msg: 'Verification code has been sent to your email'
+    };
+
+    if(await this.authService.resendToken(email, acctType)) {
+      return res;
+    } else {
+      res.statusCode = 400;
+      res.msg = '';
+      return 
+    }
   }
 }

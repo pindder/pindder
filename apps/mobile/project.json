@@ -67,6 +67,9 @@
         "development": {
           "buildTarget": "mobile:build:development"
         }
+      },
+      "options": {
+        "allowedHosts": ["https://evident-floors-lcd-medium.trycloudflare.com"]
       }
     },
     "lint": {

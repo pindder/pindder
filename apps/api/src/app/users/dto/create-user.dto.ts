@@ -8,5 +8,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     @IsEmail()
     email!: string;
-    phoneNo!: string;
+    
+    countryCode!: string;
+    tel!: string;
 }

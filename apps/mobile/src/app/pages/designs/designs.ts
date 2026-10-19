@@ -35,7 +35,7 @@ export class Designs implements ViewWillEnter, OnInit{
 
   dataTypes = DataTypes;
   designs$!: Observable<IDesign[]>;
-  isLoading: boolean = false;
+  isLoading = false;
 
   ionViewWillEnter(): void {
     this.fetchDesigns();
@@ -91,14 +91,6 @@ export class Designs implements ViewWillEnter, OnInit{
       })
     );
     this.cdr.markForCheck();
-
-    // this.designService.fetchDesigns().subscribe({
-    //   next: (data) => {
-    //     this.designs = data;
-    //     this.cdr.markForCheck(); // Force Angular to update the view immediately
-    //   },
-    //   error: (err: HttpErrorResponse) => console.error(err)
-    // });
   }
 
   updateDesignsList(design: IDesign) {

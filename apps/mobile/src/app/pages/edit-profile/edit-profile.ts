@@ -4,7 +4,7 @@ import { IonButtons, IonContent, IonHeader, IonTitle, IonToolbar,
   IonBackButton, IonInput,
   ViewWillEnter,
   ToastController,
-  IonList,
+  IonList, IonAvatar,
   IonItem
 } from '@ionic/angular';
 import { ProfileService } from '../../services/profile.service';
@@ -18,7 +18,8 @@ const initialProfile: IProfile = {
   lastname: '',
   email: '',
   address: '',
-  phoneNo: '',
+  countryCode: '',
+  tel: '',
   username: ''
 };
 
@@ -26,7 +27,7 @@ const initialProfile: IProfile = {
   selector: 'app-edit-profile',
   imports: [IonHeader, IonContent, FormsModule, IonToolbar,
     IonTitle, IonBackButton, IonButtons, IonList, IonInput,
-    IonItem, PrimaryButton],
+    IonItem, PrimaryButton, IonAvatar],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
 })
@@ -42,7 +43,9 @@ export class EditProfile implements OnInit, ViewWillEnter{
     this.loadProfile();
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    return;
+   }
 
   async loadProfile() {
     const profileStr = await this.tokenService.getProfile();

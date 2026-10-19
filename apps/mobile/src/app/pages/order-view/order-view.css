@@ -37,3 +37,7 @@ ion-avatar {
     border-color: rgba(0, 0, 0, 0.3);
   }
 }
+
+ion-note {
+  display: block;
+}

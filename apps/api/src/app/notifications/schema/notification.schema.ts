@@ -22,13 +22,13 @@ export class Notification {
     @Prop({ type: mongoose.Schema.Types.Mixed })
     data: any;
 
-    @Prop({ type: ClientSnapshot })
+    @Prop({ type: () => ClientSnapshot, default: null })
     client?: ClientSnapshot;
 
-    @Prop({ type: TailorSnapshot })
+    @Prop({ type: () => TailorSnapshot, default: null })
     tailor?: TailorSnapshot;
 
-    @Prop({ type: UserSnapshot })
+    @Prop({ type: () => UserSnapshot, default: null })
     customer?: UserSnapshot;
 
     @Prop({ type: String, required: true })

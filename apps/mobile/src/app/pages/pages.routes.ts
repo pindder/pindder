@@ -47,6 +47,10 @@ export const pagesRoutes: Route[] = [
         loadComponent: () => import('./premium/premium').then((m) => m.Premium),
     },
     {
+        path: 'profile/bank-details',
+        loadComponent: () => import('./bank-details/bank-detail').then((m) => m.BankDetail),
+    },
+    {
         path: 'profile/referrals',
         loadComponent: () => import('./referrals/referrals').then((m) => m.Referrals),
     },

@@ -36,7 +36,7 @@ export class DesignView implements ViewWillEnter, OnInit{
   uploadedImageUrls: string[] = [];
   selectedColors: IColors[] = [];
   availableColors: IColors[] = [];
-  isUploading: boolean = false;
+  isUploading = false;
   isActionSheetOpen = signal<boolean>(false);
   modalContent = signal<string>("");
   actionSheetButtons = [
@@ -64,7 +64,7 @@ export class DesignView implements ViewWillEnter, OnInit{
       icon: 'trash-outline',
       // role: 'destructive',
       handler: () => {
-    
+        return;
       },
     },
   ];
@@ -94,7 +94,7 @@ export class DesignView implements ViewWillEnter, OnInit{
   }
 
   ngOnInit(): void {
-    
+    return;
   }
 
   async openSpecificationModal() {
@@ -147,10 +147,10 @@ export class DesignView implements ViewWillEnter, OnInit{
   async openImage() {
     //this.appService.openSingle(imageUrl);
     
-    let images: GalleryItem[] =  [];
+    const images: GalleryItem[] =  [];
     
     this.design.images.map((image) => {
-      let imgObj = {
+      const imgObj = {
         src: image,
         w: 1200,
         h: 1400
@@ -276,6 +276,15 @@ export class DesignView implements ViewWillEnter, OnInit{
   }
 
   removeImage(index: number) {
-    this.uploadedImageUrls.splice(index, 1);
+    this.designService.removeDesignImage(this.design._id!, this.uploadedImageUrls[index]).subscribe({
+      next: (response: IResponse<any>) => {
+        if(response.statusCode === 200){
+          this.uploadedImageUrls.splice(index, 1);
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
   }
 }

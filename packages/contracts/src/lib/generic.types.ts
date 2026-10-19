@@ -13,3 +13,28 @@ export interface GalleryItem {
   h: number; // height in px
   alt?: string;
 }
+
+export interface IPlan {
+  _id: string;
+  name: string;
+  description?: string;
+  amount: number;
+  interval: string; // e.g., 'month', 'year'
+  features: string[];
+  isPopular?: boolean;
+  recommended:boolean;
+  free: boolean;
+  buttonText?: string;
+  plan_id: number;
+  plan_code: string;
+  metadata: any;
+}
+
+export interface IBankDetail {
+  _id?: string;
+  bankName: string;
+  accountNo: string;
+  accountName: string;
+  sortCode?: string;
+  disabled: boolean;
+}

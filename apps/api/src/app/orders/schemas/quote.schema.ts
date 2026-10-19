@@ -14,10 +14,10 @@ export class Quote {
     @Prop({ type: Number, required: true, default: 1 })
     amount!: number;
 
-    @Prop({ type: TailorSnapshot, required: true })
+    @Prop({ type: () => TailorSnapshot, required: true })
     tailor!: TailorSnapshot;
 
-    @Prop({ type: UserSnapshot, required: true })
+    @Prop({ type: () => UserSnapshot, required: true })
     customer!: UserSnapshot;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Order })

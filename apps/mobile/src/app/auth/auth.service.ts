@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { from, map, Observable, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ILogin, IVerification, TailorReg } from '@pindder/contracts';
+import { ILogin, IResponse, IVerification, TailorReg } from '@pindder/contracts';
 import { TokenService } from '../services/token.service';
 import { ProfileService } from '../services/profile.service';
 
@@ -59,8 +59,8 @@ export class AuthService {
     }));
   }
 
-  resendCode(email: string): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/auth/resend-token`, { email: email });
+  resendCode(email: string, acctType: string): Observable<IResponse<any>> {
+    return this.http.get<IResponse<any>>(`${environment.apiUrl}/auth/resend-token?email=${email}&acctType=${acctType}`);
   }
 
   async logout(): Promise<void> {

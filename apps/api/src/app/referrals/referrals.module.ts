@@ -12,5 +12,6 @@ import { Referral, ReferralSchema } from './schema/referral.schema';
   ],
   controllers: [ReferralsController],
   providers: [ReferralsService],
+  exports: [MongooseModule, ReferralsService]
 })
 export class ReferralsModule {}

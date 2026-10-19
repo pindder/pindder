@@ -15,11 +15,11 @@ export class MeasurementSnapshot {
     @Prop({ type: String })
     description?: string;
 
-    @Prop({ type: ClientSnapshot, required: false })
-    client?: ClientSnapshot;
+    @Prop({ type: () => ClientSnapshot, default: null })
+    client?: ClientSnapshot | null;
 
-    @Prop({ type: UserSnapshot, required: false })
-    user?: UserSnapshot;
+    @Prop({ type: () => UserSnapshot, default: null })
+    user?: UserSnapshot | null;
 
     @Prop({ type: String, enum: MeasurementTypes, default: MeasurementTypes.CUSTOM })
     measurementType!: string;
@@ -27,10 +27,10 @@ export class MeasurementSnapshot {
     @Prop({ type: Map, of: mongoose.Schema.Types.Mixed, default: {} })
     measurements?: Map<string, string>;
 
-    @Prop({ type: String})
-    notes?: string;
+    @Prop({ type: String || null, default: null })
+    notes?: string | null;
 
-    @Prop({ type: ColorSnapshot })
+    @Prop({ type: () => ColorSnapshot })
     color?: ColorSnapshot; 
 }
 
@@ -39,14 +39,14 @@ export class Measurement {
     @Prop({ type: String, required: true })
     name!: string;
 
-    @Prop({ type: String })
-    description?: string;
+    @Prop({ type: String, default: null})
+    description?: string | null;
 
-    @Prop({ type: ClientSnapshot, required: false })
-    client?: ClientSnapshot;
+    @Prop({ type: () => ClientSnapshot, default: null })
+    client?: ClientSnapshot | null;
 
-    @Prop({ type: UserSnapshot, required: false })
-    user?: UserSnapshot;
+    @Prop({ type: () => UserSnapshot, default: null })
+    user?: UserSnapshot | null;
 
     @Prop({ type: String, enum: MeasurementTypes, default: MeasurementTypes.CUSTOM })
     measurementType!: string;
@@ -57,8 +57,8 @@ export class Measurement {
     @Prop({ type: Map, of: mongoose.Schema.Types.Mixed, default: {} })
     measurements?: Map<string, string>;
 
-    @Prop({ type: String})
-    notes?: string;
+    @Prop({ type: String, default: null })
+    notes?: string | null;
 }
 
 export const MeasurementSchema = SchemaFactory.createForClass(Measurement);

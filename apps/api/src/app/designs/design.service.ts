@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateDesignDto } from './dto/create-design.dto';
 import { UpdateDesignDto } from './dto/update-design.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,22 +8,25 @@ import { AccountTypes, DataTypes, DataTypesIcon, IResponse, NotificationActions 
 import { NotificationService } from '../notifications/notification.service';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { User } from '../users/schemas/user.schema';
+import { CloudinaryService } from '../shared/cloudinary-service.service';
 
 @Injectable()
 export class DesignService {
+  private logger = new Logger(DesignService.name);
+  
   constructor(
     @InjectModel(Design.name) private readonly designModel: Model<Design>,
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly cloudinaryService: CloudinaryService
   ) {}
   async create(createDesignDto: CreateDesignDto, user: any) {
-    console.log(user);
     try {
       const newDesign = new this.designModel(createDesignDto);
 
       if(user.acctType === AccountTypes.TAILOR) {
-        const tailor = await this.tailorModel.findById(user.sub);
+        const tailor = await this.tailorModel.findById(user.sub).lean();
         
         if(tailor) {
           newDesign.owner = await tailor;
@@ -32,7 +35,7 @@ export class DesignService {
           throw new UnauthorizedException();
         }
       } else if(user.acctType === AccountTypes.USER) {
-        const customer = await this.userModel.findById(user.sub);
+        const customer = await this.userModel.findById(user.sub).lean();
         
         if(customer) {
           newDesign.owner = customer;
@@ -163,6 +166,38 @@ export class DesignService {
       return res;
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
+  async removeDesignImage(id: string, imgUrl: string) {
+    try {
+      // 1. Await the database query
+      const design = await this.designModel.findById(id);
+
+      if (!design) {
+        throw new NotFoundException(`Style not found!`);
+      }
+
+      // 2. Extract public ID from the stored URL
+      const publicId = this.cloudinaryService.extractPublicIdFromUrl(imgUrl);
+
+      // 3. Delete from Cloudinary
+      await this.cloudinaryService.deleteImage(publicId);
+
+      // 4. Remove ONLY this specific image URL from the 'images' array in MongoDB
+      await this.designModel.findByIdAndUpdate(id, {
+        $pull: { images: imgUrl },
+      });
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'image deleted successfully!',
+      }
+
+      return res;
+    } catch(error: any) {
+      this.logger.error(error);
+      return error;
     }
   }
 }

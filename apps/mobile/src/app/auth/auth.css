@@ -24,6 +24,10 @@ ion-card {
   margin: 0 auto;
 }
 
+ion-item {
+  border-radius: 20px;
+}
+
 img {
     width: 145px;
 }
@@ -57,3 +61,114 @@ ion-segment-button.ios::part(native) {
 /* ion-segment-button.ios::part(indicator-background) {
   border-radius: 20px;
 } */
+
+.auth-container {
+  max-width: 420px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px;
+
+  .header-section {
+    text-align: center;
+    margin-bottom: 24px;
+
+    .app-logo {
+      font-size: 44px;
+      color: var(--ion-color-primary);
+      background: rgba(var(--ion-color-primary-rgb), 0.1);
+      padding: 14px;
+      border-radius: 50%;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--ion-text-color);
+      margin-bottom: 4px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      font-size: 13px;
+      margin: 0;
+    }
+  }
+
+  .auth-segment {
+    margin-bottom: 24px;
+    background: #e9ecef;
+    border-radius: 12px;
+    padding: 3px;
+
+    ion-segment-button {
+      --border-radius: 10px;
+      min-height: 38px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+  }
+
+  /* Custom Bordered Inputs */
+  .custom-input {
+    --border-radius: 12px;
+    --highlight-color-focused: var(--ion-color-primary);
+    margin-bottom: 18px;
+    background: var(--ion-background-color, #ffffff);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    
+    ion-icon[slot="start"] {
+      margin-inline-end: 10px;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .otp-notice {
+    font-size: 13px;
+    color: var(--ion-color-medium);
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .otp-input-box ion-input {
+    font-size: 22px;
+    letter-spacing: 6px;
+    font-weight: bold;
+  }
+
+  .submit-btn {
+    --border-radius: 12px;
+    height: 48px;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
+  }
+
+  .resend-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding: 0 4px;
+
+    .text-button {
+      background: none;
+      border: none;
+      color: var(--ion-color-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0;
+
+      &.change-email {
+        color: var(--ion-color-medium);
+      }
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

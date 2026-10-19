@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 //import { Measurement } from "../../measurements/schemas/measurement.schema";
-import { DeliveryMethods, OrderStatus } from "@pindder/contracts";
-import { Client, ClientSnapshot } from "../../clients/schemas/client.schema";
-import { User, UserSnapshot } from "../../users/schemas/user.schema";
-import { Tailor, TailorSnapshot } from "../../tailors/schemas/tailor.schema";
+import { DeliveryMethods, OrderStatus, PaymentMethods } from "@pindder/contracts";
+import { ClientSnapshot } from "../../clients/schemas/client.schema";
+import { UserSnapshot } from "../../users/schemas/user.schema";
+import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
 import { OrderStyleSnapshot } from "../../designs/schemas/design.schema";
 
 export type OrderDocument = HydratedDocument<Order>;
@@ -14,16 +14,16 @@ export class Order {
     @Prop({ type: String, required: true, unique: true, index: true })
     orderId!: string;
 
-    @Prop({ type: ClientSnapshot, required: false })
-    client?: Client;
+    @Prop({ type: () => ClientSnapshot, default: null })
+    client?: ClientSnapshot | null;
 
-    @Prop({ type: UserSnapshot, required: false })
-    user?: User;
+    @Prop({ type: () => UserSnapshot, default: null })
+    user?: UserSnapshot | null;
 
-    @Prop({ type: TailorSnapshot, required: false })
-    tailor?: Tailor;
+    @Prop({ type: () => TailorSnapshot, required: true })
+    tailor!: TailorSnapshot;
 
-    @Prop({ type: [OrderStyleSnapshot] })
+    @Prop({ type: () => [OrderStyleSnapshot], required: true })
     styles!: OrderStyleSnapshot[];
 
     @Prop({ type: mongoose.Schema.Types.Date, required: true })
@@ -37,6 +37,12 @@ export class Order {
 
     @Prop({ type: String, required: true, enum: Object.values(OrderStatus), default: OrderStatus.PENDING })
     status!: string;
+
+    @Prop({ type: Boolean, required: true, default: false })
+    paid!: boolean; 
+
+    @Prop({ type: String, required: true, enum: PaymentMethods, default: PaymentMethods.ONLINE })
+    paymentMethod!: string;
 
     @Prop({ type: Number })
     totalAmount!: number;

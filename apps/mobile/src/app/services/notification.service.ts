@@ -17,4 +17,8 @@ export class NotificationService {
   getRecentNotifications(userId: string): Observable<IResponse<any>> {
     return this.http.get<IResponse<any>>(`${environment.apiUrl}/notifications/account/${userId}/recent`);
   }
+
+  markAsRead(notification_id: string): Observable<IResponse<any>> {
+    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/notifications/${notification_id}`, {});
+  }
 }

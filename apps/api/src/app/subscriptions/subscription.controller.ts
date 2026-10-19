@@ -7,23 +7,22 @@ import {
   Param,
   Delete,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('subscription')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
-  @Post()
-  create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
-    return this.subscriptionService.create(createSubscriptionDto);
-  }
-
-  @Post('subscribe')
-  subscribe() {
-    return this.subscriptionService.initializeSubscriptionPayment();
+  @UseGuards(AuthGuard)
+  @Post('init')
+  create(@Body() createSubscriptionDto: CreateSubscriptionDto, @Req() req: any) {
+    return this.subscriptionService.create(createSubscriptionDto, req.user);
   }
 
   @Get()

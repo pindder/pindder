@@ -47,4 +47,8 @@ export class DesignService {
   removeDesign(design_id: string): Observable<any> {
     return this.http.delete<any>(`${environment.apiUrl}/designs/${design_id}`);
   }
+
+  removeDesignImage(design_id: string, imgUrl: string): Observable<IResponse<any>> {
+    return this.http.post<IResponse<any>>(`${environment.apiUrl}/designs/${design_id}/delete-img`, { imgUrl: imgUrl });
+  }
 }

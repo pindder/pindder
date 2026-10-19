@@ -1,8 +1,43 @@
+// {
+//   "extends": "./tsconfig.json",
+//   "compilerOptions": {
+//     "outDir": "../../dist/out-tsc",
+//     "rootDir": "src",
+//     "rootDir": "../../",
+//     "module": "commonjs",
+//     "types": ["node"],
+//     "experimentalDecorators": true,
+//     "emitDecoratorMetadata": true,
+//     "target": "es2021",
+//     "moduleResolution": "bundler",
+//     "declarationMap": false
+//   },
+//   "include": ["src/**/*.ts"],
+//   "exclude": [
+//     "vite.config.ts",
+//     "vite.config.mts",
+//     "vitest.config.ts",
+//     "vitest.config.mts",
+//     "src/**/*.test.ts",
+//     "src/**/*.spec.ts",
+//     "src/**/*.test.tsx",
+//     "src/**/*.spec.tsx",
+//     "src/**/*.test.js",
+//     "src/**/*.spec.js",
+//     "src/**/*.test.jsx",
+//     "src/**/*.spec.jsx"
+//   ],
+//   "references": [
+//     {
+//       "path": "../../packages/contracts"
+//     }
+//   ]
+// }
+
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "rootDir": "src",
     "rootDir": "../../",
     "module": "commonjs",
     "types": ["node"],
@@ -12,7 +47,7 @@
     "moduleResolution": "bundler",
     "declarationMap": false
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "seed.ts"],
   "exclude": [
     "vite.config.ts",
     "vite.config.mts",

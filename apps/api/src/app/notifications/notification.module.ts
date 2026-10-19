@@ -12,6 +12,6 @@ import { Notification, NotificationSchema } from './schema/notification.schema';
   ],
   controllers: [NotificationController],
   providers: [NotificationService],
-  exports: [NotificationService],
+  exports: [NotificationService, MongooseModule],
 })
 export class NotificationModule {}

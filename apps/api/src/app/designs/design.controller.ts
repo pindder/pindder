@@ -57,4 +57,10 @@ export class DesignController {
   remove(@Param('id') id: string) {
     return this.designService.remove(id);
   }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/delete-img')
+  deleteDesignImage(@Param('id') id: string, @Body() body: any) {
+    return this.designService.removeDesignImage(id, body.imgUrl);
+  }
 }

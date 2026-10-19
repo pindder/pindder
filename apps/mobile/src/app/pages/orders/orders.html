@@ -45,7 +45,8 @@
       [scrollable]="true" 
       value="pending"
       [(ngModel)]="activeSegment" 
-      (ionChange)="onSegmentChanged($event)">
+      (ionChange)="onSegmentChanged($event)"
+      mode="ios" class="auth-segment">
         <ion-segment-button value="all" contentId="all">
           <ion-label>All</ion-label>
         </ion-segment-button>

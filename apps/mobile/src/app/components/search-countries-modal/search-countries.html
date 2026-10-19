@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Select Country</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <!-- Search Bar to filter countries -->
+    <ion-searchbar 
+      [(ngModel)]="searchTerm" 
+      (ionInput)="filterCountries()" 
+      placeholder="Search country or code...">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        @for(c of filteredCountries; track c;){
+        <ion-item (click)="selectCountry(c)" button>
+            <ion-label>
+                <h2>{{ c.flag }} {{ c.name }}</h2>
+                <p>{{ c.code }}</p>
+            </ion-label>
+        </ion-item>}
+    </ion-list>
+</ion-content>

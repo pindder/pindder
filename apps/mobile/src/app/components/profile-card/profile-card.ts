@@ -10,6 +10,6 @@ import { IProfile } from '@pindder/contracts';
 })
 export class ProfileCard {
   @Input() profile!: IProfile;
-  @Input() hideNotification: boolean = true;
+  @Input() hideNotification = true;
   @Output() action = new EventEmitter();
 }

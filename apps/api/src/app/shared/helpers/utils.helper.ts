@@ -13,8 +13,12 @@ export function truncate(value: string, length: number) {
 }
 
 // src/common/helpers/generate-code.helper.ts
-export function generateCode(length = 6): string {
-    const characters = '0123456789';
+export function generateCode(length = 6, referral = false): string {
+    let characters = '0123456789';
+
+    if(referral) {
+        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    }
 
     return Array.from({ length }, () =>
     characters[randomInt(characters.length)],

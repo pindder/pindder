@@ -1,0 +1,123 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="app/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+        <ion-button (click)="openNewBankModal()">
+            <ion-icon color="primary" name="add-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+    </ion-buttons>
+    <ion-title>Account Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light" [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar color="light">
+      <ion-title size="large">Account Details</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <!-- Bank Details list-->
+  @if(bankDetails$ | async; as details) {
+    <ion-list [inset]="true">
+      @for(detail of details; track $index){
+        <ion-item-sliding>
+          <ion-item button (click)="editBank(detail)">
+            <ion-label>
+              <h4>{{ detail.accountName }}</h4>
+              <p>{{ detail.accountNo }}</p>
+            </ion-label>
+            <ion-note>{{ detail.bankName }}</ion-note>
+          </ion-item>
+          <ion-item-options slot="end">
+            <ion-item-option (click)="presentDeleteAlert(detail)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      } @empty {
+        <app-empty-state
+        [buttonText]="'New Bank'"
+        (action)="openNewBankModal()"
+        >
+        </app-empty-state>
+      }
+    </ion-list>
+  }
+
+  <ion-modal #modal>
+      <ng-template>
+      <ion-content>
+        <ion-toolbar>
+            <ion-buttons slot="end">
+                <ion-button (click)="dismissModal()" default-href="#">
+                    <ion-icon name="close-outline" color="primary"></ion-icon>
+                </ion-button>
+            </ion-buttons>
+            <ion-title>New Account</ion-title>
+        </ion-toolbar>
+
+        <form id="bankDetailForm" #editClientForm="ngForm" (ngSubmit)="submit()" class="">
+          <ion-list>
+              <ion-item lines="full">
+                  <ion-input 
+                  name="bankName"
+                  type="text"
+                  [(ngModel)]="bankDetail.bankName" 
+                  label="Bank name" 
+                  labelPlacement="stacked"
+                  ></ion-input>
+              </ion-item>
+
+              <ion-item lines="full">
+                  <ion-input 
+                  name="accountNo"
+                  type="text" 
+                  label="Account Number"
+                  labelPlacement="stacked"  
+                  [(ngModel)]="bankDetail.accountNo"
+                  ></ion-input>
+              </ion-item>
+
+              <ion-item lines="full">
+                  <ion-input
+                  name="accountName"
+                  type="text"
+                  label="Account Name"
+                  labelPlacement="stacked"
+                  [(ngModel)]="bankDetail.accountName"
+                  ></ion-input>
+              </ion-item>
+
+              <ion-item lines="full">
+                  <ion-input 
+                  name="sortCode"
+                  label="Sort Code (Optional)"
+                  type="text" 
+                  labelPlacement="stacked" 
+                  [(ngModel)]="bankDetail.sortCode"
+                  ></ion-input>
+              </ion-item>
+
+              <ion-item lines="full" class="py-2">
+                <ion-toggle [checked]="bankDetail.disabled">
+                  Disable
+                </ion-toggle>
+              </ion-item>
+          </ion-list>
+
+          <div class="p-2">
+          <app-primary-button
+          [buttonText]="'Save'" 
+          (click)="submit()" 
+          [disabled]="!bankDetail.accountName || !bankDetail.accountNo || !bankDetail.bankName"
+          icon="save-outline"
+          ></app-primary-button>
+          </div>
+        </form>
+      </ion-content>
+      </ng-template>
+  </ion-modal>
+</ion-content>

@@ -39,7 +39,7 @@
                 <div class="scroll-item">
                     <img (click)="openImage()" [src]="imgUrl" alt="Uploaded preview" />
                     <ion-button 
-                    [id]="'present-alert' + i"
+                    [id]="'present-alert-' + i"
                     color="danger" 
                     size="small" 
                     fill="clear" 
@@ -133,8 +133,7 @@
                     ></ion-input>
                 </ion-item>
 
-                <ion-item>
-                @if(design.type === designType.BESPOKE){
+                @if(design.type === designType.BESPOKE){<ion-item>
                 <div class="py-2">
                     <p class="text-xs">
                         Select available Colors
@@ -153,8 +152,8 @@
                             ></ion-icon>}
                         </div>}
                     </div>
-                </div>}
-                </ion-item>
+                </div>
+                </ion-item>}
                 
                 <ion-item class="py-3">
                     <ion-toggle 
