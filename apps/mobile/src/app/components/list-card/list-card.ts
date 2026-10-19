@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { ViewWillEnter, IonIcon, AlertController, ToastController, IonLabel, 
+import { IonIcon, AlertController, ToastController, IonLabel, 
   IonButtons, IonButton, IonBadge } from '@ionic/angular';
 import { DataTypes, IDesign, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
@@ -14,7 +14,7 @@ import { DesignService } from '../../services/design.service';
   templateUrl: './list-card.html',
   styleUrl: './list-card.css',
 })
-export class ListCard implements ViewWillEnter, OnInit{
+export class ListCard {
   @Output() updateList = new EventEmitter();
   @Output() edit = new EventEmitter();
   @Output() action = new EventEmitter();
@@ -36,10 +36,6 @@ export class ListCard implements ViewWillEnter, OnInit{
   dataTypes = DataTypes;
   orderStatuses = OrderStatus;
 
-  ionViewWillEnter(): void { }
-
-  ngOnInit(): void { }
-
   async presentDeleteAlert(dataType: string) {
     const alert = await this.alertCtrl.create({
       header: `Delete ${dataType == DataTypes.DESIGN ? 'Style' : dataType}`,
@@ -60,9 +56,8 @@ export class ListCard implements ViewWillEnter, OnInit{
               case DataTypes.DESIGN:
                 this.deleteDesign();
                 break;
-              case DataTypes.ORDER:
-                this.deleteOrder();
-                break;
+              default:
+                return;
             }
           }
         }
@@ -121,6 +116,4 @@ export class ListCard implements ViewWillEnter, OnInit{
       }
     });
   }
-
-  deleteOrder() {}
 }

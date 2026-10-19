@@ -11,6 +11,7 @@ import { NotificationModule } from '../notifications/notification.module';
 import { Notification, NotificationSchema } from '../notifications/schema/notification.schema';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
     ]),
     ClientModule, 
     BrandModule,
-    NotificationModule
+    NotificationModule,
+    SharedModule
   ],
   controllers: [DesignController],
   providers: [DesignService, JwtService, NotificationService],

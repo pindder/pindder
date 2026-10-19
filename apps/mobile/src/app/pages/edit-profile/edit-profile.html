@@ -14,7 +14,12 @@
     </ion-header>
 
     @if(profile){
-        <form #editProfileForm="ngForm" class="my-5">
+        <div class="flex justify-center items-center my-5">
+            <ion-avatar aria-hidden="true" slot="start">
+                <img [sizes]="" src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
+            </ion-avatar>
+        </div>
+        <form #editProfileForm="ngForm">
             <ion-list lines="full">
                 <ion-item>
                     <ion-input 
@@ -48,11 +53,11 @@
 
                 <ion-item>
                     <ion-input 
-                    name="phoneNo"
+                    name="tel"
                     label="Phone No"
                     type="tel" 
                     label-placement="stacked" 
-                    [(ngModel)]="profile.phoneNo"
+                    [(ngModel)]="profile.tel"
                     ></ion-input>
                 </ion-item>
 

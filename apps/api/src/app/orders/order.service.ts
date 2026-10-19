@@ -1,10 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order } from './schemas/order.schema';
 import { Model, QueryFilter } from 'mongoose';
-import { DataTypes, DataTypesIcon, IOrderItem, IOrderStyle, IResponse, NotificationActions, OrderStatus } from '@pindder/contracts';
+import { AccountTypes, DataTypes, DataTypesIcon, IOrderItem, IOrderStyle, IResponse, NotificationActions, OrderStatus, PaymentMethods } from '@pindder/contracts';
 import { Client } from '../clients/schemas/client.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { generateCode } from '../shared/helpers';
@@ -12,27 +12,65 @@ import { Quote } from './schemas/quote.schema';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { NotificationService } from '../notifications/notification.service';
 // import { OrderStatus } from '@pindder/contracts';
+import { OnEvent } from '@nestjs/event-emitter';
+import { User } from '../users/schemas/user.schema';
+import { PaymentService } from '../payments/payment.service';
 
 @Injectable()
 export class OrderService {
+  private logger = new Logger(OrderService.name);
+
   constructor(
     @InjectModel(Quote.name) private readonly quoteModel: Model<Quote>,
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     @InjectModel(Client.name) private readonly clientModel: Model<Client>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly paymentService: PaymentService
   ) {}
 
-  async create(createOrderDto: CreateOrderDto, user_id: any) {
+  @OnEvent('order.payment.successful')
+  async handleOrderPaymentFulfilled(payload: {
+    email: string;
+    amount: number;
+    reference: string;
+    subscriptionCode: string;
+    metadata: any;
+  }) {
+    this.logger.log(`Processing successful subscription payment for ${payload.email}`);
+    
+    // TODO: Update database (e.g., set user's subscription status to 'active', 
+    // save subscriptionCode, extend expiration date)
+    
+    // Example:
+    // await this.userService.activateUserSubscription(payload.email, payload.subscriptionCode);
+  }
+
+  async create(createOrderDto: CreateOrderDto, user: any) {
     try {
       const newOrder = new this.orderModel(createOrderDto);
       //console.log(createOrderDto);
 
-      const client = await this.clientModel.findById(createOrderDto.client);
-      const tailor = await this.tailorModel.findById(user_id);
+      if(user.acctType === AccountTypes.TAILOR) {
+        const tailor = await this.tailorModel.findById(user.sub).lean();
+        const client = await this.clientModel.findById(createOrderDto.client).lean();
 
-      if(client) newOrder.client = client;
-      if(tailor) newOrder.tailor = tailor;
+        if(!tailor || !client) {
+          return;
+        }
+
+        newOrder.tailor = tailor;
+        newOrder.client = client;
+      } else if(user.acctType === AccountTypes.USER){
+        const user = await this.userModel.findById(createOrderDto.user).lean();
+
+        if(!user) {
+          return;
+        }
+
+        newOrder.user = user;
+      }
 
       const styles: any[] = [];
 
@@ -43,6 +81,13 @@ export class OrderService {
       newOrder.styles = styles;
       newOrder.orderId = `ORD-${generateCode(12)}`;
       await newOrder.save();
+
+      if(newOrder.paymentMethod === PaymentMethods.ONLINE) {
+        await this.paymentService.processOrderPayment({
+          callbackUrl: '',
+          orderId: newOrder._id.toString()
+        });
+      }
 
       await this.notificationService.create({
         client: newOrder.client,

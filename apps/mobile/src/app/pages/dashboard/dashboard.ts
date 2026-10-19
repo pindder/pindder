@@ -1,12 +1,7 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef, Component, EnvironmentInjector, inject, signal } from '@angular/core';
-import { IonContent, IonFabButton, IonFab, 
-  IonIcon, IonButton, IonList, 
-  IonLabel, IonActionSheet, IonCol, IonRow, IonGrid, IonListHeader,
-  ViewWillEnter,
-  ModalController,
-  ToastController, 
-} from "@ionic/angular";
+import { IonContent, IonFabButton, IonFab, IonIcon, IonList, IonActionSheet, IonCol, IonRow, 
+  IonGrid, IonListHeader, ViewWillEnter, ModalController, ToastController } from "@ionic/angular";
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
 import { NotificationTile } from "../../components/notification-tile/notification-tile";
@@ -21,16 +16,15 @@ import { INotification } from '@pindder/contracts';
 import { NotificationService } from '../../services/notification.service';
 import { SseService } from '../../services/sse.service';
 import { Subscription } from 'rxjs';
+import { IonNote } from "@ionic/angular";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [
+  imports: [IonNote,
     IonGrid,
     IonRow,
     IonCol,
     IonActionSheet,
-    IonLabel,
-    IonButton,
     IonList,
     IonIcon,
     IonFab,
@@ -42,8 +36,8 @@ import { Subscription } from 'rxjs';
     NotificationTile,
     IonListHeader,
     ProfileCard,
-    EmptyState
-],
+    EmptyState,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

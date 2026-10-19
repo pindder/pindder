@@ -37,9 +37,13 @@
 
   <!-- Recent Notifications-->
   <ion-list lines="none">
-    <ion-list-header class="px-0">
-      <ion-label>Recent Notifications</ion-label>
-      <ion-button fill="clear" (click)="clearRecentNotifications()">Clear all</ion-button>
+    <ion-list-header>
+      <ion-note>Recent Notifications</ion-note>
+      <!-- <ion-buttons>
+        <ion-button fill="light" (click)="clearRecentNotifications()">
+          <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons> -->
     </ion-list-header>
 
     @for(notification of notifications; track $index){

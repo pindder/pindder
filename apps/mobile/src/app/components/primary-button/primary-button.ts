@@ -8,14 +8,16 @@ import { IonButton, IonIcon } from "@ionic/angular";
   styleUrl: './primary-button.css',
 })
 export class PrimaryButton implements OnInit{
-  @Input() buttonText: string = 'Primary Button';
-  @Input() disabled: boolean = false;
+  @Input() buttonText = 'Primary Button';
+  @Input() disabled = false;
   @Input() shape?: string;
   @Input() icon?: string;
-  @Input() color: string = 'primary';
+  @Input() color = 'primary';
   @Input() buttonType = 'block';
   @Input() fill = 'solid';
   @Output() action = new EventEmitter();
 
-  ngOnInit(): void { }
+  ngOnInit(): void { 
+    return;
+  }
 }

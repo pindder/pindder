@@ -13,7 +13,7 @@
         </ion-toolbar>
     </ion-header>
 
-    <form #otpForm="ngForm" class="px-3">
+    <form #otpForm="ngForm" class="px-3" (ngSubmit)="verifyOtp()">
         <ion-label class="flex flex-col gap-1">
             <h1>Enter the code sent to your email</h1>
             <p>To verify it is you who are trying to access your account, kindly enter the verification code we sent to your email.</p>
@@ -32,11 +32,8 @@
 
         <br/>
 
-        <ion-button 
-        (click)="verifyOtp()"
-        shape="round" 
-        expand="block" 
-        color="primary"
-        >Continue</ion-button>
+        <ion-button expand="block" type="submit" class="submit-btn">
+            Continue
+        </ion-button>
     </form>
 </ion-content>

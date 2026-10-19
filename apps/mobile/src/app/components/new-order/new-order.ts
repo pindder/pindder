@@ -5,7 +5,7 @@ import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, IonLabel,
   IonListHeader, ModalController, IonDatetime, IonActionSheet, IonItemOption, 
   IonAvatar, IonItemOptions, IonItemSliding, IonTextarea, IonNote, IonModal, 
   IonSelect, IonSelectOption, IonItemGroup, IonItemDivider } from "@ionic/angular";
-import { DataTypes, DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderItem, IOrderStyle, IResponse, ISpecification } from '@pindder/contracts';
+import { DataTypes, DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderItem, IOrderStyle, IResponse, ISpecification, PaymentMethods } from '@pindder/contracts';
 import { OrderStatus } from '@pindder/contracts';
 import { NewClient } from '../new-client/new-client';
 import { ClientSelection } from '../client-selection/client-selection';
@@ -83,6 +83,9 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
     measurement: '',
     totalItems: 0,
     status: OrderStatus.PENDING,
+    paymentMethod: '',
+    deliveryMethod: DeliveryMethods.PICKUP,
+    paid: false,
     styles: [],
     client: this.client?._id ?? null
   };
@@ -132,6 +135,8 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
   deliveryMethods = Object.keys(DeliveryMethods);
   deliveryMethod = DeliveryMethods;
   designTypes = DesignTypes;
+  paymentMethods = Object.keys(PaymentMethods);
+  paymentMethod = PaymentMethods;
 
   isPreview = false;
 
@@ -218,6 +223,7 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
     const { data } = await modal.onWillDismiss();
     if (data) {
       this.selectedClient = data;
+      this.order.client = this.selectedClient?._id ?? null;
       console.log('Selected client for order:', this.selectedClient);
     }
     this.cdr.markForCheck();
@@ -476,31 +482,61 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
     let totalAmount = 0; 
     let totalItems = 0
     
-    this.order.styles.forEach((item: IOrderStyle) => {
+    for(const item of this.order.styles) {
       item.totalAmount = 0;
       item.totalItems = 0;
       if(item.type === DesignTypes.BESPOKE) {
+        console.log(item);
+        if(item.quantity < 1) {
+          this.presentToast(`Please click the ${item.name} style to specify quantity and color`, 'danger', 'bottom');
+          return;
+        }
         item.totalItems = item.quantity;
         item.totalAmount = item.amount * item.quantity;
         totalAmount += (item.amount * item.quantity);
         totalItems += item.quantity;
-      } else {
-        item.selections.forEach((selection: ISpecification) => {
-          if(selection.quantity == 0) {
-            this.presentToast('Please select at least one item to proceed', 'danger', 'bottom');
-            return;  
-          }
+      } else if(item.type === DesignTypes.READYMADE) {
+        if(item.selections.length == 0) {
+          this.presentToast(`Please click the ${item.name} style to specify quantity and colors`, 'danger', 'bottom');
+          return;  
+        }
+        for(const selection of item.selections) {
+          console.log(selection, item);
           
           item.totalItems += selection.quantity;
           item.totalAmount += (selection.amount * selection.quantity);
           totalAmount += (selection.amount * selection.quantity);
           totalItems += selection.quantity;
-        });
+        }
       }
-    });
+    }
+
+    // console.log(totalAmount, totalItems);
+    this.order.totalItems = totalItems;
+    this.order.totalAmount = totalAmount;
 
     if(!this.order.dueDate) {
       this.presentToast('Please select a due date for the order', 'danger', 'bottom');
+      return;
+    }
+
+    if(this.order.totalItems == 0) {
+      this.presentToast('Please select the quantity needed for each style', 'danger', 'bottom');
+      return;
+    }
+
+    if(!this.order.paymentMethod) {
+      this.presentToast('Please select a payment method', 'danger', 'bottom');
+      return;
+    }
+
+    if(!this.order.deliveryMethod) {
+      this.presentToast('Please select a delivery method', 'danger', 'bottom');
+      return;
+    }
+
+    if(!this.order.client) {
+      this.presentToast('Please select a client!', 'danger', 'bottom');
       return;
     }
 
@@ -511,6 +547,8 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
       styles: this.order.styles,
       totalAmount: totalAmount,
       totalItems: totalItems,
+      paid: false,
+      paymentMethod: this.order.paymentMethod,
       measurement: this.order.measurement,
       deliveryMethod: this.order.deliveryMethod,
       dueDate: this.order.dueDate,
@@ -539,26 +577,19 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
     })
   }
 
-  isColorSelected(color: IColors, specIndex?: number): boolean {
-    if(specIndex) {
-      return this.selectedStyle.selections[specIndex].colors.some((c) => c._id === color._id);
+  isColorSelected(color: IColors, spec?: ISpecification): boolean {
+    if(spec) {
+      //return this.selectedStyle.selections[specIndex].colors.some((c) => c._id === color._id);
+      return this.selectedStyle.selections[this.selectedStyle.specifications.indexOf(spec)].colors.includes(color);
     } else {
       return this.selectedStyle.selectedColors.some((c) => c._id === color._id);
     }
   }
 
-  toggleColor(color: IColors, specIndex?: number): void {
+  toggleColor(color: IColors, spec?: ISpecification): void {
     let colorIndex;
-
-    if(specIndex) {
-      colorIndex = this.selectedStyle.selections[specIndex].colors.findIndex((c) => c.name === color.name);
-
-      if(this.isColorSelected(color, specIndex)) {
-        this.selectedStyle.selections[specIndex].colors.splice(colorIndex, 1);  
-      } else {
-        this.selectedStyle.selections[specIndex].colors.push(color);
-      }
-    } else {
+  
+    if(!spec) {
       colorIndex = this.selectedStyle.colors.findIndex((c) => c._id === color._id);
 
       if(this.isColorSelected(color)) {
@@ -566,6 +597,18 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
       } else {
         this.selectedStyle.selectedColors.push(color);
       }
+      return;
+    }
+    
+    colorIndex = spec!.colors.findIndex((c: IColors) => c.name === color.name);
+
+    // console.log(this.selectedStyle.selections.indexOf(spec!));
+    // console.log(this.isColorSelected(color, spec));
+    if(this.isColorSelected(color, spec)) {
+      this.selectedStyle.selections[this.selectedStyle.specifications.indexOf(spec!)].colors.splice(colorIndex, 1);  
+    } else {
+      // this.selectedStyle.selections[specIndex!].colors.push(color);
+      this.selectedStyle.selections[this.selectedStyle.specifications.indexOf(spec!)].colors.push(color);
     }
   }
   

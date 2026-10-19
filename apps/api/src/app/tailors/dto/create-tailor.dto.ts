@@ -1,7 +1,8 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateTailorDto {
     @IsNotEmpty()
+    @IsString()
     fullname!: string;
     
     @IsNotEmpty()
@@ -9,8 +10,14 @@ export class CreateTailorDto {
     email!: string;
 
     @IsNotEmpty()
-    phoneNo!: string;
+    @IsString()
+    countryCode!: string;
 
-    // @IsNotEmpty()
-    // gender!: string;
+    @IsNotEmpty()
+    @IsString()
+    tel!: string;
+
+    @IsString()
+    @IsOptional()
+    referral?: string;
 }

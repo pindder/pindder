@@ -6,25 +6,25 @@ export type BrandDocument = HydratedDocument<Brand>;
 
 @Schema({ timestamps: true })
 export class Brand {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   brandName?: string;
 
   @Prop({ type: String, maxLength: 1000 })
   description?: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   adminFullname?: string;
 
   @Prop({ type: String })
   username?: string;
 
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ type: String, required: true, unique: true, index: true })
   email!: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   phoneNo!: string;
 
-  @Prop({ required: false })
+  @Prop({ type: String, required: false })
   logoUri?: string;
 
   @Prop({ type: String })

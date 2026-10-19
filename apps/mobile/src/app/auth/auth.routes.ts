@@ -3,7 +3,9 @@ import { Route } from '@angular/router';
 export const authRoutes: Route[] = [
     {
         path: '',
-        loadComponent: () => import('./auth').then((m) => m.Auth),
+        redirectTo: 'login',
+        pathMatch: 'full'
+        // loadComponent: () => import('./auth').then((m) => m.Auth),
     },
     // {
     //     path: 'forgot-password',

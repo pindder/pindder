@@ -5,22 +5,22 @@ export type ColorDocument = HydratedDocument<Color>;
 
 @Schema() 
 export class ColorSnapshot {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   _id!: string;
   
-  @Prop({ required: true })  
+  @Prop({ type: String, required: true })  
   name!: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   code!: string;
 
-  @Prop({ required: false })
+  @Prop({ type: String, required: false })
   rgb?: string;
 
-  @Prop({ required: false })
+  @Prop({ type: String, required: false })
   nameSlug?: string;  
   
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   hex!: string;
 }
 

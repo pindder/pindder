@@ -13,6 +13,7 @@ export enum PaymentStatus {
     PROCESSING = 'PROCESSING',
     SUCCESS = 'SUCCESS',
     FAILED = 'FAILED',
+    ABANDONED = 'ABANDONED'
 }
 
 export enum NotificationStatus {
@@ -99,6 +100,16 @@ export enum DataTypes {
     NOTIFICATION = "NOTIFICATION",
 }
 
+export enum PaymentTypes {
+    ORDER = "ORDER",
+    SUBSCRIPTION = "SUBSCRIPTION"
+}
+
+export enum PaymentMethods {
+    CASH = "CASH",
+    ONLINE = "ONLINE"
+}
+
 export enum DataTypesIcon {
     CLIENT = 'person-outline',
     DESIGN = 'color-palette-outline',
@@ -112,5 +123,4 @@ export enum DataTypesIcon {
 export enum DeliveryMethods {
     PICKUP = "PICKUP",
     SHIPPING = "SHIPPING",
-    MEETUP = "MEETUP"
 }

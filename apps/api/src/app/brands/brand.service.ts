@@ -20,7 +20,7 @@ export class BrandService {
   }
 
   async brandReferrals(id: string) {
-    const referrals = await this.clientModel.find({ referee: id }).limit(10);
+    const referrals = await this.clientModel.find({ 'referee._id': id }).limit(10);
 
     if(referrals.length < 1) {
       throw new HttpException('You have no referrals', HttpStatus.NO_CONTENT);

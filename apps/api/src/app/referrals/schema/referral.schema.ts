@@ -6,13 +6,13 @@ export type ReferralDocument = HydratedDocument<Referral>;
 
 @Schema({ })
 export class Referral {
-    @Prop({ type: TailorSnapshot, required: true })
-    referee!: TailorSnapshot;
+    @Prop({ type: () => TailorSnapshot, required: true })
+    referee_code!: TailorSnapshot;
 
-    @Prop({ type: TailorSnapshot, required: true })
-    referrer!: TailorSnapshot
+    @Prop({ type: () => TailorSnapshot, required: true })
+    referrer_code!: TailorSnapshot
 
-    @Prop({ required: true })
+    @Prop({ type: String, required: true })
     refereePlan!: string;
 }
 

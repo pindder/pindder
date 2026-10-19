@@ -6,10 +6,11 @@ import { UserModule } from '../users/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientModule } from '../clients/client.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EmailService } from '../shared/email.service';
 import { TailorModule } from '../tailors/tailor.module';
 import { TokenModule } from '../tokens/token.module';
-import { SharedService } from '../shared/shared.service';
+import { SharedModule } from '../shared/shared.module';
+import { PaymentModule } from '../payments/payment.module';
+import { SubscriptionModule } from '../subscriptions/subscription.module';
 
 @Module({
   imports: [
@@ -27,10 +28,13 @@ import { SharedService } from '../shared/shared.service';
     UserModule, 
     TailorModule,
     BrandModule,
-    TokenModule
+    TokenModule,
+    SharedModule,
+    PaymentModule,
+    SubscriptionModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, EmailService, SharedService],
+  providers: [AuthService],
   exports: [JwtModule]
 })
 export class AuthModule {}

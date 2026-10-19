@@ -1,10 +1,12 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
-import { /* DataTypes,*/ GalleryItem, IColors, IResponse } from '@pindder/contracts';
+import { /* DataTypes,*/ GalleryItem, IBankDetail, IColors, IPayment, IResponse } from '@pindder/contracts';
 import PhotoSwipe from 'photoswipe';
-import { catchError, debounceTime, distinctUntilChanged, finalize, Observable, of, Subject, switchMap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, finalize, firstValueFrom, Observable, of, Subject, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +28,7 @@ export class AppService {
     apiFetcher: (query: string) => Observable<T[]>,
     setLoading: (isLoading: boolean) => void,
     defaultFetcher?: () => Observable<T[]>,
-    debounceMs: number = 500
+    debounceMs = 500
   ): Observable<T[]> {
     return searchSubject.pipe(
       debounceTime(debounceMs),
@@ -95,11 +97,60 @@ export class AppService {
     return 'pay_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
   }
 
-  showToast() {
-    
+  async checkout(email: string, amount: number, planCode?: string) {
+    // 1. Get Authorization URL from NestJS backend
+    const res: any = await firstValueFrom(
+      this.http.post(`${environment.apiUrl}/paystack/initialize`, {
+        email,
+        amount,
+        planCode,
+      }),
+    );
+
+    const { authorization_url, reference } = res;
+
+    // 2. Open Paystack Checkout
+    if (Capacitor.isNativePlatform()) {
+      // Native iOS / Android: Use Capacitor Browser
+      await Browser.open({ url: authorization_url });
+
+      // Listen for browser close/redirect event
+      Browser.addListener('browserFinished', () => {
+        this.verifyPaymentOnBackend(reference);
+      });
+    } else {
+      // Web browser: Redirect or open in new tab
+      window.location.href = authorization_url;
+    }
+  }
+
+  async verifyPaymentOnBackend(reference: string) {
+    return await firstValueFrom(
+      this.http.get(`${environment.apiUrl}/paystack/verify/${reference}`),
+    );
   }
 
   fetchColors(): Observable<IResponse<IColors[]>> {
     return this.http.get<IResponse<IColors[]>>(`${environment.apiUrl}/colors`);
+  }
+
+  generatePaymentLink(payment: IPayment): Observable<IResponse<any>> {
+    return this.http.post<IResponse<any>>(`${environment.apiUrl}/payment/init`, payment);
+  }
+
+  createNewPayoutDetail(data: IBankDetail): Observable<IResponse<IBankDetail>> {
+    return this.http.post<IResponse<IBankDetail>>(`${environment.apiUrl}/banks`, data);
+  }
+
+  updatePayoutDetail(data: IBankDetail): Observable<IResponse<IBankDetail>> {
+    return this.http.patch<IResponse<IBankDetail>>(`${environment.apiUrl}/banks/${data._id}`, data);
+  }
+
+  deletePayoutDetail(bankDetail_id: string): Observable<IResponse<IBankDetail>> {
+    return this.http.delete<IResponse<IBankDetail>>(`${environment.apiUrl}/banks/${bankDetail_id}`);
+  }
+
+  fetchPayoutDetails(): Observable<IResponse<IBankDetail[]>> {
+    return this.http.get<IResponse<IBankDetail[]>>(`${environment.apiUrl}/banks/search`);
   }
 }

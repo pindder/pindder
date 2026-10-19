@@ -1,203 +1,314 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Payment } from './schemas/payment.schema';
 import { Model } from 'mongoose';
 import { RedisService } from '../shared/redis.service';
-import { PaymentStatus } from '@pindder/contracts';
+import { IResponse, PaymentStatus, PaymentTypes } from '@pindder/contracts';
 import { PaystackService } from '../shared/paystack.service';
+import { Order } from '../orders/schemas/order.schema';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class PaymentService {
+  private logger = new Logger(PaymentService.name);
+
   constructor(
     @InjectModel(Payment.name) private paymentModel: Model<Payment>,
+    @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     private redisService: RedisService,
     private paystackService: PaystackService
   ) {}
 
-  async processOrderPayment(dto: {
-    idempotencyKey: string;
-    client: string;
+  @OnEvent('order.payment.successful')
+  async handleOrderPaymentFulfilled(payload: {
     email: string;
-    amountInNaira: number;
-    orderId: string;
+    amount: number;
+    reference: string;
+    metadata: any;
   }) {
-    const { idempotencyKey, client, email, amountInNaira, orderId } = dto;
+    this.logger.log(`Processing successful order payment for ${payload}`);
+    
+    const payment = await this.paymentModel.findOne({ providerTransactionId: payload.reference });
 
-    if (!idempotencyKey) {
-      throw new BadRequestException('x-idempotency-key header is required');
+    if(!payment) {
+      this.logger.error(`Payment not found:`, payload.metadata);
+      return; 
     }
 
-    // 1. Check Redis Cache
-    const cachedResponse = await this.redisService.getCachedResponse(idempotencyKey);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
+    payment.status = PaymentStatus.SUCCESS;
+    payment.metadata = payload.metadata;
 
-    // 2. Check Database for Existing Transaction
-    const existingTx = await this.paymentModel.findOne({ idempotencyKey });
-    if (existingTx && existingTx.status !== PaymentStatus.PROCESSING) {
-      const response = {
-        status: existingTx.status,
-        reference: existingTx.providerTransactionId,
-        data: existingTx.responsePayload,
-      };
-      await this.redisService.setCachedResponse(idempotencyKey, response);
-      return response;
-    }
+    await payment.save()
+    return;
+  }
 
-    // 3. Acquire Distributed Lock (30s TTL)
-    const lockAcquired = await this.redisService.acquireLock(idempotencyKey, 30);
-    if (!lockAcquired) {
-      throw new ConflictException('Payment request is already processing. Please wait.');
-    }
+  async processOrderPayment(createPaymentDto: CreatePaymentDto) {
+    let idempotencyKey: string | undefined;
 
     try {
-      // Convert Naira to Kobo for Paystack
-      const amountInKobo = amountInNaira * 100;
+      // 1. Check if Order exists
+      const orderDoc = await this.orderModel.findById(createPaymentDto.orderId);
 
-      // Create Pending Database Record
-      let tx = existingTx;
-      if (!tx) {
-        tx = await this.paymentModel.create({
-          idempotencyKey,
-          client,
-          amount: amountInNaira,
-          currency: 'NGN',
-          status: PaymentStatus.PROCESSING,
-        });
+      // 2. If order is not found return 
+      if(!orderDoc) {
+        throw new NotFoundException('Order not found.');
       }
 
-      // 4. Initialize Transaction via Paystack
+      // 3. Convert document to object
+      const order = orderDoc?.toObject();
+      
+      // 4. Extract tailor details from order object into a variable
+      const tailor = order.tailor;
+
+      // 5. Extract client information from order and assign to variable declared above
+      const client = order.client || order?.user;
+      
+      // 6. Check that client information exists
+      if (!client) {
+        throw new BadRequestException('Client information is missing from the order.');
+      }
+
+      // 7. Extract idempotencyKey safely
+      if (!order.orderId || !order.orderId.includes('-')) {
+        throw new BadRequestException('Invalid order reference format for idempotency.');
+      }
+
+      // 8. Assign IdempotencyKey safely;
+      idempotencyKey = order.orderId.split('-')[1];
+
+      // 9. If Idempotency key is empty return
+      if (!idempotencyKey) {
+        throw new BadRequestException('x-idempotency-key header is required');
+      }
+
+      // 10. Check Redis Cache
+      // const cachedResponse = await this.redisService.getCachedResponse(idempotencyKey);
+      // console.log('cachedResponse::::::', cachedResponse);
+      // if (cachedResponse) {
+      //   return cachedResponse;
+      // }
+
+      // 11. Check Database for Existing Transaction
+      const existingTx = await this.paymentModel.findOne({ idempotencyKey });
+      if (existingTx && existingTx.status === PaymentStatus.PROCESSING) {
+        const response: IResponse<any> = {
+          statusCode: 201,
+          msg: `Transaction ${existingTx.providerTransactionId} already exists`,
+          data: existingTx.responsePayload,
+        };
+        await this.redisService.setCachedResponse(idempotencyKey, response);
+        return response;
+      }
+
+      // 12. Acquire Distributed Lock (30s TTL)
+      // const lockAcquired = await this.redisService.acquireLock(idempotencyKey, 30);
+      // console.log('lockAcquired::::::', lockAcquired);
+      // if (!lockAcquired) {
+      //   throw new ConflictException('Payment request is already processing. Please wait.');
+      // }
+
+      // 13. Convert Naira to Kobo for Paystack
+      const amountInKobo = order.totalAmount * 100;
+
+      // 14. Create Pending Database Record
+      const tx = await this.paymentModel.create({
+        idempotencyKey,
+        amount: order.totalAmount,
+        currency: 'NGN',
+        status: PaymentStatus.PROCESSING,
+        client: client,
+        tailor: tailor,
+        order: order._id,
+        paymentType: PaymentTypes.ORDER
+      });
+
+      // 15. Initialize Transaction via Paystack
       const paystackRes = await this.paystackService.initializeTransaction(
-        email,
         amountInKobo,
         idempotencyKey,
-        { orderId, client }
+        { order: order._id, ...client },
+        createPaymentDto.plan_code
       );
 
-      // Save Paystack reference
+      // 16. Save Paystack reference
       tx.status = PaymentStatus.PROCESSING; // Remains pending until webhook or verification confirms success
-      tx.providerTransactionId = paystackRes.data.reference;
-      tx.responsePayload = paystackRes.data;
+      tx.providerTransactionId = paystackRes.reference;
+      tx.responsePayload = paystackRes;
       await tx.save();
 
       const finalResult = {
         status: 'SUCCESS',
-        reference: paystackRes.data.reference,
-        authorizationUrl: paystackRes.data.authorization_url, // URL for frontend to complete checkout
+        reference: paystackRes.reference,
+        authorizationUrl: paystackRes.authorization_url, // URL for frontend to complete checkout
       };
 
-      // Cache result in Redis
+      // 17. Cache result in Redis
       await this.redisService.setCachedResponse(idempotencyKey, finalResult);
 
-      return finalResult;
-    } finally {
-      // Always release lock
-      await this.redisService.releaseLock(idempotencyKey);
-    }
-  }
+      // 18. Create customer in paystack
+      await this.paystackService.createCustomer(client);
 
-  async processPayment(dto: CreatePaymentDto) {
-    const { idempotencyKey, client, amount, currency } = dto;
-
-    if (!idempotencyKey) {
-      throw new BadRequestException('Idempotency-Key header is required.');
-    }
-
-    // 1. Check Redis cache for fast response on repeated client retries
-    const cachedResponse = await this.redisService.getCachedResponse(idempotencyKey);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-
-    // 2. Check Database for existing completed/failed payment
-    const existingTx = await this.paymentModel.findOne({ idempotencyKey });
-    if (existingTx && existingTx.status !== PaymentStatus.PROCESSING) {
-      const response = {
-        status: existingTx.status,
-        transactionId: existingTx.providerTransactionId,
-        amount: existingTx.amount,
-        responsePayload: existingTx.responsePayload,
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Checkout Link',
+        data: finalResult
       };
-      // Warm Redis cache
-      await this.redisService.setCachedResponse(idempotencyKey, response);
-      return response;
-    }
 
-    // 3. Acquire Distributed Lock (prevents concurrent race conditions)
-    const lockAcquired = await this.redisService.acquireLock(idempotencyKey, 30);
-    if (!lockAcquired) {
-      throw new ConflictException('Payment processing is currently in progress. Please wait.');
+      return res;
     }
-
-    try {
-      // 4. Create or update record as PENDING
-      let tx = existingTx;
-      if (!tx) {
-        tx = await this.paymentModel.create({
-          idempotencyKey,
-          client,
-          amount,
-          currency,
-          status: PaymentStatus.PROCESSING,
+    catch(error: any) {
+      // Optional: Update DB to FAILED if a transaction was created
+      if (idempotencyKey) {
+        await this.paymentModel.updateOne(
+          { idempotencyKey, status: PaymentStatus.PROCESSING },
+          { $set: { status: PaymentStatus.FAILED, responsePayload: { error: error.message } } }
+        ).catch((err) => {
+          this.logger.error('Failed to update transaction failure state', err);
         });
       }
 
-      // 5. Call External Payment Gateway (e.g., Stripe, Paystack)
-      const chargeResult = await this.executeGatewayCharge(client!, amount, currency!, idempotencyKey);
-
-      // 6. Update DB with success result
-      tx.status = PaymentStatus.SUCCESS;
-      tx.providerTransactionId = chargeResult.id;
-      tx.responsePayload = chargeResult;
-      await tx.save();
-
-      const finalResponse = {
-        status: PaymentStatus.SUCCESS,
-        transactionId: chargeResult.id,
-        amount: tx.amount,
-        responsePayload: chargeResult,
-      };
-
-      // 7. Cache in Redis
-      await this.redisService.setCachedResponse(idempotencyKey, finalResponse);
-
-      return finalResponse;
-    } catch (error: any) {
-      // Record failure state if payment gateway failed
-      await this.paymentModel.updateOne(
-        { idempotencyKey },
-        { $set: { status: PaymentStatus.FAILED, responsePayload: { error: error.message } } }
-      );
+      // Re-throw NestJS HTTP exceptions as-is, wrap others
+      if (error.status) {
+        throw error;
+      }
+      console.log(error);
       throw new InternalServerErrorException(error.message || 'Payment processing failed');
-    } finally {
-      // 8. Always release distributed lock
-      await this.redisService.releaseLock(idempotencyKey);
+    } 
+    finally {
+      // Safely release distributed lock only if key was generated
+      if(idempotencyKey){
+        await this.redisService.releaseLock(idempotencyKey).catch((err) => {
+          this.logger.error('Failed to release Redis lock', err);
+        });;
+      }
     }
   }
 
-  private async executeGatewayCharge(userId: string, amount: number, currency: string, idempotencyKey: string) {
-    // Example Stripe/Paystack call
-    // Note: Most gateways (like Stripe) accept an idempotency key directly in request headers:
-    // { headers: { 'Idempotency-Key': idempotencyKey } }
-    return { id: `ch_${Date.now()}`, status: 'succeeded', amount, currency };
+  async processSubscription(createPaymentDto: CreatePaymentDto, user: any, sub_id?: string) {
+    try {      
+      if(!createPaymentDto.idempotencyKey) {
+        return `Idempotency key is required!`;
+      }
+
+      if(!createPaymentDto.amount) {
+        return `Plan amount is required!`;
+      }
+
+      if(!user) {
+        return `User account not provided!`;
+      }
+
+      const tx = await this.paymentModel.create({
+        idempotencyKey: createPaymentDto.idempotencyKey,
+        amount: createPaymentDto.amount,
+        currency: 'NGN',
+        status: PaymentStatus.PROCESSING,
+        tailor: user,
+        paymentType: PaymentTypes.SUBSCRIPTION,
+        subscription: sub_id
+      });
+
+      const amountInKobo = createPaymentDto.amount * 100;
+      const response = await this.paystackService.initializeTransaction(
+        amountInKobo, 
+        createPaymentDto.idempotencyKey, 
+        {...user },
+        createPaymentDto.plan_code
+      );
+
+      tx.responsePayload = response;
+      await tx.save()
+
+      this.logger.log(`Subscription payment initialized:`, tx);
+
+      return response;
+    } catch(error: any) {
+      this.logger.log(error);
+    } finally {
+      this.logger.log('success');
+    }
   }
 
-  create(createPaymentDto: CreatePaymentDto) {
-    return 'This action adds a new payment';
+  async verify(paymentId: string) {
+    const response = await this.paystackService.verifyTransaction(paymentId);
+    console.log(response);
   }
 
-  findAll() {
-    return `This action returns all payment`;
+  async checkForTransaction(idempotencyKey: string) {
+    // 1. Confirm idempotency key is provided 
+    if (!idempotencyKey) {
+      return {status: false, msg: 'idempotencyKey is required'};
+    }
+
+    // 2. Check Redis Cache
+    const cachedResponse = await this.redisService.getCachedResponse(idempotencyKey);
+    if (cachedResponse) {
+      return {status: true, msg: `Transaction Cached!`, data: cachedResponse};
+    }
+
+    // 3. Check Database for Existing Transaction
+    const existingTx = await this.paymentModel.findOne({ idempotencyKey });
+    if(existingTx) {
+      return { status: true, msg: 'Transaction Found!', data: existingTx.responsePayload};
+    } else {
+      return { status: false, msg: 'transaction not found'};
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
+  async findAll() {
+    try {
+      const payments = await this.paymentModel
+      .find()
+      .populate('order')
+      .populate('subscription')
+      .exec();
+
+      if(!payments) {
+        throw new NotFoundException(`No payments have been recorded yet!`);
+      }
+
+      const res: IResponse<Payment[]> = {
+        statusCode: 200,
+        msg: 'List of all payments',
+        data: payments
+      } 
+
+      return res;
+    } catch(error: any) {
+      this.logger.log(error);
+      return error;
+    }
+  }
+
+  async findOrderPayment(id: string) {
+    try {
+      const payment = await this.paymentModel.find({
+        $or: [
+          { order: id }
+        ]
+      });
+
+      if(!payment) {
+        throw new NotFoundException(`No payment found for this order!`);
+      }
+
+      const res: IResponse<Payment[]> = {
+        statusCode: 200,
+        msg: 'payment retrieved successfully!',
+        data: payment
+      } 
+
+      return res;
+    } catch(error: any) {
+      this.logger.log(error);
+      return error;
+    }
   }
 
   update(id: number, updatePaymentDto: UpdatePaymentDto) {
+    console.log(updatePaymentDto);
     return `This action updates a #${id} payment`;
   }
 

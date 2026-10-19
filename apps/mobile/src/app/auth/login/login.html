@@ -1,4 +1,4 @@
-<form #loginForm="ngForm" class="py-4">
+<!-- <form #loginForm="ngForm" class="py-4">
     <ion-item lines="full">
         <ion-input
         name="email"
@@ -9,4 +9,71 @@
         [(ngModel)]="loginData.email"
         ></ion-input>
     </ion-item>
-</form>
+</form> -->
+
+<ion-content class="ion-padding ion-text-center" color="light">
+    <div class="login-container">
+        <!-- App Logo / Header -->
+        <div class="flex flex-col gap-2 items-center header-section">
+            <ion-icon name="lock-closed-outline" class="app-logo"></ion-icon>
+            <img src="images/logo.png" alt="" />
+            <h2>Welcome Back</h2>
+            <p>Log in to manage your clients and orders</p>
+        </div>
+
+        <!-- Login Form -->
+        <form #loginForm="ngForm" (ngSubmit)="login()">
+        
+            <!-- Email Field -->
+            <ion-item lines="none" fill="outline" class="custom-input">
+                <ion-icon name="mail-outline" slot="start" aria-hidden="true"></ion-icon>
+                <ion-input 
+                label="Email Address" 
+                label-placement="stacked" 
+                type="email" 
+                [(ngModel)]="loginData.email"
+                name="email"
+                placeholder="name@example.com" 
+                required>
+                </ion-input>
+            </ion-item>
+
+            <!-- Password Field -->
+            <!-- <ion-item lines="none" fill="outline" class="custom-input">
+                <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true"></ion-icon>
+                <ion-input 
+                [type]="showPassword ? 'text' : 'password'" 
+                label="Password" 
+                label-placement="stacked" 
+                [(ngModel)]="loginData.password" 
+                name="password"
+                placeholder="Enter your password" 
+                required>
+                </ion-input>
+                <ion-button fill="clear" slot="end" aria-label="Show/Hide Password" (click)="togglePassword()">
+                <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                </ion-button>
+            </ion-item> -->
+
+            <!-- Forgot Password -->
+            <!-- <div class="forgot-container">
+                <a routerLink="/forgot-password" class="forgot-link">Forgot Password?</a>
+            </div> -->
+
+            <!-- Submit Button -->
+            <ion-button expand="block" type="submit" class="submit-btn" [disabled]="isLoading">
+                @if(isLoading){
+                <ion-spinner name="crescent" slot="start"></ion-spinner>
+                }
+                {{ isLoading ? 'Processing...' : 'Sign In' }}
+            </ion-button>
+
+        </form>
+
+        <!-- Footer Register Link -->
+        <div class="footer-section">
+            <p>Don't have an account? <span routerLink="/auth/register" class="signup-link">Sign Up</span></p>
+        </div>
+
+    </div>
+</ion-content>

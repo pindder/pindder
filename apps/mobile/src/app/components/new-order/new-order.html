@@ -73,7 +73,7 @@
             <ion-label>Styles</ion-label>
         </ion-list-header>
 
-        @if(order.styles.length == 0){
+        @if(order.styles.length === 0){
         <div class="">
             <app-empty-state 
             [icon]="'color-palette-outline'" 
@@ -176,14 +176,31 @@
                     </ion-select> 
                 </ion-item>
 
-                <ion-item>
+                <ion-item lines="full">
+                    <ion-select 
+                    name="payment_method" 
+                    [(ngModel)]="order.paymentMethod" 
+                    label="Payment Method" 
+                    aria-label="Payment Method" 
+                    placeholder="Select payment method" 
+                    labelPlacement="stacked"
+                    >
+                    @for (pm of paymentMethods; track pm) {
+                        <ion-select-option [value]="pm">{{ pm }}</ion-select-option>
+                    }
+                    </ion-select> 
+                </ion-item>
+
+                <ion-item lines="none">
                     <ion-datetime
                     name="dueDate"
                     presentation="date"
-                    [showDefaultTitle]="true"
+                    [showDefaultTitle]="false"
                     [(ngModel)]="order.dueDate" 
                     (ionChange)="onDateChange($event)"
-                    ></ion-datetime>
+                    >
+                        <span slot="title">Select due date</span>    
+                    </ion-datetime>
                 </ion-item>
             </ion-list>
         </form>
@@ -210,7 +227,7 @@
         <app-primary-button
             [buttonText]="'Preview Order'"
             [icon]="'eye-outline'"
-            [disabled]="selectedClient == undefined || order.styles.length == 0"
+            [disabled]="selectedClient === undefined || order.styles.length === 0"
             (action)="buildOrder()"
         ></app-primary-button>
     </div>
@@ -248,14 +265,14 @@
                             <ion-item lines="full">
                                 <ion-label>
                                     <div class="py-1 color-grid">
-                                    @for(color of spec.colors; track color._id; let colorIndex = $index){
+                                    @for(color of spec.colors; track color._id){
                                         <div
                                             class="color-swatch"
                                             [style.background-color]="color.hex"
-                                            [class.selected]="isColorSelected(color, specIndex)"
-                                            (click)="toggleColor(color, specIndex)"
+                                            [class.selected]="isColorSelected(color, spec)"
+                                            (click)="toggleColor(color, spec)"
                                         >
-                                            @if(isColorSelected(color, specIndex)){<ion-icon
+                                            @if(isColorSelected(color, spec)){<ion-icon
                                             name="checkmark"
                                             [style.color]="getContrastColor(color.hex)"
                                             ></ion-icon>}

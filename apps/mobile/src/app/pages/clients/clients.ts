@@ -30,7 +30,7 @@ import { EmptyState } from '../../components/empty-state/empty-state';
     AsyncPipe,
     PrimaryButton,
     EmptyState
-],
+  ],
   templateUrl: './clients.html',
   styleUrl: './clients.css',
 })
@@ -44,7 +44,7 @@ export class Clients implements ViewWillEnter, OnInit{
   //clients: IClient[] =  [];
   dataTypes = DataTypes;
   clients$!: Observable<IClient[]>;
-  isLoading: boolean = false;
+  isLoading = false;
 
   ionViewWillEnter() {
     this.fetchClients();

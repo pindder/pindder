@@ -4,19 +4,23 @@ import { SubscriptionController } from './subscription.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Subscription, SubscriptionSchema } from './schemas/subscription.schema';
 import { JwtService } from '@nestjs/jwt';
-import { HttpModule } from '@nestjs/axios';
+import { TailorModule } from '../tailors/tailor.module';
+import { PlanModule } from '../plans/plan.module';
+import { PaymentModule } from '../payments/payment.module';
+import { OrderModule } from '../orders/order.module';
 
 @Module({
   imports: [
-    HttpModule.register({
-      timeout: 5000,
-      maxRedirects: 5
-    }),
     MongooseModule.forFeature([
-      { name: Subscription.name, schema: SubscriptionSchema }
-    ])
+      { name: Subscription.name, schema: SubscriptionSchema },
+    ]),
+    TailorModule,
+    PlanModule,
+    PaymentModule,
+    OrderModule,
   ],
   controllers: [SubscriptionController],
   providers: [SubscriptionService, JwtService],
+  exports: [MongooseModule, SubscriptionService]
 })
 export class SubscriptionModule {}

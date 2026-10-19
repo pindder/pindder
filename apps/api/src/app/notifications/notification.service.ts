@@ -125,7 +125,7 @@ export class NotificationService {
 
   async update(id: string, updateNotificationDto: UpdateNotificationDto) {
     const notification = await this.notificationModel
-      .findByIdAndUpdate(id, { $set: updateNotificationDto }, { new: true, runValidators: true })
+      .findByIdAndUpdate(id, { $set: {...updateNotificationDto, status: NotificationStatus.READ }}, { returnDocument: 'after', runValidators: true })
       .exec();
     if (!notification) throw new NotFoundException(`Notification ${id} not found`);
     return notification;

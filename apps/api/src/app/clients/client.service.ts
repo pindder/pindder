@@ -1,80 +1,77 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Client } from './schemas/client.schema';
 import { Model } from 'mongoose';
 import { Follow } from './schemas/follows.schema';
-import { User } from '../users/schemas/user.schema';
 import { ClientAssociationDto } from './dto/client-association.dto';
 import { DataTypes, DataTypesIcon, IResponse, NotificationActions } from '@pindder/contracts';
 import { NotificationService } from '../notifications/notification.service';
+import { Tailor } from '../tailors/schemas/tailor.schema';
 
 @Injectable()
 export class ClientService {
+  private logger = new Logger(ClientService.name);
+
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Follow.name) private readonly followModel: Model<Follow>,
     @InjectModel(Client.name) private readonly clientModel:  Model<Client>,
+    @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     private readonly notificationService: NotificationService
   ) {}
 
   async create(createClientDto: CreateClientDto, referee_id?: string) {
     try{
       //check if the email already is in the system
-      const existing_client = await this.clientModel
-      .findOne({ email: createClientDto.email })
-      .select('_id firstname lastname email phoneNo')
-      .exec();
-      
-      const existing_user = await this.userModel.findOne({ email: createClientDto.email }); 
+      const existing_client = await this.clientModel.findOne({ email: createClientDto.email }).lean();
 
-      if(existing_client || existing_user) {
-
-        const res = { 
-          client: existing_user ?? existing_client, 
-          message: `The email provided currently exists on pindder,
+      if(existing_client) {
+        console.log(existing_client);
+        const res:IResponse<any> = { 
+          statusCode: 409,
+          data: existing_client, 
+          msg: `The email provided currently exists on pindder,
           would you like to verify the information and add the client to your client list?`
         }
 
+        return res;  
+      } else {
+        const tailor = await this.tailorModel.findById(referee_id);
+
+        if(!tailor) {
+          return;
+        }
+
+        const client = new this.clientModel(createClientDto);
+        client.fullname = client.firstname + ' ' + client.lastname;
+        client.referee = tailor;
+
+        await client.save();
+
+        await this.notificationService.create({
+          client: client,
+          tailor: client.referee,
+          type: DataTypes.CLIENT,
+          action: NotificationActions.CLIENT_CREATED,
+          icon: DataTypesIcon.CLIENT,
+          title: 'New Client',
+          message: `Client #${client.fullname} has been created.`,
+          data: {
+            ...client
+          },
+        });
+        
+        const res: IResponse<any> = {
+          statusCode: 200,
+          msg: 'Client added successfully.',
+          data: client
+        };
+
         return res;
       }
-
-      const client = new this.clientModel(createClientDto);
-      client.fullname = client.firstname + ' ' + client.lastname;
-      client.referee = referee_id;
-
-      await client.save();
-
-      const new_follow = new this.followModel({
-        client: client._id,
-        tailor: client.referee
-      });
-
-      await new_follow.save();
-
-      await this.notificationService.create({
-        client: client,
-        tailor: client.referee,
-        type: DataTypes.CLIENT,
-        action: NotificationActions.CLIENT_CREATED,
-        icon: DataTypesIcon.CLIENT,
-        title: 'New Client',
-        message: `Client #${client.fullname} has been created.`,
-        data: {
-          ...client
-        },
-      });
-      
-      const res: IResponse<any> = {
-        statusCode: 200,
-        msg: 'Client added successfully.',
-        data: client
-      };
-
-      return res;
     } catch (error: any) {
-      console.error(error);
+      this.logger.error(error);
       throw new InternalServerErrorException(`${error}`);
     }
   }
@@ -94,7 +91,7 @@ export class ClientService {
         ],
         $and: [
           {
-            referee: user_id
+            'referee._id': user_id
           }
         ]
       }).exec();
@@ -127,14 +124,14 @@ export class ClientService {
 
       }
     } catch(error: any) {
-
+      return;
     }
   }
 
   async findAll(acct_id: string) {
     try {
       const clients = await this.clientModel
-      .find({ referee: acct_id })
+      .find({ 'referee._id': acct_id })
       .sort({ createdAt: -1 })
       .populate('referee', '-_v')
       .exec();

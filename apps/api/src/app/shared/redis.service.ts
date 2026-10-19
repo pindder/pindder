@@ -1,9 +1,13 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy{
-    private client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    private redis_url = `${this.configService.get<string>('REDIS_URL')}:6379`;
+    constructor(private readonly configService: ConfigService) {}
+
+    private client = new Redis(this.redis_url || 'redis://localhost:6379');
 
     async acquireLock(key: string, ttlSeconds = 30): Promise<boolean> {
         // NX = set if not exists, EX = expire in seconds
@@ -16,6 +20,7 @@ export class RedisService implements OnModuleDestroy{
     }
 
     async getCachedResponse<T>(key: string): Promise<T | null> {
+        console.log(this.client);
         const data = await this.client.get(`cache:${key}`);
         return data ? JSON.parse(data) : null;
     }

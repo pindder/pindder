@@ -16,12 +16,12 @@
         <ion-item-option color="success">Archive</ion-item-option>
     </ion-item-options>
 
-    <ion-item button detail lines="full">
+    <ion-item button detail (click)="viewNotification(notification)" lines="full">
         <ion-button size="medium" color="medium" slot="start">
           <ion-icon [name]="notification.icon" slot="icon-only"></ion-icon>
         </ion-button>
         <ion-label>
-          <h2 class="text-primary">{{ notification.type }}</h2>
+          <h2 class="text-primary">{{ notification.title }}</h2>
           <p>{{ notification.message }}</p>
         </ion-label>
         @if(notification.status === notificationStatus.UNREAD){

@@ -6,53 +6,44 @@ import {
   Patch,
   Param,
   Delete,
-  Headers,
+  UseGuards
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Post('charge')
-  async chargeUser(
-    @Headers('x-idempotency-key') idempotencyKey: string,
-    @Body() body: { client: string; tailor: string, amount: number; currency: string }
+  @UseGuards(AuthGuard)
+  @Post('init')
+  async initializeTransaction( 
+    @Body() CreatePaymentDto: CreatePaymentDto,
   ) {
-    return this.paymentService.processPayment({
-      idempotencyKey: idempotencyKey,
-      tailor: body.tailor,
-      client: body.client,
-      amount: body.amount,
-      currency: body.currency,
-    });
+    return this.paymentService.processOrderPayment(CreatePaymentDto);
   }
 
-  // @Post('verify')
-  // async verifyPayment(
-  //   @Headers('x-idempotency-key') idempotencyKey: string,
-  //   @Body('reference') reference: string
-  // ) {
-  //   return this.paymentService.verifyAndFinalizeTransaction(reference, idempotencyKey);
-  // }
-
-  @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
+  @UseGuards(AuthGuard)
+  @Get('verify/:id')
+  async verifyPayment(@Param('id') paymentId: string) {
+    return this.paymentService.verify(paymentId);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.paymentService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id);
+  @UseGuards(AuthGuard)
+  @Get('orders/:orderId')
+  fetchOrderPayment(@Param('orderId') orderId: string) {
+    return this.paymentService.findOrderPayment(orderId);
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
     return this.paymentService.update(+id, updatePaymentDto);

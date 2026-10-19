@@ -22,6 +22,8 @@ import { ColorsModule } from './colors/colors.module';
 import { ReferralsModule } from './referrals/referrals.module';
 import { WebhookModule } from './webhooks/webhook.module';
 import { NotificationModule } from './notifications/notification.module';
+import { PlanModule } from './plans/plan.module';
+import { BankDetailModule } from './bank-details/bank-detail.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { NotificationModule } from './notifications/notification.module';
     ReferralsModule,
     WebhookModule,
     NotificationModule,
+    PlanModule,
+    BankDetailModule,
   ],
   controllers: [AppController],
   providers: [AppService, SharedService],

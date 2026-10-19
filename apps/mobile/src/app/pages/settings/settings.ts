@@ -2,7 +2,10 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonTitle, IonToggle, IonToolbar, IonBackButton, IonButtons, IonListHeader, ViewWillEnter } from '@ionic/angular';
+import { IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, 
+  IonTitle, IonToggle, IonToolbar, IonBackButton, IonButtons, 
+  IonListHeader, ViewWillEnter, IonNote 
+} from '@ionic/angular';
 import { ProfileCard } from "../../components/profile-card/profile-card";
 import { TokenService } from '../../services/token.service';
 import { IProfile } from '@pindder/contracts';
@@ -12,13 +15,14 @@ const initialProfile: IProfile = {
   lastname: '',
   email: '',
   address: '',
-  phoneNo: '',
+  countryCode: '',
+  tel: '',
   username: ''
 };
 
 @Component({
   selector: 'app-settings',
-  imports: [
+  imports: [IonNote, 
     IonBackButton,
     IonContent,
     IonHeader,
@@ -57,6 +61,10 @@ export class Settings implements ViewWillEnter{
     // Fall back to initialProfile instead of null to prevent template errors
     this.profile = profileStr ? JSON.parse(profileStr) : { ...initialProfile };
     this.cdr.markForCheck();
+  }
+
+  openProfileEdit() {
+    this.router.navigate(['app/profile/edit']);
   }
 
   logout() {

@@ -19,33 +19,35 @@ export class MeasurementService {
   /**
    * Save or update client measurements
    */
-  async create(
-    dto: CreateMeasurementDto,
-  ) {
+  async create(dto: CreateMeasurementDto) {
     try {
-      //const { client, user, measurements, notes } = dto;
+      const measurementsMap = new Map(Object.entries(dto.measurements || {}));
 
-      // Convert standard JS object to a Map for Mongoose
-      const measurementsMap = new Map(Object.entries(dto.measurements!));
+      if (measurementsMap.size === 0) {
+        return;
+      }
 
-      // Atomically update if exists, or insert if new (upsert)
-      const newRecord = new this.measurementModel(dto);
+      // Safely query only if the ID is provided to avoid Mongoose CastErrors
+      const client = dto.client ? await this.clientModel.findById(dto.client).lean() : null;
+      const user = dto.user ? await this.userModel.findById(dto.user).lean() : null;
 
-      const client = await this.clientModel.findById(dto.client);
-      const user = await this.userModel.findById(dto.user);
-      
-      if(client) newRecord.client = client;
-      if(user) newRecord.user = user;       
-      if(dto.notes) newRecord.notes = dto.notes;
+      if (!client && !user) {
+        return;
+      }
 
-      newRecord.measurements = measurementsMap;
-
-      newRecord.save();
+      const newRecord = await this.measurementModel.create({
+        name: dto.name,
+        description: dto.description,
+        notes: dto.notes, 
+        measurements: measurementsMap,
+        client: client ?? null,
+        user: user ?? null,
+      });
 
       const res: IResponse<any> = {
         statusCode: 200,
         msg: 'Measurement added successfully.',
-        data: newRecord
+        data: newRecord,
       };
 
       return res;

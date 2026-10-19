@@ -1,8 +1,132 @@
-h1{
+.login-container {
+  /* max-width: 400px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  padding: 20px 10px; */
+
+  max-width: 420px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px;
+
+  .header-section {
+    text-align: center;
+    margin-bottom: 30px;
+
+    .app-logo {
+      font-size: 32px;
+      color: var(--ion-color-primary);
+      background: rgba(var(--ion-color-primary-rgb), 0.1);
+      padding: 16px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 24px;
+      color: var(--ion-text-color);
+      margin-bottom: 5px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+
+  /* Customizing the Bordered Inputs */
+  .custom-input {
+    --border-radius: 12px;
+    --highlight-color-focused: var(--ion-color-primary);
+    margin-bottom: 20px;
+    background: var(--ion-background-color, #ffffff);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    
+    ion-icon[slot="start"] {
+      /* margin-inline-end: 10px; */
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .forgot-container {
+    text-align: right;
+    margin-bottom: 25px;
+
+    .forgot-link {
+      font-size: 13px;
+      color: var(--ion-color-primary);
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .submit-btn {
+    --border-radius: 12px;
+    height: 48px;
     font-weight: 600;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+  }
+
+  .footer-section {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 14px;
+    color: var(--ion-color-medium);
+
+    .signup-link {
+      color: var(--ion-color-primary);
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+
+  ion-item {
+    border-radius: 20px;
+  }
 }
 
-p{
-    color: var(--ion-secondary-color);
-}
+/* Phone Number Field Specific Layout */
+.phone-container-item {
+  /* --padding-start: 12px;
+  --padding-end: 12px; */
 
+  .phone-input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    padding: 0px;
+
+    .country-code-select {
+      flex: 0 0 82px;
+      font-weight: 500;
+      font-size: 16px;
+      border-right: 1px solid rgba(var(--ion-color-medium-rgb), 0.3);
+      padding-right: 4px;
+      margin-inline-end: 4px;
+      --padding-start: 4px;
+      --padding-end: 4px;
+    }
+
+    .phone-digits-input {
+      flex: 1;
+    }
+
+    ion-input, ion-select {
+        min-height: 36px;
+    }
+  }
+}

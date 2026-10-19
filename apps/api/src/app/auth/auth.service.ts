@@ -7,12 +7,14 @@ import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
 import { Brand } from '../brands/schemas/brand.schema';
 import { JwtService } from '@nestjs/jwt';
-//import { Client } from '../clients/schemas/client.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { EmailService } from '../shared/email.service';
 import { CreateTailorDto } from '../tailors/dto/create-tailor.dto';
-import { AccountStatus, AccountTypes, IVerification, TokenTypes } from '@pindder/contracts';
+import { AccountStatus, AccountTypes, IResponse, IVerification, TokenTypes } from '@pindder/contracts';
 import { SharedService } from '../shared/shared.service';
+import { PaystackService } from '../shared/paystack.service';
+import { generateCode } from '../shared/helpers';
+import { SubscriptionService } from '../subscriptions/subscription.service';
 
 @Injectable()
 export class AuthService {
@@ -20,14 +22,15 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly sharedService: SharedService,
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
-    //@InjectModel(Client.name) private readonly clientModel: Model<Client>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Brand.name) private readonly brandModel: Model<Brand>,
     private readonly jwtService: JwtService,
+    private readonly paystackService: PaystackService,
+    private readonly subscriptionService: SubscriptionService
   ) {}
 
   async tailorLogin(loginDto: LoginDto) {
-  try {
+    try {
       let token;
       const tailor = await this.tailorModel.findOne({ email: loginDto.email });
 
@@ -77,14 +80,23 @@ export class AuthService {
       tailor.lastname = tailorRegistrationDto.fullname.split(' ')[1];
       tailor.username = tailorRegistrationDto.email.split('@')[0];
       tailor.accountType = AccountTypes.TAILOR;
+      tailor.tel = tailorRegistrationDto.tel;
+      tailor.countryCode = tailorRegistrationDto.countryCode;
+      tailor.referralCode = generateCode(8, true);
       await tailor.save();
 
-      await this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
+      // await this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
       const token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE);
 
       await this.emailService.sendOneTimeLoginCode(tailor, token.token);
 
-      return { status: 200, data: tailor, message: `Account created successfully!` };
+      const res: IResponse<Tailor> = {
+        statusCode: 200,
+        msg: `Account created successfully!`,
+        data: tailor,
+      };
+
+      return res;
     } catch(error: any) {
       console.error(error);
       throw new InternalServerErrorException(`${error}`);
@@ -119,7 +131,7 @@ export class AuthService {
 
   async userRegistration(createUserDto: CreateUserDto) {
     // Implementation for user registration
-    const user = new this.userModel(createUserDto);
+    const user = new this.userModel({...createUserDto, referralCode: generateCode(8, true)});
     await user.save();
 
     this.emailService.sendWelcomeEmail(user.email, user.username);
@@ -157,7 +169,7 @@ export class AuthService {
 
   async verifyOneTimeLoginCode(data: IVerification) {
     try {
-      let payload;
+      //let payload;
       let acct;
 
       const token = await this.sharedService.findToken(data.code);
@@ -182,7 +194,7 @@ export class AuthService {
       if(!acct) throw new NotFoundException();
 
       // generate payload for token
-      payload = { sub: acct._id, username: acct.username, email: acct.email, acctType: acct.accountType }
+      const payload = { sub: acct._id, username: acct.username, email: acct.email, acctType: acct.accountType }
 
       // sign tokens
       const auth_token = await this.jwtService.signAsync(payload);
@@ -194,6 +206,12 @@ export class AuthService {
       if(acct && acct.status == AccountStatus.PENDING) {
         acct.status = AccountStatus.ACTIVE;
         await acct.save();
+
+        if(acct.accountType === AccountTypes.TAILOR) {
+          await this.paystackService.createCustomer(acct);
+          await this.emailService.sendWelcomeEmail(acct.email, acct.username!);
+          await this.subscriptionService.assignSubscription(acct);
+        }
       }
 
       return result;
@@ -206,7 +224,34 @@ export class AuthService {
     }
   }
 
-  async resendToken() {
-    
+  async resendToken(email: string, acctType: string) {
+    let acct;
+
+    try {
+      switch (acctType) {
+        case AccountTypes.TAILOR:
+          acct = await this.tailorModel.findOne({ email: email });
+          break;
+
+        case AccountTypes.USER:
+          acct = await this.userModel.findOne({ email: email });
+          break;
+
+        default:
+          return `Account not found!`;
+      }
+      
+      if(!acct) {
+        return false;
+      }
+
+      const token = await this.sharedService.updateToken(acct._id, TokenTypes.CODE);
+
+      await this.emailService.sendOneTimeLoginCode(acct, token.token);
+
+      return true;
+    } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
   }
 }

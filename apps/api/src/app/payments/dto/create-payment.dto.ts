@@ -1,8 +1,11 @@
 export class CreatePaymentDto {
-    idempotencyKey!: string;
-    client?: string;
-    tailor!: string; 
-    customer?: string;
-    amount!: number;
     currency?: string;
+    idempotencyKey?: string;
+    orderId?: string;
+    plan_id?: number;
+    plan_code?: string;
+    amount?: number;
+    callbackUrl!: string; 
+    startDate?: string;
+    authorization?: string;
 }

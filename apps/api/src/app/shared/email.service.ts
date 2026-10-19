@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 import { Brand } from '../brands/schemas/brand.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 export class EmailService {
      private readonly resend: Resend;
      private readonly sender_email: string;
+     private logger = new Logger(EmailService.name); 
 
     constructor(private readonly configService: ConfigService) {
         // Initialize Resend with key from environment
@@ -34,8 +35,9 @@ export class EmailService {
         });
 
         if (error) {
-            console.error('Resend error:', error);
-            throw new InternalServerErrorException('Failed to send email');
+            this.logger.error('Resend error:', error)
+            // throw new InternalServerErrorException('Failed to send email');
+            return;
         }
 
         return data;
@@ -54,8 +56,9 @@ export class EmailService {
         });
 
         if (error) {
-            console.error('Resend error:', error);
-            throw new InternalServerErrorException('Failed to send email');
+            this.logger.error('Resend error:', error)
+            //throw new InternalServerErrorException('Failed to send email');
+            return;
         }
 
         return data;

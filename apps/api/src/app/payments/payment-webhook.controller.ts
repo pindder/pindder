@@ -1,53 +1,100 @@
-import { BadRequestException, Controller, Headers, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Payment } from './schemas/payment.schema';
-import { Model } from 'mongoose';
+import { BadRequestException, Controller, Headers, HttpCode, HttpStatus, Logger, Post, Req, Res } from '@nestjs/common';
 import * as crypto from 'crypto';
-import { PaymentStatus } from '@pindder/contracts';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ConfigService } from '@nestjs/config';
+import { Request, Response } from 'express';
 
 @Controller('payment-webhook')
 export class PaymentWebhookController {
+    private logger = new Logger(PaymentWebhookController.name);
+    private secretKey = this.configService.get<string>('PAYSTACK_SECRET_KEY');
+
     constructor(
-        @InjectModel(Payment.name) private paymentModel: Model<Payment>,
+        private readonly configService: ConfigService,
+        private readonly eventEmitter: EventEmitter2
     ) {}
 
     @Post('paystack-webhook')
     @HttpCode(HttpStatus.OK)
     async handleWebhook(
-        @Req() req: any,
+        @Req() req: Request, @Res() res: Response,
         @Headers('x-paystack-signature') signature: string
     ) {
         // 1. Verify Paystack HMAC SHA512 Signature
-        const secret = process.env.PAYSTACK_SECRET_KEY || 'payment_secret';
         const hash = crypto
-        .createHmac('sha512', secret)
+        .createHmac('sha512', this.secretKey || 'payment_secret')
         .update(JSON.stringify(req.body))
         .digest('hex');
 
         if (hash !== signature) {
-        throw new BadRequestException('Invalid signature');
+            throw new BadRequestException('Invalid signature');
         }
+
+        // 2. Acknowledge receipt immediately (Paystack expects a 200 OK fast)
+        res.status(HttpStatus.OK).send({ status: 'success' });
 
         const event = req.body;
+        this.logger.log(`Received Paystack Event: ${event.event}`);
 
-        // 2. Process charge.success event idempotently
-        if (event.event === 'charge.success') {
-        const reference = event.data.reference;
+        // 3. Handle specific event types
+        switch (event.event) {
+            case 'charge.success':
+                await this.handleSuccessfulCharge(event.data);
+                break;
+            
+            case 'subscription.create':
+                await this.handleSubscriptionCreated(event.data);
+                break;
 
-        // Idempotency check: Find transaction by Paystack reference
-        const tx = await this.paymentModel.findOne({ providerTransactionId: reference });
+            case 'invoice.create':
+                await this.handleSuccessfulRenewal(event.data);
+                break;
 
-        if (tx && tx.status !== PaymentStatus.SUCCESS) {
-            tx.status = PaymentStatus.SUCCESS;
-            tx.responsePayload = event.data;
-            await tx.save();
+            case 'invoice.payment_failed':
+                await this.handleFailedRenewal(event.data);
+                break;
 
-            // Trigger post-payment actions (e.g., mark order as PAID in Pindder DB)
-            console.log(`Order for payment ref ${reference} marked as SUCCESS.`);
+            default:
+                this.logger.log(`Unhandled event type: ${event.event}`);
         }
-        }
+    }
 
-        // Always acknowledge Paystack webhook with 200 OK immediately
-        return { status: 'acknowledged' };
+    private async handleSuccessfulCharge(data: any) {
+        const metadata = data.metadata || {};
+        
+        // Check if this payment belongs to an Order or a Subscription package
+        if (metadata.type === 'subscription' || data.plan) {
+        // Dispatch an internal event for subscriptions
+        this.eventEmitter.emit('subscription.payment.successful', {
+            email: data.customer.email,
+            amount: data.amount,
+            reference: data.reference,
+            planCode: data.plan?.plan_code || metadata.plan_code,
+            subscriptionCode: data.subscription_code,
+            metadata: metadata,
+        });
+        } else {
+        // Dispatch an internal event for standard orders
+        this.eventEmitter.emit('order.payment.successful', {
+            reference: data.reference,
+            amount: data.amount,
+            metadata: metadata,
+        });
+        }
+    }
+
+    private async handleSubscriptionCreated(data: any) {
+        // Optional: track when a recurring subscription is officially initialized
+        this.logger.log(`Subscription created: ${data.subscription_code}`);
+    }
+
+    private async handleFailedRenewal(data: any) {
+        // Renewal failed (e.g., expired card, insufficient funds)
+        this.logger.log(`Subscription renewal failed: ${data.subscription_code}`);
+    }
+
+    private async handleSuccessfulRenewal(data: any) {
+        // Sent 3 days before a renewal charge attempt is due
+        this.logger.log(`Upcoming renewal invoice for customer: ${data.customer.email}`);
     }
 }
