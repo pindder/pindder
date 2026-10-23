@@ -14,6 +14,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'https://pindder-buisness.onrender.com',
+      'https://pindder-admin.onrender.com',
       'http://localhost:4200',
       'http://localhost:4500',
       'http://localhost:8100',
