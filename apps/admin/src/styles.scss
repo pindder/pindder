@@ -1,1 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+@import url('https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css');
+
+@theme {
+  --color-pindder-primary: #F1641D;
+  --color-pindder-primary-rgb: 241, 100, 29;
+  --color-pindder-primary-contrast: #ffffff;
+  --color-pindder-primary-contrast-rgb: 255, 255, 255;
+  --color-pindder-primary-shade: #d4581a;
+  --color-pindder-primary-tint: #f27435;
+  --color-pindder-primary-border: #E7E7E7;
+  --color-pindder-primary-fade: #FEF0E8;
+
+  --secondary-text-color: #00000080;
+}

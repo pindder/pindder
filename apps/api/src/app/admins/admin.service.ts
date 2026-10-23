@@ -1,26 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Admin } from './schemas/admin.schema';
+import { Model } from 'mongoose';
+import { IResponse } from '@pindder/contracts';
+import { SharedService } from '../shared/shared.service';
+
 
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
+  private logger = new Logger(AdminService.name);
+
+  constructor(
+    @InjectModel(Admin.name) private readonly adminModel: Model<Admin>,
+    private readonly sharedService: SharedService
+  ) {}
+  
+  async create(createAdminDto: CreateAdminDto) {
+    try {
+      const newAdmin = new this.adminModel(createAdminDto);
+
+      const hashedPassword = await this.sharedService.hashPassword(createAdminDto.password);
+
+      newAdmin.password = hashedPassword;
+      await newAdmin.save();
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Admin account created successfully',
+        data: newAdmin
+      };  
+
+      return res;
+    } catch(error: any) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 
-  findAll() {
+  async findAll() {
     return `This action returns all admin`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
+  async findOne(id: string) {
+    try {
+      const admin = await this.adminModel.findById(id);
+
+      if(!admin) {
+        throw new NotFoundException();
+      }
+      
+    } catch(error: any) {
+      this.logger.error(error);
+      return error;
+    }
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
+  async update(id: number, updateAdminDto: UpdateAdminDto) {
     return `This action updates a #${id} admin`;
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} admin`;
   }
 }

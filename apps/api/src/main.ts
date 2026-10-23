@@ -15,6 +15,7 @@ async function bootstrap() {
     origin: [
       'https://pindder-buisness.onrender.com',
       'http://localhost:4200',
+      'http://localhost:4500',
       'http://localhost:8100',
       'http://localhost',       // Capacitor Android
       'http://10.0.2.2:4000',   // Android Emulator to host API

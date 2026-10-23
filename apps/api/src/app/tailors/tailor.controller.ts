@@ -27,16 +27,16 @@ export class TailorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.tailorService.findOne(+id);
+    return this.tailorService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTailorDto: UpdateTailorDto) {
-    return this.tailorService.update(+id, updateTailorDto);
+    return this.tailorService.update(id, updateTailorDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.tailorService.remove(+id);
+    return this.tailorService.remove(id);
   }
 }

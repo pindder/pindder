@@ -1,11 +1,9 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { CreateBrandDto } from '../brands/dto/create-brand.dto';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../users/schemas/user.schema';
 import { Model } from 'mongoose';
-import { Brand } from '../brands/schemas/brand.schema';
 import { JwtService } from '@nestjs/jwt';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { EmailService } from '../shared/email.service';
@@ -15,19 +13,69 @@ import { SharedService } from '../shared/shared.service';
 import { PaystackService } from '../shared/paystack.service';
 import { generateCode } from '../shared/helpers';
 import { SubscriptionService } from '../subscriptions/subscription.service';
+import { Admin } from '../admins/schemas/admin.schema';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger(AuthService.name);
+
   constructor(
-    private readonly emailService: EmailService,
-    private readonly sharedService: SharedService,
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(Brand.name) private readonly brandModel: Model<Brand>,
+    @InjectModel(Admin.name) private readonly adminModel: Model<Admin>,
     private readonly jwtService: JwtService,
     private readonly paystackService: PaystackService,
+    private readonly emailService: EmailService,
+    private readonly sharedService: SharedService,
     private readonly subscriptionService: SubscriptionService
   ) {}
+
+  async adminLogin(loginDto: LoginDto) {
+    try {
+      const admin = await this.adminModel.findOne({
+        email: loginDto.email
+      }).lean();
+
+      if(!admin) {
+        throw new UnauthorizedException();
+      }
+
+      const {password, ...adminData} = admin;
+
+      const matched = await this.sharedService.comparePassword(loginDto.password, password);
+
+      if(!matched) {
+        throw new UnauthorizedException();
+      }
+
+      // generate payload for token
+      const payload = { sub: admin._id, roles: admin.roles, email: admin.email, acctType: AccountTypes.ADMIN }
+
+      // sign tokens
+      const auth_token = await this.jwtService.signAsync(payload);
+
+      const token = await this.sharedService.createToken(
+        AccountTypes.ADMIN, 
+        admin._id, 
+        TokenTypes.JWT
+      );
+
+      if(!token) {
+        throw new HttpException('Failed to generate access token!', HttpStatus.EXPECTATION_FAILED);
+      }
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Admin Logged in successfully!',
+        data: {...adminData, token: auth_token}
+      };
+
+      return res;
+    } catch(error: any) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
 
   async tailorLogin(loginDto: LoginDto) {
     try {
@@ -143,30 +191,6 @@ export class AuthService {
 
   }
 
-  async brandLogin(brandLoginDto: LoginDto) {
-    // Implementation for brand login
-    const brand = await this.brandModel.findOne({ email: brandLoginDto.email });
-
-    if(!brand) {
-      throw new NotFoundException('Brand not found');
-    }
-
-    const payload = { sub: brand._id, brand: brand.brandName };
-    
-    return {
-      user: brand,
-      access_token: await this.jwtService.signAsync(payload),
-    };
-  }
-
-  async brandRegistration(brandCreateDto: CreateBrandDto) {
-    // Implementation for brand registration
-    const brand = new this.brandModel(brandCreateDto);
-    await brand.save();
-
-    return brand;
-  }
-
   async verifyOneTimeLoginCode(data: IVerification) {
     try {
       //let payload;
@@ -185,9 +209,6 @@ export class AuthService {
       } 
       else if(token.accountType === AccountTypes.USER) {
         acct = await this.userModel.findById(token.user);
-      }
-      else if(token.accountType === AccountTypes.BRAND) {
-        acct = await this.brandModel.findById(token.brand);
       }
 
       // throw an error if the acct associated with the token could not be found

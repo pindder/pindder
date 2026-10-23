@@ -1,5 +1,7 @@
 //import { IOrder } from "./order.types";
 
+import { IOrderItem } from "./order.types";
+
 export interface IClient {
     _id?: string;
     fullname?: string;
@@ -10,8 +12,9 @@ export interface IClient {
     phoneNo: string;
     gender: string;
     referee: string;
-    // measurements?: IMeasurement;
-    // orders?: IOrder;
+    createdAt?: string;
+    measurements?: IMeasurement[];
+    orders?: IOrderItem[];
 }
 
 export interface IMeasurement {

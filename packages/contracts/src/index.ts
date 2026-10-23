@@ -1,4 +1,5 @@
 export * from './lib/contracts';
+export * from './lib/admin.interfaces';
 export * from './lib/auth.types';
 export * from './lib/order.types';
 export * from './lib/enum.types';

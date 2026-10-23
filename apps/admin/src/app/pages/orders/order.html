@@ -1,0 +1,247 @@
+<div class="space-y-6">
+    <!-- Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Orders Overview</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Welcome back, Awele. Here is what is happening today.</p>
+        </div>
+        
+
+        <div class="flex items-center space-x-3">
+            <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-all flex items-center space-x-2">
+                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Export Data</span>
+            </button>
+            
+            <!-- Date filter buttons -->
+            <div class="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-700/50 p-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+                <button (click)="setTimeRange('7d')" [class.bg-white]="timeRange() === '7d'" [class.dark:bg-slate-800]="timeRange() === '7d'" [class.shadow-sm]="timeRange() === '7d'" class="px-3 py-1.5 rounded-lg transition-all">7 Days</button>
+                <button (click)="setTimeRange('30d')" [class.bg-white]="timeRange() === '30d'" [class.dark:bg-slate-800]="timeRange() === '30d'" [class.shadow-sm]="timeRange() === '30d'" class="px-3 py-1.5 rounded-lg transition-all">30 Days</button>
+                <button (click)="setTimeRange('90d')" [class.bg-white]="timeRange() === '90d'" [class.dark:bg-slate-800]="timeRange() === '90d'" [class.shadow-sm]="timeRange() === '90d'" class="px-3 py-1.5 rounded-lg transition-all">Year</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-orange-200 transition-all">
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Orders</span>
+        <div class="mt-2 flex items-baseline justify-between">
+        <span class="text-2xl font-black text-slate-900">{{ stats().total }}</span>
+        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">+12%</span>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-blue-200 transition-all">
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Ongoing</span>
+        <div class="mt-2 flex items-baseline justify-between">
+        <span class="text-2xl font-black text-blue-600">{{ stats().ongoing }}</span>
+        <span class="text-xs text-slate-400">Active</span>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-emerald-200 transition-all">
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Completed</span>
+        <div class="mt-2 flex items-baseline justify-between">
+        <span class="text-2xl font-black text-emerald-600">{{ stats().completed }}</span>
+        <span class="text-xs text-slate-400">Delivered</span>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-rose-200 transition-all">
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Overdue</span>
+        <div class="mt-2 flex items-baseline justify-between">
+        <span class="text-2xl font-black text-rose-600">{{ stats().overdue }}</span>
+        <span class="text-xs font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">Action required</span>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-amber-200 transition-all">
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Pending</span>
+        <div class="mt-2 flex items-baseline justify-between">
+        <span class="text-2xl font-black text-amber-600">{{ stats().pending }}</span>
+        <span class="text-xs text-slate-400">Awaiting specs</span>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-slate-900 to-red-500 text-white p-4 rounded-xl shadow-sm">
+        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Cancelled</span>
+        <div class="mt-2">
+        <span class="text-xl font-black text-white">{{ stats().cancelled }}</span>
+        <span class="block text-[10px] text-slate-400 mt-1">Cancelled Orders</span>
+        </div>
+    </div>
+    </div>
+
+    <!-- Controls: Search & Filter Toolbar -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:space-x-4">
+    
+    <!-- Search Input -->
+    <div class="relative flex-grow max-w-md">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <input 
+        type="text"
+        [value]="searchQuery()"
+        (input)="updateSearch($event)"
+        placeholder="Search Client, Tailor name, or Order ID..." 
+        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F1641D] focus:bg-white transition-all">
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap items-center gap-3">
+        <!-- Status Filter Tabs -->
+        <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200/80 text-xs font-medium">
+        @for (status of statusFilterOptions; track status) {
+            <button 
+            (click)="setStatusFilter(status)"
+            class="px-2.5 py-1 rounded-md transition-all capitalize"
+            [class]="selectedStatusFilter() === status ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'">
+            {{ status }}
+            </button>
+        }
+        </div>
+
+        <!-- Type Filter Dropdown -->
+        <select 
+        [value]="selectedTypeFilter()"
+        (change)="setTypeFilter($event)"
+        class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#F1641D]">
+        <option value="All">All Types</option>
+        <option value="Bespoke">Bespoke</option>
+        <option value="Ready to Wear">Ready to Wear</option>
+        <option value="Mixed">Mixed</option>
+        </select>
+    </div>
+    </div>
+
+    <!-- Orders Data Table -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <th class="py-3.5 px-4">Order Details</th>
+            <th class="py-3.5 px-4">Client</th>
+            <th class="py-3.5 px-4">Assigned Tailor</th>
+            <!-- <th class="py-3.5 px-4">Type</th> -->
+            <th class="py-3.5 px-4">Items</th>
+            <th class="py-3.5 px-4">Amount</th>
+            <th class="py-3.5 px-4">Due Date</th>
+            <th class="py-3.5 px-4">Status</th>
+            <th class="py-3.5 px-4 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+            @for (order of filteredOrders(); track order._id) {
+            <tr class="hover:bg-slate-50/80 transition-colors group">
+                
+                <!-- Order ID & Date -->
+                <td class="py-3.5 px-4">
+                <div class="font-bold text-slate-900 group-hover:text-[#F1641D] transition-colors cursor-pointer" (click)="navigateToDetails(order._id)">
+                    #{{ order.orderId }}
+                </div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Placed {{ order.createdAt | date:'medium' }}</div>
+                </td>
+
+                <!-- Client Profile -->
+                <td class="py-3.5 px-4">
+                <div class="flex items-center space-x-2.5">
+                    <div>
+                        <div class="font-bold text-slate-800">{{ order.client?.firstname + '' + order.client?.lastname  }}</div>
+                        <div class="text-[10px] text-slate-400">{{ order.client?.phoneNo }}</div>
+                    </div>
+                </div>
+                </td>
+
+                <!-- Assigned Tailor -->
+                <td class="py-3.5 px-4">
+                <div class="flex items-center space-x-2">
+                    @if(!order.tailor.profilePic){
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-500/20 shrink-0">
+                        {{ order.tailor.firstname[0] }}
+                    </div>}@else{
+                        <img [src]="order.tailor.avatar" [alt]="order.tailor.fullname" class="w-6 h-6 rounded-full object-cover">
+                    }
+                    <span class="font-medium text-slate-700">{{ order.tailor.fullname }}</span>
+                </div>
+                </td>
+
+                <!-- Order Type Badge -->
+                <!-- <td class="py-3.5 px-4">
+                <span [class]="getOrderTypeBadgeClass(order.type)" class="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight inline-block border">
+                    {{ order.type }}
+                </span>
+                </td> -->
+
+                <!-- Items Count -->
+                <td class="py-3.5 px-4">
+                <span class="font-semibold text-slate-800">{{ order.styles.length }} {{ order.styles.length === 1 ? 'item' : 'items' }}</span>
+                <div class="text-[10px] text-slate-400 truncate max-w-[120px]">{{ getItemSummaryNames(order) }}</div>
+                </td>
+
+                <!-- Amount & Payment Status -->
+                <td class="py-3.5 px-4">
+                <div class="font-black text-slate-900">\${{ order.totalAmount | number:'1.2-2' }}</div>
+                <span class="text-[10px] font-semibold" [class]="order.paid ? 'text-emerald-600' : 'text-amber-600'">
+                    {{ order.paid ? 'PAID' : 'NOT PAID' }}
+                </span>
+                </td>
+
+                <!-- Due Date -->
+                <td class="py-3.5 px-4">
+                <div class="font-medium text-slate-700">{{ order.dueDate }}</div>
+                </td>
+
+                <!-- Status Pill -->
+                <td class="py-3.5 px-4">
+                <span [class]="getStatusBadgeClass(order?.status)" class="px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center space-x-1 border">
+                    <span class="w-1.5 h-1.5 rounded-full" [class]="getStatusDotClass(order?.status)"></span>
+                    <span>{{ order.status }}</span>
+                </span>
+                </td>
+
+                <!-- Action Button -->
+                <td class="py-3.5 px-4 text-right">
+                <button 
+                    (click)="navigateToDetails(order._id)"
+                    class="px-3 py-1.5 bg-slate-100 hover:bg-[#FFF3ED] hover:text-[#D44E0C] text-slate-700 font-bold text-xs rounded-lg transition-all inline-flex items-center space-x-1">
+                    <span>View Details</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                </td>
+
+            </tr>
+            } @empty {
+            <!-- Empty State -->
+            <tr>
+                <td colspan="9" class="py-12 text-center text-slate-400">
+                <svg class="w-12 h-12 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                <p class="text-sm font-semibold">No orders match your search filters.</p>
+                <button (click)="resetFilters()" class="mt-2 text-xs text-[#F1641D] font-bold underline hover:text-[#D44E0C]">Reset filters</button>
+                </td>
+            </tr>
+            }
+        </tbody>
+        </table>
+    </div>
+
+    <!-- Table Footer / Pagination Info -->
+    <div class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <div>Showing <span class="font-bold text-slate-700">{{ filteredOrders().length }}</span> of <span class="font-bold text-slate-700">{{ orders().length }}</span> active commissions</div>
+        <div class="flex space-x-2">
+        <button class="px-2.5 py-1 border border-slate-200 bg-white rounded hover:bg-slate-50 font-medium disabled:opacity-50" disabled>Previous</button>
+        <button class="px-2.5 py-1 border border-slate-200 bg-white rounded hover:bg-slate-50 font-medium">Next</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Simple Interactive Toast Notification -->
+    @if (toastMessage()) {
+        <div class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center space-x-3 z-50 animate-bounce">
+        <svg class="w-5 h-5 text-[#F1641D]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-xs font-semibold">{{ toastMessage() }}</span>
+        </div>
+    }
+</div>

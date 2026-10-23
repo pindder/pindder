@@ -15,7 +15,7 @@ export interface GalleryItem {
 }
 
 export interface IPlan {
-  _id: string;
+  _id?: string;
   name: string;
   description?: string;
   amount: number;
@@ -24,10 +24,9 @@ export interface IPlan {
   isPopular?: boolean;
   recommended:boolean;
   free: boolean;
-  buttonText?: string;
-  plan_id: number;
-  plan_code: string;
-  metadata: any;
+  plan_id?: number;
+  plan_code?: string;
+  metadata?: any;
 }
 
 export interface IBankDetail {

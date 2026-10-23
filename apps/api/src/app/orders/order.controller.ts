@@ -40,7 +40,7 @@ export class OrderController {
   @UseGuards(AuthGuard)
   @Get()
   findAll(@Query('status') status: string, @Req() req: any) {
-    return this.orderService.findAll(req.user.sub, status);
+    return this.orderService.findAll(req.user, status);
   }
 
   @UseGuards(AuthGuard)

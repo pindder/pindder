@@ -5,6 +5,8 @@ export interface IVerification {
 export interface ILogin {
   email: string;
   password: string;
+  rememberMe?: boolean;
+  phone?: string; 
 }
 
 export interface TailorReg {
@@ -17,6 +19,7 @@ export interface TailorReg {
 }
 
 export interface IProfile {
+  fullname?: string;
   firstname?: string;
   lastname?: string;
   address?: string;
@@ -26,6 +29,8 @@ export interface IProfile {
   username?: string;
   status?: string;
   subscription?: any;
+  profileImg?: string;
+  roles?: string[]
 }
 
 export const countries = [

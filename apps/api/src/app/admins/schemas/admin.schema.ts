@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory, } from '@nestjs/mongoose';
+import { AccountStatus, AdminRoles } from '@pindder/contracts';
 import { HydratedDocument } from 'mongoose';
 
 export type AdminDocument = HydratedDocument<Admin>;
@@ -14,28 +15,34 @@ export class Admin {
     @Prop({ type: String, required: true })
     lastname!: string;
 
-    @Prop({ type: String, required: true })
+    @Prop({ type: String, required: true, unique: true, index: true })
     email!: string;
 
-    @Prop({ type: String, required: true })
-    phoneNo!: string;
+    @Prop({ type: String, default: null })
+    countryCode?: string;
 
-    @Prop({ type: String, required: true })
-    role!: string;
+    @Prop({ type: String, default: null })
+    tel?: string;
 
-    @Prop({ type: String, required: true, enum: [] })
+    @Prop({ type: String })
+    formattedPhoneNo?: string;
+
+    @Prop({ type: [String], required: true, enum: AdminRoles })
+    roles!: string[];
+
+    @Prop({ type: String, required: true, enum: AccountStatus, default: AccountStatus.PENDING })
     status!: string;
 
-    @Prop({ type: String })
+    @Prop({ type: String, default: null })
     country?: string;
 
-    @Prop({ type: String })
+    @Prop({ type: String, default: null })
     state?: string;
 
-    @Prop({ type: String })
+    @Prop({ type: String, default: null })
     postalCode?: string;
 
-    @Prop({ type: String, required: true, minLength: 12, maxLength: 32 })
+    @Prop({ type: String, required: true })
     password!: string;
 }
 

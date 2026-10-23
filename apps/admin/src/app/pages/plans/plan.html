@@ -1,0 +1,243 @@
+<div class="space-y-6">
+    <!-- Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Packages Overview</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Welcome back, Awele. Here is what is happening today.</p>
+        </div>
+        
+        <!-- Package Filters and Search -->
+        <div class="flex gap-2">
+            <div class="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-700/50 p-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <div class="relative w-full sm:w-64">
+                        <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input
+                        type="text"
+                        placeholder="Search package name..."
+                        [value]="packageSearchQuery()"
+                        (input)="updatePackageSearch($event)"
+                        class="w-full text-slate-800 text-xs pl-9 pr-4 py-2 rounded-xl focus:outline-none focus:ring-pindder"
+                        />
+                    </div>
+                </div>
+            </div>
+            <button 
+                type="button" 
+                (click)="openModal()"
+                class="bg-pindder-primary text-white font-semibold px-4 py-2.5 rounded-xl shadow-md transition-transform active:scale-95 text-xs sm:text-sm flex items-center space-x-2 self-start sm:self-auto cursor-pointer"
+            >
+                <i class="ri-add-fill text-md"></i>
+                <span>Add Package</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Available Tailoring Packages Card Grid View -->
+
+    <!-- Packages Card Grid -->
+    @if (filteredPackages().length === 0) {
+        <div class="border border-slate-300/60 rounded-2xl p-12 text-center text-slate-400">
+        <p class="text-base font-medium text-slate-900">No tailoring packages matched your search criteria.</p>
+        <p class="text-xs text-slate-500 mt-1">Try switching categories or clearing your search term.</p>
+        </div>
+    } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (pkg of filteredPackages(); track pkg._id) {
+            <div class="rounded-2xl overflow-hidden shadow-xl hover:border-pindder/50 transition-all flex flex-col justify-between group relative">
+            <!-- Image and Badges Header -->
+            <div class="relative h-48 w-full overflow-hidden bg-pindder-primary">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/30 to-transparent"></div>
+                
+                <!-- Category & Badge Tags -->
+                <div class="absolute top-3 left-3 flex items-center space-x-2">
+                    <span class="px-2.5 py-1 bg-slate-900/80 backdrop-blur-md border border-slate-700 text-slate-200 text-xs font-semibold rounded-lg">
+                        {{ pkg.name }}
+                    </span>
+                </div>
+
+                <!-- Active Orders Badge -->
+                <div class="absolute bottom-3 right-3 bg-slate-900/90 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-300 flex items-center space-x-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>{{ pkg.amount > 0 ? pkg.amount : 'No'}} active subscriptions</span>
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                <div class="flex items-baseline justify-between mb-2">
+                    <h3 class="text-lg font-bold text-pindder-primary group-hover:text-pindder transition-colors">{{ pkg.name }}</h3>
+                </div>
+
+                <p class="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+                    {{ pkg.description }}
+                </p>
+
+                <!-- Key Details Specs -->
+                <div class="grid grid-cols-2 gap-2 bg-pindder-primary-fade p-3 rounded-xl border border-slate-700/50 mb-5">
+                    <div class="flex items-center space-x-2 text-xs text-slate-800">
+                        <svg class="w-4 h-4 text-pindder" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>{{ pkg.interval }} {{ pkg.free ? '' : 'Days Turnaround' }}</span>
+                    </div>
+                </div>
+
+                <!-- Feature List -->
+                <div class="space-y-2 mb-6">
+                    <div class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Package Inclusions:</div>
+                    @for (feat of pkg.features; track feat) {
+                    <div class="flex items-start space-x-2 text-xs text-slate-400">
+                        <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span>{{ feat }}</span>
+                    </div>
+                    }
+                </div>
+                </div>
+
+                <!-- Price and Action CTA -->
+                <div class="pt-4 border-t border-slate-700/60 flex items-center justify-between">
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Standard Price</div>
+                    <div class="flex items-baseline space-x-2">
+                    <span class="text-xl font-extrabold text-pindder-primary-shade">${{ pkg.amount.toLocaleString() }}</span>
+                    @if (pkg.amount) {
+                        <span class="text-xs line-through text-slate-500">${{ pkg.amount.toLocaleString() }}</span>
+                    }
+                    </div>
+                </div>
+
+                <button
+                    (click)="openModal(pkg)"
+                    class="px-4 py-2 bg-pindder-primary hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-pindder/20 flex items-center space-x-1.5"
+                >
+                    <i class="ri-pencil-line"></i>
+                    <span>Edit Package</span>
+                </button>
+                </div>
+            </div>
+            </div>
+        }
+        </div>
+    }
+</div>
+
+<!-- ================= NEW PLAN MODAL ================= -->
+@if(displayModal() === true){
+<div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+    <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <div class="flex items-center space-x-2">
+        <div 
+            class="w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold bg-pindder-primary"
+        >
+            <i class="ri-user-add-line text-lg"></i>
+        </div>
+        <h3 class="font-bold text-slate-900 text-sm">Add Package</h3>
+        </div>
+        <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
+        <i class="ri-close-fill text-pindder-primary text-xl"></i>
+        </button>
+    </div>
+
+    <form #planForm="ngForm" (ngSubmit)="submitPlan()" class="p-6 space-y-4">
+        <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Name</label>
+        <input 
+            type="text" 
+            name="name"
+            [ngModel]="package()?.name"
+            [disabled]="package()?.free!"
+            (ngModelChange)="package.update(p => p ? {...p, name: $event} : null)"
+            placeholder="e.g Basic" 
+            class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none"
+        >
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Description</label>
+            <textarea 
+            name="description"
+            [ngModel]="package()?.description"
+            (ngModelChange)="package.update(p => p ? {...p, description: $event} : null)"
+            rows="5"
+            placeholder="Enter a brief description for this plan....."
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white outline-none cursor-pointer"
+            ></textarea>
+        </div>
+
+        <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Amount</label>
+        <input 
+            type="number"
+            [min]="package()?.free === true ? 0 : 500" 
+            [ngModel]="package()?.amount"
+            [disabled]="package()?.free!"
+            (ngModelChange)="package.update(p => p ? {...p, amount: $event} : null)"
+            name="amount"
+            placeholder="500" 
+            class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:outline-none"
+        >
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Interval</label>
+            <select 
+            name="interval"
+            [ngModel]="package()?.interval"
+            (ngModelChange)="package.update(p => p ? {...p, interval: $event} : null)"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white outline-none cursor-pointer"
+            >
+            <option value="monthly">monthly</option>
+            <option value="quarterly">quarterly</option>
+            <option value="yearly">yearly</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Features</label>
+            <textarea 
+            name="features"
+            [ngModel]="features()"
+            (ngModelChange)="features.set($event)"
+            rows="5"
+            placeholder="Enter feature list and seperate using comma,"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white outline-none cursor-pointer"
+            ></textarea>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <input 
+                type="checkbox" 
+                class="w-4 h-4 rounded accent-[#F1641D] cursor-pointer"
+                [ngModel]="package()?.recommended" 
+                (ngModelChange)="package.update(p => p ? { ...p, recommended: $event } : null)"
+                name="recommended"
+            /> 
+            <span class="text-xs">Recommended</span>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end space-x-3 border-t border-slate-100">
+        <button 
+            type="button" 
+            (click)="closeModal()" 
+            class="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold rounded-xl cursor-pointer"
+        >
+            Cancel
+        </button>
+        <button 
+            type="submit" 
+            [disabled]="planForm.invalid"
+            class="text-white bg-pindder-primary font-semibold px-4 py-2 text-xs rounded-xl shadow-xs transition disabled:opacity-50 cursor-pointer"
+        >
+            Save
+        </button>
+        </div>
+    </form>
+    </div>
+</div>}

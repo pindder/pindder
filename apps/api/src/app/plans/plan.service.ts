@@ -25,9 +25,9 @@ export class PlanService {
     @InjectModel(Plan.name) private readonly planModel: Model<Plan>
   ) {}
 
-  async create(createPlanDto: CreatePlanDto) {
+  async create(createPlanDto: CreatePlanDto, type?: string) {
     try {
-      const { features, recommended, ...planDto} = createPlanDto
+      const { features, recommended, free, ...planDto} = createPlanDto
 
       if(features.length < 2) {
         throw new BadRequestException(`A plan must have at least two features`);
@@ -35,12 +35,13 @@ export class PlanService {
 
       let newPlan = new this.planModel();
 
-      if(createPlanDto.amount < 100) {
+      if(type || createPlanDto.amount < 100) {
         const freePlan = await this.planModel.findOne({ free: true });
 
         if(freePlan) {
           throw new ConflictException(`You can have only one free plan!`);
         }
+        
         newPlan.name = createPlanDto.name;
         newPlan.interval = createPlanDto.interval;
         newPlan.plan_id = 1;
@@ -55,6 +56,8 @@ export class PlanService {
       } else {
         const amountInKobo = createPlanDto.amount * 100;
 
+        if(free) createPlanDto.free = free;
+        
         const response = await firstValueFrom(
           this.httpService.post(
             `${this.url}/plan`, 

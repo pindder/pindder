@@ -1,5 +1,7 @@
-import { IClient } from "./client.types";
+import { ITailor } from "./admin.interfaces";
+import { IClient, IMeasurement } from "./client.types";
 import { IColors, ISpecification } from "./design.types";
+import { PaymentStatus } from "./enum.types";
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -16,7 +18,7 @@ export interface IOrder {
   tailor?: string;
   styles: IOrderStyle[];
   dueDate: string | Date;
-  measurement?: string;
+  measurements?: IMeasurement[];
   address?: string;
   deliveryMethod?: string;
   paymentMethod: string;
@@ -35,7 +37,7 @@ export interface IOrderItem {
   user?: any;
   styles: IOrderStyle[];
   dueDate: string | Date;
-  measurement?: string;
+  measurements?: IMeasurement[];
   address?: string;
   deliveryMethod?: string;
   status: OrderStatus;
@@ -50,13 +52,20 @@ export interface IOrderItem {
 }
 
 export interface IPayment {
+  _id?: string;
   currency?: string;
   idempotencyKey?: string;
   orderId?: string;
   plan_id?: number;
   amount?: number;
   callbackUrl: string; 
+  order?: IOrderItem;
+  tailor?: ITailor;
+  client?: IClient;
+  responsePayload?: any;
   startDate?: string;
+  status?: PaymentStatus;
+  createdAt?: string;
   authorization?: string;
 }
 
@@ -92,3 +101,6 @@ export interface IQuote {
   customer: any;
   order: string;
 }
+
+export type IOrderType = 'Bespoke' | 'Ready to Wear' | 'Mixed';
+export type OrderStatuses = 'Ongoing' | 'Completed' | 'Overdue' | 'Pending' | 'Cancelled';
