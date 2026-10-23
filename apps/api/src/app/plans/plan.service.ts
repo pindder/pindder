@@ -29,10 +29,6 @@ export class PlanService {
     try {
       const { features, recommended, free, ...planDto} = createPlanDto
 
-      if(features.length < 2) {
-        throw new BadRequestException(`A plan must have at least two features`);
-      }
-
       let newPlan = new this.planModel();
 
       if(type || createPlanDto.amount < 100) {
@@ -41,12 +37,21 @@ export class PlanService {
         if(freePlan) {
           throw new ConflictException(`You can have only one free plan!`);
         }
-        
+
         newPlan.name = createPlanDto.name;
         newPlan.interval = createPlanDto.interval;
         newPlan.plan_id = 1;
         newPlan.plan_code = 'PLN_8690x10a83v0312';
-        newPlan.features = features;
+        newPlan.features = [
+          'Maximum of 10 catalog', 
+          'Maximum of 3 style images per catalog', 
+          'Maximum of 25 orders', 
+          'Maximum of 25 clients', 
+          'Maximum of 2 measurements per client', 
+          'Maximum of 1 withdrawal account', 
+          'No access to Logistic service', 
+          'No visibility on pindder marketplace'
+        ];
         newPlan.free = true;
         newPlan.amount = createPlanDto.amount;
         if(createPlanDto.description) newPlan.description = createPlanDto.description; 
@@ -54,8 +59,11 @@ export class PlanService {
 
         await newPlan.save();
       } else {
-        const amountInKobo = createPlanDto.amount * 100;
+        if(features.length < 2) {
+          throw new BadRequestException(`A plan must have at least two features`);
+        }
 
+        const amountInKobo = createPlanDto.amount * 100;
         if(free) createPlanDto.free = free;
         
         const response = await firstValueFrom(
