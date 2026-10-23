@@ -1,0 +1,86 @@
+<div class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-3xl w-full p-6 md:p-8 shadow-2xl relative my-8">
+    <!-- Modal Header -->
+    <div class="flex justify-between items-start pb-6 border-b border-slate-800">
+        <div>
+        <div class="flex items-center space-x-3">
+            <h2 class="text-xl font-bold text-white">Payment Detail Ledger</h2>
+            <span class="px-2.5 py-0.5 bg-pindder/10 text-pindder border border-pindder/20 rounded-full text-xs font-mono font-semibold">
+            {{ payment()?.order?.orderId }}
+            </span>
+        </div>
+        <p class="text-xs text-slate-400 mt-1">
+            Transaction Ref: <span class="font-mono text-slate-300">{{ payment()?.responsePayload.reference }}</span>
+        </p>
+        </div>
+        <button
+        (click)="goBack()"
+        class="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-xl border border-slate-700"
+        >
+        ✕
+        </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="py-6 space-y-6">
+        <!-- Client & Tailor Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-800/40 p-4 rounded-2xl border border-slate-700/60">
+        <div class="flex items-center space-x-3">
+            <img [src]="payment()?.order?.client?.firstname[0]" alt="" class="w-10 h-10 rounded-full" />
+            <div>
+            <div class="text-xs text-slate-400 uppercase font-semibold">Client</div>
+            <div class="text-sm font-bold text-white">{{ payment()?.order?.client?.fullname }}</div>
+            <div class="text-xs text-slate-400">{{ payment()?.order?.client?.email }}</div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3 border-t md:border-t-0 md:border-l border-slate-700 pt-3 md:pt-0 md:pl-4">
+            <img [src]="payment()?.order?.tailor.profileImg" alt="{{ payment()?.order?.tailor?.fullname }}" class="w-10 h-10 rounded-full" />
+            <div>
+            <div class="text-xs text-slate-400 uppercase font-semibold">Assigned Tailor</div>
+            <div class="text-sm font-bold text-white">{{ payment()?.order?.tailor?.fullname }}</div>
+            <div class="text-xs text-pindder font-medium">{{ payment()?.order?.tailor?.email }}</div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Financial Breakdown Table -->
+        <div>
+        <h4 class="text-xs font-semibold uppercase text-slate-400 mb-3">Itemized Quotation Breakdown</h4>
+        <div class="bg-slate-800/60 rounded-xl border border-slate-700/60 p-4 space-y-2 text-sm">
+            <div class="flex justify-between text-slate-300">
+                <span>Base Tailoring Fee</span>
+                <span>\${{ payment()?.amount?.toLocaleString() }}</span>
+            </div>
+            <div class="border-t border-slate-700 pt-2 flex justify-between font-bold text-white text-base">
+            <span>Total Agreed Price</span>
+            <span class="text-pindder">${{ payment()?.amount?.toLocaleString() }}</span>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Modal Actions -->
+    <div class="flex items-center justify-between pt-6 border-t border-slate-800">
+        <div class="text-xs text-slate-400">
+            Method: <span class="text-white font-medium">{{ payment()?.order?.paymentMethod }}</span>
+        </div>
+        <div class="flex space-x-3">
+            <button
+                (click)="downloadReceipt(payment()?._id!)"
+                class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2"
+            >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                <span>Download Receipt</span>
+            </button>
+            <button
+                (click)="selectedOrderSignal.set(null)"
+                class="px-4 py-2 bg-pindder hover:opacity-90 text-white rounded-xl text-xs font-semibold transition-all"
+            >
+                Close Ledger
+            </button>
+        </div>
+    </div>
+    </div>
+</div>

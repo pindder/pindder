@@ -52,6 +52,7 @@ export class NewClient implements ViewWillEnter{
     referee: '',
     gender: '',
     address: '',
+    
   };
 
   genders: string[] = Object.keys(Gender);

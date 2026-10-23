@@ -1,10 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument, Types } from "mongoose";
 import { Order } from "../../orders/schemas/order.schema";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
 import { PaymentStatus, PaymentTypes } from "@pindder/contracts";
-import { UserSnapshot } from "../../users/schemas/user.schema";
-import { ClientSnapshot } from "../../clients/schemas/client.schema";
 import { Subscription } from "../../subscriptions/schemas/subscription.schema";
 
 export type PaymentDocument = HydratedDocument<Payment>;
@@ -22,12 +19,6 @@ export class Payment {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Subscription })
     subscription?: Types.ObjectId;
-
-    @Prop({ type: () => TailorSnapshot })
-    tailor!: TailorSnapshot;
-
-    @Prop({ type: () => UserSnapshot || ClientSnapshot })
-    client!: UserSnapshot | ClientSnapshot;
 
     @Prop({ required: true, type: Number })
     amount!: number;

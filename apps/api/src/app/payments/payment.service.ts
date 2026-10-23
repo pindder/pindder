@@ -60,7 +60,7 @@ export class PaymentService {
       const order = orderDoc?.toObject();
       
       // 4. Extract tailor details from order object into a variable
-      const tailor = order.tailor;
+      //const tailor = order.tailor;
 
       // 5. Extract client information from order and assign to variable declared above
       const client = order.client || order?.user;
@@ -118,8 +118,6 @@ export class PaymentService {
         amount: order.totalAmount,
         currency: 'NGN',
         status: PaymentStatus.PROCESSING,
-        client: client,
-        tailor: tailor,
         order: order._id,
         paymentType: PaymentTypes.ORDER
       });
@@ -205,7 +203,6 @@ export class PaymentService {
         amount: createPaymentDto.amount,
         currency: 'NGN',
         status: PaymentStatus.PROCESSING,
-        tailor: user,
         paymentType: PaymentTypes.SUBSCRIPTION,
         subscription: sub_id
       });

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { BrandModule } from '../brands/brand.module';
 import { UserModule } from '../users/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientModule } from '../clients/client.module';
@@ -11,6 +10,7 @@ import { TokenModule } from '../tokens/token.module';
 import { SharedModule } from '../shared/shared.module';
 import { PaymentModule } from '../payments/payment.module';
 import { SubscriptionModule } from '../subscriptions/subscription.module';
+import { AdminModule } from '../admins/admin.module';
 
 @Module({
   imports: [
@@ -24,10 +24,10 @@ import { SubscriptionModule } from '../subscriptions/subscription.module';
         verifyOptions: { ignoreExpiration: false },
       })
     }),
+    AdminModule,
     ClientModule,
     UserModule, 
     TailorModule,
-    BrandModule,
     TokenModule,
     SharedModule,
     PaymentModule,

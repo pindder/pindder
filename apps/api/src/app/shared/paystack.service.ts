@@ -9,7 +9,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class PaystackService {
-    private readonly paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+    private readonly paystackSecretKey = this.configService.get<string>('PAYSTACK_SECRET_KEY');
     private readonly baseUrl = 'https://api.paystack.co';
     private readonly logger = new Logger(PaystackService.name);
     private headers = {

@@ -80,7 +80,7 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
   order: IOrder = {
     totalAmount: 0,
     dueDate: '',
-    measurement: '',
+    measurements: [],
     totalItems: 0,
     status: OrderStatus.PENDING,
     paymentMethod: '',
@@ -549,7 +549,7 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
       totalItems: totalItems,
       paid: false,
       paymentMethod: this.order.paymentMethod,
-      measurement: this.order.measurement,
+      measurements: this.order.measurements,
       deliveryMethod: this.order.deliveryMethod,
       dueDate: this.order.dueDate,
       status: OrderStatus.PENDING,

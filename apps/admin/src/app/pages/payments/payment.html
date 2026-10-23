@@ -1,0 +1,222 @@
+<div class="space-y-6">
+    <!-- Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Payments Overview</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Welcome back, Awele. Here is what is happening today.</p>
+        </div>
+        
+        <!-- Date filter buttons -->
+        <!-- <div class="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-700/50 p-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+        <button (click)="setTimeRange('7d')" [class.bg-white]="timeRange() === '7d'" [class.dark:bg-slate-800]="timeRange() === '7d'" [class.shadow-sm]="timeRange() === '7d'" class="px-3 py-1.5 rounded-lg transition-all">7 Days</button>
+        <button (click)="setTimeRange('30d')" [class.bg-white]="timeRange() === '30d'" [class.dark:bg-slate-800]="timeRange() === '30d'" [class.shadow-sm]="timeRange() === '30d'" class="px-3 py-1.5 rounded-lg transition-all">30 Days</button>
+        <button (click)="setTimeRange('90d')" [class.bg-white]="timeRange() === '90d'" [class.dark:bg-slate-800]="timeRange() === '90d'" [class.shadow-sm]="timeRange() === '90d'" class="px-3 py-1.5 rounded-lg transition-all">Year</button>
+        </div> -->
+    </div>
+
+
+    <div>
+        <!-- Metrics Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+            <div class="bg-pindder-primary p-5 rounded-2xl">
+            <div class="flex justify-between items-center text-white mb-2 text-sm font-medium">
+                <span>Collected Revenue</span>
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="text-2xl font-bold text-white">${{ metrics().totalRevenueCollected.toLocaleString() }}</div>
+            <div class="text-xs text-white mt-1 flex items-center">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Settled from all clients
+            </div>
+            </div>
+
+            <div class="bg-pindder-primary/10 border border-pindder-primary p-5 rounded-2xl">
+            <div class="flex justify-between items-center text-slate-400 mb-2 text-sm font-medium">
+                <span>Pending Payments</span>
+                <svg class="w-4 h-4 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="text-2xl font-bold text-slate-800">${{ metrics().totalPendingBalance.toLocaleString() }}</div>
+            <div class="text-xs text-amber-400 mt-1 flex items-center">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Processing transactions
+            </div>
+            </div>
+
+            <div class="bg-pindder-primary/10 border border-pindder-primary p-5 rounded-2xl">
+            <div class="flex justify-between items-center text-slate-400 mb-2 text-sm font-medium">
+                <span>Completed Payments</span>
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="text-2xl font-bold text-slate-800">{{ metrics().completedPaymentsCount }}</div>
+            <div class="text-xs text-slate-400 mt-1">100% Fully paid</div>
+            </div>
+
+            <div class="bg-red-500/20 border border-red-700/60 p-5 rounded-2xl">
+            <div class="flex justify-between items-center text-slate-400 mb-2 text-sm font-medium">
+                <span>Cancelled Payments</span>
+                <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="text-2xl font-bold text-slate-800">{{ metrics().cancelledPaymentsCount }}</div>
+            <div class="text-xs text-rose-400 mt-1">Refunded or abandoned</div>
+            </div>
+        </div>
+
+        <!-- Filter and Search Toolbar -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <!-- Tab Filters -->
+            <div class="flex bg-slate-200/80 p-1 rounded-xl w-full md:w-auto">
+            <button
+                (click)="statusTab.set('ALL')"
+                [class]="statusTab() === 'ALL' ? 'bg-pindder text-white shadow' : 'text-slate-400 hover:text-pindder-primary'"
+                class="flex-1 md:flex-none px-4 py-2 text-xs md:text-sm font-semibold rounded-lg transition-all flex items-center justify-center space-x-2"
+            >
+                <span>All Payments</span>
+                <span class="px-1.5 py-0.5 text-xs rounded-full bg-slate-700 text-slate-300">
+                {{ metrics().totalCount }}
+                </span>
+            </button>
+            <button
+                (click)="statusTab.set('PROCESSING')"
+                [class]="statusTab() === 'PROCESSING' ? 'bg-pindder text-white shadow' : 'text-slate-400 hover:text-pindder-primary'"
+                class="flex-1 md:flex-none px-4 py-2 text-xs md:text-sm font-semibold rounded-lg transition-all flex items-center justify-center space-x-2"
+            >
+                <span>Pending</span>
+                <span class="px-1.5 py-0.5 text-xs rounded-full bg-slate-700 text-slate-300">
+                {{ metrics().pendingPaymentsCount }}
+                </span>
+            </button>
+            <button
+                (click)="statusTab.set('SUCCESS')"
+                [class]="statusTab() === 'SUCCESS' ? 'bg-pindder text-white shadow' : 'text-slate-400 hover:text-pindder-primary'"
+                class="flex-1 md:flex-none px-4 py-2 text-xs md:text-sm font-semibold rounded-lg transition-all flex items-center justify-center space-x-2"
+            >
+                <span>Completed</span>
+                <span class="px-1.5 py-0.5 text-xs rounded-full bg-slate-700 text-slate-300">
+                {{ metrics().completedPaymentsCount }}
+                </span>
+            </button>
+            <button
+                (click)="statusTab.set('ABANDONED')"
+                [class]="statusTab() === 'ABANDONED' ? 'bg-pindder text-white shadow' : 'text-slate-400 hover:text-pindder-primary'"
+                class="flex-1 md:flex-none px-4 py-2 text-xs md:text-sm font-semibold rounded-lg transition-all flex items-center justify-center space-x-2"
+            >
+                <span>Cancelled</span>
+                <span class="px-1.5 py-0.5 text-xs rounded-full bg-slate-700 text-slate-300">
+                {{ metrics().cancelledPaymentsCount }}
+                </span>
+            </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-80">
+            <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input
+                type="text"
+                placeholder="Search by ID, client, tailor or txn..."
+                [value]="searchQuery()"
+                (input)="updateSearch($event)"
+                class="w-full bg-slate-200/80 text-sm pl-10 pr-4 py-2 rounded-xl focus:outline-none focus:ring-pindder"
+            />
+            </div>
+        </div>
+
+        <!-- Payments List Table -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    <th class="px-6 py-4">Order & Txn Ref</th>
+                    <th class="px-6 py-4">Client</th>
+                    <th class="px-6 py-4">Assigned Tailor</th>
+                    <th class="px-6 py-4">Amount</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/60">
+                @if (payments().length === 0) {
+                    <tr>
+                    <td colSpan="7" class="text-center py-12 text-slate-400">
+                        No payment records found matching your filters.
+                    </td>
+                    </tr>
+                } @else {
+                    @for (payment of payments(); track payment._id) {
+                    <tr class="border-b border-slate-200 hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
+                        <td class="px-6 py-4 font-medium text-white">
+                        <div class="font-semibold text-pindder">{{ payment.responsePayload.reference }}</div>
+                        <!-- <div class="text-xs text-slate-400 font-mono mt-0.5">{{ payment.responsePayload.reference }}</div> -->
+                        </td>
+                        <td class="px-6 py-4">
+                        <div class="flex items-center space-x-3">
+                            <div>
+                            <div class="text-slate-900 dark:text-white font-medium">{{ payment.client?.firstname + ' ' + payment.client?.lastname }}</div>
+                            <div class="text-xs text-slate-400">{{ payment.client?.email }}</div>
+                            </div>
+                        </div>
+                        </td>
+                        <td class="px-6 py-4">
+                        <div class="text-slate-900 dark:text-white font-medium">{{ payment.tailor?.fullname }}</div>
+                        <div class="text-xs text-slate-400">{{ payment.tailor?.email }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                        <div class="text-emerald-400 font-medium">${{ payment.amount?.toLocaleString() }} paid</div>
+                        </td>
+                        <td class="px-6 py-4">
+                        <span [class]="getStatusClass(payment?.status!)" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold">
+                            @if (payment.status! === 'SUCCESS') {
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            }
+                            @if (payment.status! === 'PROCESSING') {
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            }
+                            @if (payment.status === 'ABANDONED') {
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            }
+                            {{ payment.status }}
+                        </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end space-x-2">
+                            <button
+                            (click)="navigateToPayment(payment._id!)"
+                            class="cursor-pointer px-3 py-1.5 bg-pindder/10 hover:bg-pindder-primary text-pindder-primary hover:text-white rounded-lg border border-pindder/30 text-xs font-semibold transition-all flex items-center space-x-1"
+                            >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <span>View Details</span>
+                            </button>
+                        </div>
+                        </td>
+                    </tr>
+                    }
+                }
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,392 @@
+<!-- Navigation Breadcrumb & Back button when in Detail Mode -->
+<!-- <div class="flex items-center justify-between pb-4">
+    <div class="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
+    <button (click)="currentView.set('list')" class="hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors">Tailors Directory</button>
+    @if (currentView() === 'detail' && tailor()) {
+        <span>/</span>
+        <span class="text-slate-800 dark:text-slate-200 font-semibold">{{ tailor()?.name }}</span>
+    }
+    </div>
+
+    @if (currentView() === 'detail') {
+    <button 
+        (click)="currentView.set('list')"
+        class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+    >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <span>Back to Directory</span>
+    </button>
+    }
+</div> -->
+
+<!-- VIEW 2: DETAILED TAILOR MANAGEMENT PAGE -->
+@if(tailor()){
+<div class="space-y-6">
+    
+    <!-- Tailor Header Profile Banner -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm relative overflow-hidden">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+        
+        <div class="flex items-center space-x-4">
+            @if(!tailor()?.profileImg){
+            <div class="w-16 h-16 rounded-2xl bg-pindder-primary flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20 shrink-0">
+                <p class="md:text-xl lg:text-5xl">{{ tailor()?.firstname[0] }}</p>
+            </div>}@else{
+                <img [src]="tailor()?.profileImg" [alt]="tailor()?.fullname" class="w-6 h-6 rounded-full object-cover ring-4 ring-indigo-500/20 shadow-md">
+            }
+            <div>
+            <div class="flex items-center space-x-3">
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ tailor()?.fullname }}</h1>
+                <span 
+                [class]="
+                    tailor()?.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                    tailor()?.status === 'suspended' ? 'bg-rose-50 text-rose-600 border-rose-200' :
+                    'bg-amber-50 text-amber-600 border-amber-200'
+                "
+                class="px-2.5 py-0.5 text-xs font-bold rounded-full border uppercase"
+                >
+                {{ tailor()?.status }}
+                </span>
+            </div>
+            <!-- <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">{{ tailor()?.studioName }} • {{ tailor()?.location }}</p> -->
+            <p class="text-xs text-slate-400 mt-1">Joined Pindder: {{ tailor()?.createdAt | date: 'medium' }}</p>
+            </div>
+        </div>
+
+        <!-- Admin Action Toolbar -->
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            
+            <!-- Email Direct Action -->
+            <button 
+            (click)="openEmailModal()"
+            class="px-3.5 py-2 rounded-xl bg-pindder-primary hover:pindder-primary-shade text-white font-semibold text-xs shadow-md shadow-indigo-500/20 flex items-center space-x-1.5 transition-all"
+            >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>Send Mail</span>
+            </button>
+
+            <!-- Suspend/Reactivate Toggle -->
+            <button 
+            (click)="toggleSuspendAccount()"
+            [class]="tailor()?.status === 'suspended' ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-amber-500 hover:bg-amber-400 text-white'"
+            class="px-3.5 py-2 rounded-xl font-semibold text-xs shadow-md flex items-center space-x-1.5 transition-all"
+            >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            <span>{{ tailor()?.status === 'suspended' ? 'Reactivate Account' : 'Suspend Account' }}</span>
+            </button>
+
+            <!-- Delete Account -->
+            <button 
+            (click)="confirmDeleteAccount()"
+            class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow-md shadow-rose-500/20 flex items-center space-x-1.5 transition-all"
+            >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            <span>Delete</span>
+            </button>
+
+        </div>
+
+        </div>
+
+        <!-- Quick Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+        <div>
+            <p class="text-[11px] font-semibold text-slate-400 uppercase">Total Clients</p>
+            <p class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">{{ tailor()?.metrics.totalClients }}</p>
+        </div>
+        <div>
+            <p class="text-[11px] font-semibold text-slate-400 uppercase">Total Orders</p>
+            <p class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">{{ tailor()?.metrics.totalOrders }}</p>
+        </div>
+        <div>
+            <p class="text-[11px] font-semibold text-slate-400 uppercase">Revenue Collected</p>
+            <p class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5">{{ tailor()?.metrics.totalRevenue.toLocaleString() }}</p>
+        </div>
+        <div>
+            <p class="text-[11px] font-semibold text-slate-400 uppercase">Total Referrals</p>
+            <p class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">{{ tailor()?.metrics.totalReferrals }}</p>
+        </div>
+        </div>
+    </div>
+
+    <!-- Tabbed Detail Navigation -->
+    <div class="flex space-x-1 bg-slate-200/80 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
+        <button 
+        (click)="activeTab.set('info')" 
+        [class.bg-white]="activeTab() === 'info'" 
+        [class.dark:bg-slate-800]="activeTab() === 'info'" 
+        [class.text-slate-900]="activeTab() === 'info'" 
+        [class.dark:text-white]="activeTab() === 'info'" 
+        [class.shadow-sm]="activeTab() === 'info'" 
+        class="px-4 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 transition-all whitespace-nowrap"
+        >
+        Profile & Subscription
+        </button>
+        <button 
+        (click)="activeTab.set('clients')" 
+        [class.bg-white]="activeTab() === 'clients'" 
+        [class.dark:bg-slate-800]="activeTab() === 'clients'" 
+        [class.text-slate-900]="activeTab() === 'clients'" 
+        [class.dark:text-white]="activeTab() === 'clients'" 
+        [class.shadow-sm]="activeTab() === 'clients'" 
+        class="px-4 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 transition-all whitespace-nowrap"
+        >
+        Clients Directory ({{ tailor()?.clients?.length }})
+        </button>
+        <button 
+        (click)="activeTab.set('orders')" 
+        [class.bg-white]="activeTab() === 'orders'" 
+        [class.dark:bg-slate-800]="activeTab() === 'orders'" 
+        [class.text-slate-900]="activeTab() === 'orders'" 
+        [class.dark:text-white]="activeTab() === 'orders'" 
+        [class.shadow-sm]="activeTab() === 'orders'" 
+        class="px-4 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 transition-all whitespace-nowrap"
+        >
+        Orders Pipeline ({{ tailor()?.orders?.length }})
+        </button>
+        <button 
+        (click)="activeTab.set('payments')" 
+        [class.bg-white]="activeTab() === 'payments'" 
+        [class.dark:bg-slate-800]="activeTab() === 'payments'" 
+        [class.text-slate-900]="activeTab() === 'payments'" 
+        [class.dark:text-white]="activeTab() === 'payments'" 
+        [class.shadow-sm]="activeTab() === 'payments'" 
+        class="px-4 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 transition-all whitespace-nowrap"
+        >
+        Payments History
+        </button>
+        <button 
+        (click)="activeTab.set('referrals')" 
+        [class.bg-white]="activeTab() === 'referrals'" 
+        [class.dark:bg-slate-800]="activeTab() === 'referrals'" 
+        [class.text-slate-900]="activeTab() === 'referrals'" 
+        [class.dark:text-white]="activeTab() === 'referrals'" 
+        [class.shadow-sm]="activeTab() === 'referrals'" 
+        class="px-4 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 transition-all whitespace-nowrap"
+        >
+        Referrals Network
+        </button>
+    </div>
+
+    <!-- TAB 1: PROFILE & SUBSCRIPTION INFO -->
+    @if (activeTab() === 'info') {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Personal & Studio Info Card -->
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Studio Profile Information</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <span class="text-slate-400 block font-medium">Email Address</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-200">{{ tailor()?.email }}</span>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <span class="text-slate-400 block font-medium">Phone Number</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-200">{{ tailor()?.countryCode + '-' + tailor()?.tel }}</span>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <span class="text-slate-400 block font-medium">Studio Name</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-200">{{ tailor()?.studioName }}</span>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <span class="text-slate-400 block font-medium">Location</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-200">{{ tailor()?.location }}</span>
+                </div>
+                </div>
+            </div>
+
+            <!-- Subscription Status Box -->
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white">Subscription Status</h2>
+                        <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 text-xs font-bold">
+                        {{ tailor()?.subscription.plan.name }}
+                        </span>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
+                        <span class="text-slate-400">Plan Amount</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-200">{{ tailor()?.subscription.plan.amount }}/month</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
+                        <span class="text-slate-400">Status</span>
+                        <span class="font-bold text-emerald-500">{{ tailor()?.subscription.status }}</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-100 dark:border-slate-800">
+                        <span class="text-slate-400">Next Billing Date</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-200">{{ tailor()?.subscription.renewalDate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold text-xs rounded-xl text-slate-800 dark:text-slate-200 transition-colors">
+                Upgrade / Modify Plan
+                </button>
+            </div>
+        </div>
+    }
+
+    <!-- TAB 2: CLIENTS DIRECTORY -->
+    @if (activeTab() === 'clients') {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 class="font-bold text-sm">Clients linked to {{ tailor()?.fullname }}</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+            <thead>
+                <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase text-[10px] bg-slate-50/50 dark:bg-slate-800/40">
+                <th class="p-3.5">Client Name</th>
+                <th class="p-3.5">Contact</th>
+                <th class="p-3.5">Gender</th>
+                <th class="p-3.5">Date  Created</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                @for (client of tailor()?.clients; track client._id) {
+                <tr>
+                    <td class="p-3.5 font-bold text-slate-800 dark:text-slate-200">{{ client.fullname }}</td>
+                    <td class="p-3.5 text-slate-500">{{ client.email }} • {{ client?.phoneNo }}</td>
+                    <td class="p-3.5 font-semibold text-indigo-600 dark:text-indigo-400">{{ client.gender }}</td>
+                    <td class="p-3.5 text-slate-400">{{ client.createdAt | date:'medium' }}</td>
+                </tr>
+                }
+            </tbody>
+            </table>
+        </div>
+        </div>
+    }
+
+    <!-- TAB 3: ORDERS PIPELINE -->
+    @if (activeTab() === 'orders') {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 class="font-bold text-sm">Orders Pipeline</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+            <thead>
+                <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase text-[10px] bg-slate-50/50 dark:bg-slate-800/40">
+                <th class="p-3.5">Order Ref</th>
+                <th class="p-3.5">Client Name</th>
+                <th class="p-3.5">Total Item(s)</th>
+                <th class="p-3.5">Amount</th>
+                <th class="p-3.5">Fulfillment</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                @for (order of tailor()?.orders; track order._id) {
+                <tr>
+                    <td class="p-3.5 font-bold text-slate-900 dark:text-white">{{ order.orderId }}</td>
+                    <td class="p-3.5 font-semibold text-slate-800 dark:text-slate-200">{{ order.client?.firstname + '' + order?.client?.lastname }}</td>
+                    <td class="p-3.5 text-slate-500">{{ order.styles.length }}</td>
+                    <td class="p-3.5 font-bold text-emerald-600 dark:text-emerald-400">{{ order.totalAmount.toLocaleString() }}</td>
+                    <td class="p-3.5">
+                    <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-semibold text-[10px]">
+                        {{ order.status }}
+                    </span>
+                    </td>
+                </tr>
+                }
+            </tbody>
+            </table>
+        </div>
+        </div>
+    }
+
+    <!-- TAB 4: PAYMENTS HISTORY -->
+    @if (activeTab() === 'payments') {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 class="font-bold text-sm">Received Payments & Payout Transactions</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+            <thead>
+                <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase text-[10px] bg-slate-50/50 dark:bg-slate-800/40">
+                <th class="p-3.5">Tx Reference</th>
+                <th class="p-3.5">Client</th>
+                <th class="p-3.5">Amount</th>
+                <th class="p-3.5">Channel</th>
+                <th class="p-3.5">Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                @for (payment of mockPayments; track payment.id) {
+                <tr>
+                    <td class="p-3.5 font-bold text-slate-800 dark:text-slate-200">{{ payment.id }}</td>
+                    <td class="p-3.5 font-semibold text-slate-700 dark:text-slate-300">{{ payment.clientName }}</td>
+                    <td class="p-3.5 font-bold text-slate-900 dark:text-white">{{ payment.amount }}</td>
+                    <td class="p-3.5 text-slate-500">{{ payment.method }}</td>
+                    <td class="p-3.5 text-slate-400">{{ payment.date }}</td>
+                </tr>
+                }
+            </tbody>
+            </table>
+        </div>
+        </div>
+    }
+
+    <!-- TAB 5: REFERRALS NETWORK -->
+    @if (activeTab() === 'referrals') {
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Invited Designers & Referrals</h3>
+            <p class="text-xs text-slate-400">Total earned through referrals: <span class="font-bold text-emerald-500">{{ tailor()?.metrics.referralEarnings }}</span></p>
+            </div>
+        </div>
+
+        <div class="divide-y divide-slate-100 dark:divide-slate-800">
+            @for (ref of mockReferrals; track ref.id) {
+            <div class="py-3 flex items-center justify-between text-xs">
+                <div>
+                <p class="font-bold text-slate-800 dark:text-slate-200">{{ ref.tailorName }}</p>
+                <p class="text-[10px] text-slate-400">Joined {{ ref.joinedDate }}</p>
+                </div>
+                <div class="text-right">
+                <p class="font-bold text-emerald-500">+{{ ref.commissionEarned }}</p>
+                <span class="text-[10px] text-slate-400">{{ ref.status }}</span>
+                </div>
+            </div>
+            }
+        </div>
+        </div>
+    }
+</div>}
+
+<!-- DIRECT MAIL MODAL -->
+@if (showEmailModal() && tailor(); as tailor) {
+<div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 shadow-2xl space-y-4">
+    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h3 class="font-bold text-base text-slate-900 dark:text-white">Send Direct Email</h3>
+        <button (click)="closeEmailModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+    </div>
+
+    <div class="space-y-3 text-xs">
+        <div>
+        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Recipient</label>
+        <input type="text" [value]="tailor.fullname + ' <' + tailor.email + '>'" disabled class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 font-medium" />
+        </div>
+
+        <div>
+        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Subject</label>
+        <input type="text" [(ngModel)]="emailSubject" placeholder="Enter message subject..." class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" />
+        </div>
+
+        <div>
+        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Message Body</label>
+        <textarea rows="4" [(ngModel)]="emailBody" placeholder="Type your email message directly to this tailor..." class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50"></textarea>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-end space-x-2 pt-2">
+        <button (click)="closeEmailModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Cancel</button>
+        <button (click)="sendDirectEmail()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-500 shadow-md">Send Email</button>
+    </div>
+    </div>
+</div>
+}

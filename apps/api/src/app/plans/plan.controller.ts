@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
@@ -16,8 +17,8 @@ export class PlanController {
   constructor(private readonly planService: PlanService) {}
 
   @Post()
-  create(@Body() createPlanDto: CreatePlanDto) {
-    return this.planService.create(createPlanDto);
+  create(@Query('type') type: string, @Body() createPlanDto: CreatePlanDto) {
+    return this.planService.create(createPlanDto, type);
   }
 
   @Get()

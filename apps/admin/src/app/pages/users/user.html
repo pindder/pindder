@@ -1,0 +1,16 @@
+<div class="space-y-6">
+    <!-- Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Users Overview</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Welcome back, Awele. Here is what is happening today.</p>
+        </div>
+        
+        <!-- Date filter buttons -->
+        <div class="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-700/50 p-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+        <button (click)="setTimeRange('7d')" [class.bg-white]="timeRange() === '7d'" [class.dark:bg-slate-800]="timeRange() === '7d'" [class.shadow-sm]="timeRange() === '7d'" class="px-3 py-1.5 rounded-lg transition-all">7 Days</button>
+        <button (click)="setTimeRange('30d')" [class.bg-white]="timeRange() === '30d'" [class.dark:bg-slate-800]="timeRange() === '30d'" [class.shadow-sm]="timeRange() === '30d'" class="px-3 py-1.5 rounded-lg transition-all">30 Days</button>
+        <button (click)="setTimeRange('90d')" [class.bg-white]="timeRange() === '90d'" [class.dark:bg-slate-800]="timeRange() === '90d'" [class.shadow-sm]="timeRange() === '90d'" class="px-3 py-1.5 rounded-lg transition-all">Year</button>
+        </div>
+    </div>
+</div>

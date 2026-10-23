@@ -5,10 +5,13 @@ import { Token } from '../tokens/schemas/token.schema';
 import { AccountTypes, TokenStatus, TokenTypes } from '@pindder/contracts';
 import { generateCode } from './helpers';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 @Global()
 @Injectable()
 export class SharedService {
+    private readonly SALT_ROUNDS = 15;
+
     constructor(@InjectModel(Token.name) private readonly tokenModel: Model<Token>) {}
 
     generateId(): string {
@@ -53,7 +56,7 @@ export class SharedService {
         }
     }
 
-    async createToken(acctType: string, acct_id: any, tokenType?: string) {
+    async createToken(acctType: string, acct_id: any, tokenType = '', token?: string) {
         try {
             const token = new this.tokenModel();
 
@@ -63,7 +66,7 @@ export class SharedService {
             token.accountType = acctType;
 
             if(acctType === AccountTypes.TAILOR) token.tailor = acct_id;
-            if(acctType === AccountTypes.BRAND) token.brand = acct_id;
+            if(acctType === AccountTypes.ADMIN) token.admin = acct_id;
             if(acctType === AccountTypes.USER) token.user = acct_id;
 
             await token.save(); 
@@ -86,5 +89,30 @@ export class SharedService {
         } catch(error) {
             throw new InternalServerErrorException(`${error}`);
         }
+    }
+
+    /**
+   * Hashes a plain-text password using bcrypt with standard salt rounds.
+   * 
+   * @param plainTextPassword The raw password from user input (e.g., registration request)
+   * @returns Promise<string> The generated bcrypt password hash to be saved in DB
+   */
+    async hashPassword(plainTextPassword: string): Promise<string> {
+        const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
+        return bcrypt.hash(plainTextPassword, salt);
+    }
+
+    /**
+   * Compares a candidate plain-text password against a stored bcrypt hash.
+   * 
+   * @param plainTextPassword The login input password to check
+   * @param hashedPassword The stored hash retrieved from the database
+   * @returns Promise<boolean> True if match succeeds, false otherwise
+   */
+    async comparePassword(
+        plainTextPassword: string,
+        hashedPassword: string,
+    ): Promise<boolean> {
+        return bcrypt.compare(plainTextPassword, hashedPassword);
     }
 }

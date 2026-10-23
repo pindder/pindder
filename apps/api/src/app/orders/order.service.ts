@@ -165,16 +165,18 @@ export class OrderService {
     }
   }
 
-  async findAll(user_id: any, status?: string) {
+  async findAll(user: any, status?: string) {
     try {
-      // 1. Build base filter matching user involvement
-      const filter: QueryFilter<Order> = {
-        $or: [
-          { 'tailor._id': user_id },
-          { 'client.id': user_id },
-          { 'user_id': user_id },
-        ]
-      };
+      const filter: QueryFilter<Order> = {};
+
+      if(user.acctType !== AccountTypes.ADMIN) {
+        // 1. Build base filter matching user involvement
+        filter.$or = [
+          { 'tailor._id': user.sub },
+          { 'client.id': user.sub },
+          { 'user_id': user.sub },
+        ];
+      }
 
       // 2. Conditionally attach status filter if present
       if (status) {
@@ -183,6 +185,7 @@ export class OrderService {
 
       const orders = await this.orderModel
       .find(filter)
+      .limit(20)
       .sort({ createdAt: -1 })
       .populate('client')
       .populate('tailor')

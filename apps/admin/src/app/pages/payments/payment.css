@@ -1,0 +1,21 @@
+:host {
+    --primary-color: #F1641D;
+}
+.bg-pindder {
+    background-color: #F1641D;
+}
+.text-pindder {
+    color: #F1641D;
+}
+.border-pindder {
+    border-color: #F1641D;
+}
+.ring-pindder {
+    --tw-ring-color: #F1641D;
+}
+.shadow-pindder {
+    box-shadow: 0 10px 15px -3px rgba(241, 100, 29, 0.3);
+}
+.shadow-pindder {
+    box-shadow: 0 10px 15px -3px rgba(241, 100, 29, 0.2);
+}

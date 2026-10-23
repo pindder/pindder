@@ -9,6 +9,13 @@ export enum AccountStatus {
     PENDING = 'PENDING',
 }
 
+export enum AdminRoles {
+    SUPER_ADMIN = 'SUPER_ADMIN',
+    ADMIN = 'ADMIN',
+    SUPPORT = 'SUPPORT',
+    SUPERVISOR = 'SUPERVISOR'
+}
+
 export enum PaymentStatus {
     PROCESSING = 'PROCESSING',
     SUCCESS = 'SUCCESS',
@@ -52,6 +59,7 @@ export enum Gender {
 }
 
 export enum AccountTypes {
+    ADMIN = "ADMIN",
     TAILOR = "TAILOR",
     BRAND = "BRAND",
     BUSINESS = "BUSINESS",

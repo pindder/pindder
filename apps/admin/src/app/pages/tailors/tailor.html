@@ -1,0 +1,138 @@
+<div class="space-y-6">
+    <!-- Welcome Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+        <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Tailors Overview</h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Manage onboarded bespoke fashion designers, studio subscriptions, and accounts.</p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+        <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900">
+            Total Active Tailors: {{ tailors().length }}
+        </span>
+        </div>
+    </div>
+
+    <!-- TAILORS LIST -->
+
+    <!-- Filters & Search Bar -->
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
+        
+        <div class="relative w-full md:w-80">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </span>
+        <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search by name, studio or email..." 
+            class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-800 dark:text-white"
+        />
+        </div>
+
+        <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+        <!-- Status Filter -->
+        <select 
+            [(ngModel)]="selectedStatusFilter"
+            class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-700 dark:text-slate-200"
+        >
+            <option value="all">All Account Status</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+            <option value="pending">Pending</option>
+        </select>
+
+        <!-- Plan Filter -->
+        <select 
+            [(ngModel)]="selectedPlanFilter"
+            class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-700 dark:text-slate-200"
+        >
+            <option value="all">All Subscription Plans</option>
+            <option value="Basic">Basic Plan</option>
+            <option value="Pro">Pro Plan</option>
+            <option value="Enterprise">Enterprise Plan</option>
+        </select>
+        </div>
+
+    </div>
+
+    <!-- Tailors Table / Grid -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <th class="py-3.5 px-4">Tailor & Studio</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4">Subscription</th>
+                <th class="py-3.5 px-4">Clients</th>
+                <th class="py-3.5 px-4">Revenue</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+            @for (tailor of filteredTailors(); track tailor._id) {
+                <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
+                <td class="py-3.5 px-4">
+                    <div class="flex items-center space-x-3">
+                        @if(!tailor.profileImg){
+                        <div class="w-10 h-10 rounded-2xl bg-pindder-primary flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20 shrink-0">
+                            <p class="text-2xl">{{ tailor.firstname[0] }}</p>
+                        </div>}@else{
+                            <img [src]="tailor.profileImg" [alt]="tailor.fullname" class="w-6 h-6 rounded-full object-cover ring-4 ring-indigo-500/20 shadow-md">
+                        }
+                        <div>
+                            <p class="font-bold text-slate-900 dark:text-white hover:text-indigo-600 transition-colors cursor-pointer" (click)="viewTailorDetails(tailor)">
+                            {{ tailor.fullname }}
+                            </p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400">{{ tailor.email }}</p>
+                            <!-- <p class="text-[11px] text-slate-500 dark:text-slate-400">{{ tailor.studioName }} • {{ tailor.location }}</p> -->
+                        </div>
+                    </div>
+                </td>
+
+                <td class="py-3.5 px-4">
+                    <span 
+                    [class]="
+                        tailor.status === 'ACTIVE' ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900' :
+                        tailor.status === 'suspended' ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900' :
+                        'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900'
+                    "
+                    class="px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider border"
+                    >
+                    {{ tailor.status }}
+                    </span>
+                </td>
+
+                <td class="py-3.5 px-4">
+                    <div>
+                    <p class="font-semibold text-slate-800 dark:text-slate-200">{{ tailor.subscription.plan.name }} Plan</p>
+                    <span class="text-[10px] text-slate-400">{{ tailor.subscription.status }}</span>
+                    </div>
+                </td>
+
+                <td class="py-3.5 px-4 font-semibold text-slate-700 dark:text-slate-300">
+                    {{ tailor.metrics.totalClients }} Clients
+                </td>
+
+                <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                    {{ tailor.metrics.totalRevenue.toLocaleString() }}
+                </td>
+
+                <td class="py-3.5 px-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                    <button 
+                        (click)="viewTailorDetails(tailor)"
+                        class="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-600 dark:text-indigo-300 rounded-lg font-semibold transition-colors"
+                    >
+                        Manage Profile
+                    </button>
+                    </div>
+                </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>

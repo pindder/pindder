@@ -6,4 +6,5 @@ export class CreatePlanDto {
     // Convert Naira to Kobo (multiply by 100)
     amount!: number;
     description?: string;
+    free?: boolean;
 }
