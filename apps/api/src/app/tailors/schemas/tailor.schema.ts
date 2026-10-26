@@ -74,14 +74,8 @@ export class Tailor {
     @Prop({ type: String })
     catalog?: string;
 
-    @Prop({ type: String })
-    oneTimeLoginCode?: string;
-
     @Prop({ type: String, required: true, unique: true, index: true })
     referralCode!: string;
-
-    @Prop({ type: String })
-    website?: string;
 
     @Prop({ type: String, enum: AccountTypes, required: true })
     accountType!: string;

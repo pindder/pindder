@@ -40,7 +40,24 @@ export class AdminService {
   }
 
   async findAll() {
-    return `This action returns all admin`;
+    try {
+      const admins = await this.adminModel.find();
+
+      if(!admins) {
+        throw new NotFoundException(`No admin account was found!`);
+      }
+
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'List of admin accounts!',
+        data: admins
+      };
+
+      return res;
+    } catch(error: any) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async findOne(id: string) {

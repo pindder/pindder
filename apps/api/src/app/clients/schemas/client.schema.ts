@@ -36,7 +36,11 @@ export class ClientSnapshot {
     gender!: string;
 }
 
-@Schema({ timestamps: true })
+@Schema({ 
+    timestamps: true, 
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true } 
+})
 export class Client {
     @Prop({ 
         type: String, 
@@ -82,3 +86,11 @@ export class Client {
 }
 
 export const ClientSchema = SchemaFactory.createForClass(Client);
+
+// 1. Virtual definition for subscription assigned to this tailor
+ClientSchema.virtual('address', {
+    ref: 'address',
+    localField: '_id',
+    foreignField: 'tailor._id', // Uses 'tailor' if referencing ID string, or 'tailor._id' if embedded subdocument
+    justOne: true
+});

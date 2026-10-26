@@ -198,6 +198,7 @@
             <!-- Subscription Status Box -->
             <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 flex flex-col justify-between">
                 <div>
+                    @if(tailor()?.subscription){
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-base font-bold text-slate-900 dark:text-white">Subscription Status</h2>
                         <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 text-xs font-bold">
@@ -218,10 +219,10 @@
                         <span class="text-slate-400">Next Billing Date</span>
                         <span class="font-bold text-slate-800 dark:text-slate-200">{{ tailor()?.subscription.renewalDate }}</span>
                         </div>
-                    </div>
+                    </div>}
                 </div>
 
-                <button class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold text-xs rounded-xl text-slate-800 dark:text-slate-200 transition-colors">
+                <button (click)="openPlanAssignmentModal()" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold text-xs rounded-xl text-slate-800 dark:text-slate-200 transition-colors">
                 Upgrade / Modify Plan
                 </button>
             </div>
@@ -270,7 +271,7 @@
             <thead>
                 <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase text-[10px] bg-slate-50/50 dark:bg-slate-800/40">
                 <th class="p-3.5">Order Ref</th>
-                <th class="p-3.5">Client Name</th>
+                <th class="p-3.5">Client</th>
                 <th class="p-3.5">Total Item(s)</th>
                 <th class="p-3.5">Amount</th>
                 <th class="p-3.5">Fulfillment</th>
@@ -280,7 +281,7 @@
                 @for (order of tailor()?.orders; track order._id) {
                 <tr>
                     <td class="p-3.5 font-bold text-slate-900 dark:text-white">{{ order.orderId }}</td>
-                    <td class="p-3.5 font-semibold text-slate-800 dark:text-slate-200">{{ order.client?.firstname + '' + order?.client?.lastname }}</td>
+                    <td class="p-3.5 font-semibold text-slate-800 dark:text-slate-200">{{ order.client?.firstname | titlecase }} {{ order?.client?.lastname | titlecase }}</td>
                     <td class="p-3.5 text-slate-500">{{ order.styles.length }}</td>
                     <td class="p-3.5 font-bold text-emerald-600 dark:text-emerald-400">{{ order.totalAmount.toLocaleString() }}</td>
                     <td class="p-3.5">
@@ -390,3 +391,56 @@
     </div>
 </div>
 }
+
+<!-- ================= PLAN UPGRADE MODAL ================= -->
+@if(displayModal() === true){
+<div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+    <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <div class="flex items-center space-x-2">
+        <div 
+            class="w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold bg-pindder-primary"
+        >
+            <i class="ri-user-add-line text-lg"></i>
+        </div>
+        <h3 class="font-bold text-slate-900 text-sm">Upgrade Package</h3>
+        </div>
+        <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
+        <i class="ri-close-fill text-pindder-primary text-xl"></i>
+        </button>
+    </div>
+
+    <form #planForm="ngForm" (ngSubmit)="assignPlan()" class="p-6 space-y-4">
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Interval</label>
+            <select 
+            name="plan"
+            [ngModel]="selectedPackageId()"
+            (ngModelChange)="selectedPackageId.set($event)"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white outline-none cursor-pointer"
+            >
+            @for(package of packages(); track package._id){
+                <option [value]="package._id">{{ package.name }}</option>
+            }
+            </select>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end space-x-3 border-t border-slate-100">
+        <button 
+            type="button" 
+            (click)="closeModal()" 
+            class="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold rounded-xl cursor-pointer"
+        >
+            Cancel
+        </button>
+        <button 
+            type="submit" 
+            [disabled]="planForm.invalid"
+            class="text-white bg-pindder-primary font-semibold px-4 py-2 text-xs rounded-xl shadow-xs transition disabled:opacity-50 cursor-pointer"
+        >
+            Save
+        </button>
+        </div>
+    </form>
+    </div>
+</div>}

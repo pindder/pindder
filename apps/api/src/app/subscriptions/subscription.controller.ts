@@ -14,6 +14,7 @@ import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { AssignSubscriptionDto } from './dto/assign-subscription.dto';
 
 @Controller('subscription')
 export class SubscriptionController {
@@ -23,6 +24,11 @@ export class SubscriptionController {
   @Post('init')
   create(@Body() createSubscriptionDto: CreateSubscriptionDto, @Req() req: any) {
     return this.subscriptionService.create(createSubscriptionDto, req.user);
+  }
+
+  @Post('assign')
+  assignSubscription(@Body() assignSubscriptionDto: AssignSubscriptionDto) {
+    return this.subscriptionService.assignSubscription(assignSubscriptionDto);
   }
 
   @Get()

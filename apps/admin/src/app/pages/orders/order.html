@@ -14,11 +14,11 @@
             </button>
             
             <!-- Date filter buttons -->
-            <div class="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-700/50 p-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+            <!-- <div class="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-700/50 p-1 text-xs font-medium text-slate-600 dark:text-slate-300">
                 <button (click)="setTimeRange('7d')" [class.bg-white]="timeRange() === '7d'" [class.dark:bg-slate-800]="timeRange() === '7d'" [class.shadow-sm]="timeRange() === '7d'" class="px-3 py-1.5 rounded-lg transition-all">7 Days</button>
                 <button (click)="setTimeRange('30d')" [class.bg-white]="timeRange() === '30d'" [class.dark:bg-slate-800]="timeRange() === '30d'" [class.shadow-sm]="timeRange() === '30d'" class="px-3 py-1.5 rounded-lg transition-all">30 Days</button>
                 <button (click)="setTimeRange('90d')" [class.bg-white]="timeRange() === '90d'" [class.dark:bg-slate-800]="timeRange() === '90d'" [class.shadow-sm]="timeRange() === '90d'" class="px-3 py-1.5 rounded-lg transition-all">Year</button>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -92,13 +92,13 @@
     <!-- Filters -->
     <div class="flex flex-wrap items-center gap-3">
         <!-- Status Filter Tabs -->
-        <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200/80 text-xs font-medium">
+        <div class="md:hidden flex overflow-scroll bg-slate-100 p-1 rounded-lg border border-slate-200/80 text-xs font-medium">
         @for (status of statusFilterOptions; track status) {
             <button 
             (click)="setStatusFilter(status)"
             class="px-2.5 py-1 rounded-md transition-all capitalize"
             [class]="selectedStatusFilter() === status ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'">
-            {{ status }}
+            {{ status | titlecase }}
             </button>
         }
         </div>
@@ -107,11 +107,8 @@
         <select 
         [value]="selectedTypeFilter()"
         (change)="setTypeFilter($event)"
-        class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#F1641D]">
-        <option value="All">All Types</option>
-        <option value="Bespoke">Bespoke</option>
-        <option value="Ready to Wear">Ready to Wear</option>
-        <option value="Mixed">Mixed</option>
+        class="hidden md:block bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#F1641D]">
+        @for(status of orderStatuses; track status){<option [value]="status">{{ status | titlecase }}</option>}
         </select>
     </div>
     </div>
@@ -122,13 +119,12 @@
         <table class="w-full text-left border-collapse">
         <thead>
             <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            <th class="py-3.5 px-4">Order Details</th>
+            <th class="py-3.5 px-4">Order</th>
             <th class="py-3.5 px-4">Client</th>
-            <th class="py-3.5 px-4">Assigned Tailor</th>
+            <th class="py-3.5 px-4">Tailor</th>
             <!-- <th class="py-3.5 px-4">Type</th> -->
             <th class="py-3.5 px-4">Items</th>
             <th class="py-3.5 px-4">Amount</th>
-            <th class="py-3.5 px-4">Due Date</th>
             <th class="py-3.5 px-4">Status</th>
             <th class="py-3.5 px-4 text-right">Actions</th>
             </tr>
@@ -142,20 +138,20 @@
                 <div class="font-bold text-slate-900 group-hover:text-[#F1641D] transition-colors cursor-pointer" (click)="navigateToDetails(order._id)">
                     #{{ order.orderId }}
                 </div>
-                <div class="text-[11px] text-slate-400 mt-0.5">Placed {{ order.createdAt | date:'medium' }}</div>
+                <!-- <div class="text-[11px] text-slate-400 mt-0.5">Placed {{ order.createdAt | date:'medium' }}</div> -->
                 </td>
 
                 <!-- Client Profile -->
                 <td class="py-3.5 px-4">
                 <div class="flex items-center space-x-2.5">
                     <div>
-                        <div class="font-bold text-slate-800">{{ order.client?.firstname + '' + order.client?.lastname  }}</div>
+                        <div class="font-bold text-slate-800">{{ order.client?.firstname | titlecase }} {{ order.client?.lastname | titlecase}}</div>
                         <div class="text-[10px] text-slate-400">{{ order.client?.phoneNo }}</div>
                     </div>
                 </div>
                 </td>
 
-                <!-- Assigned Tailor -->
+                <!-- Tailor Profile -->
                 <td class="py-3.5 px-4">
                 <div class="flex items-center space-x-2">
                     @if(!order.tailor.profilePic){
@@ -183,15 +179,10 @@
 
                 <!-- Amount & Payment Status -->
                 <td class="py-3.5 px-4">
-                <div class="font-black text-slate-900">\${{ order.totalAmount | number:'1.2-2' }}</div>
+                <div class="font-black text-slate-900">${{ order.totalAmount | number:'1.2-2' }}</div>
                 <span class="text-[10px] font-semibold" [class]="order.paid ? 'text-emerald-600' : 'text-amber-600'">
                     {{ order.paid ? 'PAID' : 'NOT PAID' }}
                 </span>
-                </td>
-
-                <!-- Due Date -->
-                <td class="py-3.5 px-4">
-                <div class="font-medium text-slate-700">{{ order.dueDate }}</div>
                 </td>
 
                 <!-- Status Pill -->
@@ -229,7 +220,7 @@
 
     <!-- Table Footer / Pagination Info -->
     <div class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-        <div>Showing <span class="font-bold text-slate-700">{{ filteredOrders().length }}</span> of <span class="font-bold text-slate-700">{{ orders().length }}</span> active commissions</div>
+        <div>Showing <span class="font-bold text-slate-700">{{ filteredOrders().length }}</span> of <span class="font-bold text-slate-700">{{ orders().length }}</span> Orders  </div>
         <div class="flex space-x-2">
         <button class="px-2.5 py-1 border border-slate-200 bg-white rounded hover:bg-slate-50 font-medium disabled:opacity-50" disabled>Previous</button>
         <button class="px-2.5 py-1 border border-slate-200 bg-white rounded hover:bg-slate-50 font-medium">Next</button>

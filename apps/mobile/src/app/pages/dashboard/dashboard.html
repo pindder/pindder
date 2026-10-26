@@ -11,7 +11,8 @@
   </ion-fab-button>
 </ion-fab>
 
-<ion-content [fullscreen]="true">
+<ion-content [scrollY]="false" [fullscreen]="true">
+  <div class="scroll-container-wrapper">
   @if(profile){
     <!-- Profile Header-->
     <app-profile-card 
@@ -20,42 +21,53 @@
     (action)="openNotifications()"
     ></app-profile-card>
 
+    <!-- Earnings -->
+    <app-earnings-card [profile]="profile" (withdraw)="gotoPayout()" (earn)="gotoEarn()"></app-earnings-card>
+
     <!-- Referral Block-->
     <app-referral-block [profile]="profile" (action)="copyToClipboard()"></app-referral-block>
   }
+
+  <!-- Quick Access-->
+  <div class="mx-3 mt-2">
+    <div class="">
+      <ion-label>
+        <h3>Quick Access</h3>
+      </ion-label>
+    </div>
   
-  <!-- Data Cards -->
-  <ion-grid>
-    <ion-row class="">
+      <div class="flex flex-nowrap gap-2 pt-2 no-scrollbar overflow-auto">
       @for(tile of tiles; track $index){
-        <ion-col class="p-2" sizeLg="3" sizeMd="3" sizeXs="6">
+        <!-- <ion-col class="p-2" sizeLg="3" sizeMd="3" sizeXs="6"> -->
           <app-data-tile [data]="tile" (action)="gotoOrder($event)"></app-data-tile>
-        </ion-col>
+        <!-- </ion-col> -->
       }
-    </ion-row>
-  </ion-grid>
+      </div>
+  </div>
 
   <!-- Recent Notifications-->
-  <ion-list lines="none">
-    <ion-list-header>
-      <ion-note>Recent Activities</ion-note>
-      <!-- <ion-buttons>
-        <ion-button fill="light" (click)="clearRecentNotifications()">
-          <ion-icon name="close-circle" slot="icon-only"></ion-icon>
-        </ion-button>
-      </ion-buttons> -->
-    </ion-list-header>
+  <div class="scrollable-body">
+    <ion-list lines="none">
+      <ion-list-header>
+        <ion-note>Recent Activities</ion-note>
+        <!-- <ion-buttons>
+          <ion-button fill="light" (click)="clearRecentNotifications()">
+            <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons> -->
+      </ion-list-header>
 
-    @for(notification of notifications; track $index){
-      <app-notification-tile [notification]="notification"></app-notification-tile>
-    } @empty { 
-      <app-empty-state
-      [hideButton]="true"
-      [icon]="'notifications-off-outline'"
-      [title]="'No data'"
-      ></app-empty-state>
-    }
-  </ion-list>
+      @for(notification of notifications; track $index){
+        <app-notification-tile [notification]="notification"></app-notification-tile>
+      } @empty { 
+        <app-empty-state
+        [hideButton]="true"
+        [icon]="'notifications-off-outline'"
+        [title]="'No Activity'"
+        ></app-empty-state>
+      }
+    </ion-list>
+  </div>
 
   <!-- Action Sheet -->
   <ion-action-sheet
@@ -65,4 +77,5 @@
     [buttons]="actionSheetButtons"
     (didDismiss)="isActionSheetOpen.set(false)">
   </ion-action-sheet>
+</div>
 </ion-content>

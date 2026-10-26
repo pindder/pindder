@@ -7,9 +7,9 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content color="light" [fullscreen]="true">
     <ion-header collapse="condense">
-        <ion-toolbar>
+        <ion-toolbar color="light">
         <ion-title size="large">Premium</ion-title>
         </ion-toolbar>
     </ion-header>
@@ -27,11 +27,11 @@
           <ion-card-subtitle>{{ pkg.description }}</ion-card-subtitle>
           <ion-card-title>{{ pkg.name }}</ion-card-title>
           
-          <div class="price-container">
+          <!-- <div class="price-container">
             <span class="currency">₦</span>
             <span class="amount">{{ pkg.amount | number }}</span>
             <span class="period">/ {{ pkg.interval }}</span>
-          </div>
+          </div> -->
         </ion-card-header>
 
         <ion-card-content>

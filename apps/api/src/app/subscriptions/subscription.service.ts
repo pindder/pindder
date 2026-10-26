@@ -11,6 +11,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { Plan } from '../plans/schema/plan.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { Payment } from '../payments/schemas/payment.schema';
+import { AssignSubscriptionDto } from './dto/assign-subscription.dto';
 
 @Injectable()
 export class SubscriptionService {
@@ -48,12 +49,12 @@ export class SubscriptionService {
     return;
   }
 
-  async assignSubscription(user: any, plan?: string, activity?: string) {
+  async assignSubscription(assignSubscriptionDto: AssignSubscriptionDto, activity?: string) {
     try {
       let selected_plan; 
 
-      if(plan) {
-        selected_plan = await this.planModel.findOne({ plan_code: plan });
+      if(assignSubscriptionDto.plan_id) {
+        selected_plan = await this.planModel.findById(assignSubscriptionDto.plan_id);
       } else {
         selected_plan = await this.planModel.findOne({ free: true });
       }
@@ -62,8 +63,14 @@ export class SubscriptionService {
         throw new NotFoundException(`Plan not found!`);
       }
 
+      const tailor = await this.tailorModel.findById(assignSubscriptionDto.user_id);
+
+      if(!tailor) {
+        throw new NotFoundException(`Tailor not found!`);
+      }
+
       const newSubscription = await this.subscriptionModel.create({
-        tailor: user,
+        tailor: tailor,
         plan: selected_plan,
         provider: SubscriptionProviders.paystack,
         status: SubscriptionStatus.active,
@@ -71,10 +78,16 @@ export class SubscriptionService {
 
       await newSubscription.save();
 
-      return;
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: `${newSubscription.plan.name} subscription activated for ${newSubscription.tailor.fullname}`,
+        data: newSubscription
+      }
+
+      return res;
     } catch(error: any) {
       this.logger.error(error);
-      return;
+      throw new InternalServerErrorException(error);
     }
   }
 

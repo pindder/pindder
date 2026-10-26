@@ -28,6 +28,23 @@ export interface IAdminMenu {
     submenu?: IAdminMenu[]; 
 }
 
+export interface IAdminTeamMate {
+  _id?: string;
+  fullname?: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  countryCode: string;
+  tel: string;
+  formattedPhoneNo?: string;
+  country: string;
+  state: string;
+  postalCode?: string;
+  roles: string[];
+  profileImg?: string;
+  status?: string;
+}
+
 export interface ITailor {
   _id: string;
   fullname: string;

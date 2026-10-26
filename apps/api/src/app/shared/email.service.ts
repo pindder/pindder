@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
-import { Brand } from '../brands/schemas/brand.schema';
 import { Tailor } from '../tailors/schemas/tailor.schema';
 import { User } from '../users/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
@@ -43,13 +42,13 @@ export class EmailService {
         return data;
     }
 
-    async sendOneTimeLoginCode(user: User | Tailor | Brand, code: string) {
+    async sendOneTimeLoginCode(user: User | Tailor, code: string) {
         const { data, error } = await this.resend.emails.send({
         from: this.sender_email,
-        to: [user!.email],
+        to: [user.email],
         subject: 'Login Request: OTP Code',
         html: `
-            <h1>Welcome back, ${user!.username}!</h1>
+            <h1>Welcome back, ${user.username}!</h1>
             <p>Here is your one time login code. if you have not initiated this request please kindly ignore this message but ensure that your email is secure</p>
             <p>${code}</p>
         `,

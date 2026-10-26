@@ -51,7 +51,7 @@ export class WebhookService {
       case 'invoice.payment_failed':
         await this.subscriptionModel.updateMany(
           { 'tailor.email': email, Provider: 'paystack' },
-          { $set: { status: SubscriptionStatus.past_due } },
+          { $set: { status: SubscriptionStatus.expired } },
         );
         break;
       case 'subscription.disable':

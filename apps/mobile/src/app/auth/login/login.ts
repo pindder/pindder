@@ -41,8 +41,8 @@ export class Login implements OnInit {
     this.authService.loginBrand(this.loginData).subscribe({
       next: (val) => {
         if(val) {
-          this.router.navigate(['auth/otp']);
           this.isLoading = false;
+          this.router.navigate(['auth/otp']);
         }
       }, 
       error: (error: HttpErrorResponse) => {

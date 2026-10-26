@@ -1,32 +1,35 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Brand } from './schemas/brand.schema';
 import { Model } from 'mongoose';
-import { Client } from '../clients/schemas/client.schema';
+import { Tailor } from '../tailors/schemas/tailor.schema';
+import { AccountStatus } from '@pindder/contracts';
 
 @Injectable()
 export class BrandService {
   constructor(
-    @InjectModel(Client.name) private readonly clientModel: Model<Client>,
+    @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     @InjectModel(Brand.name) private readonly brandModel: Model<Brand>
   ) {}
   async create(createBrandDto: CreateBrandDto) {
+    const tailor = await this.tailorModel.findById(createBrandDto.tailor);
+
+    if(!tailor) {
+      throw new NotFoundException(`Account not found!`);
+    }
+
+    if(tailor && tailor.status === AccountStatus.SUSPENDED) {
+      throw new NotAcceptableException(`This account cannot create a brand at this time. Please contact admin for support!`);
+    }
+
     const createdBrand = new this.brandModel(createBrandDto);
+    createdBrand.admin = tailor;
+    
     await createdBrand.save();
 
     return createdBrand;
-  }
-
-  async brandReferrals(id: string) {
-    const referrals = await this.clientModel.find({ 'referee._id': id }).limit(10);
-
-    if(referrals.length < 1) {
-      throw new HttpException('You have no referrals', HttpStatus.NO_CONTENT);
-    }
-
-    return referrals;
   }
 
   findAll() {

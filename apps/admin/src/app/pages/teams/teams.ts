@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators  } from '@angular/forms';
+import { FormsModule  } from '@angular/forms';
+import { AppService } from '../../services/app.service';
+import { AccountStatus, AdminRoles, IAdminTeamMate, IResponse } from '@pindder/contracts';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface TeamMember {
   id: number;
@@ -19,47 +22,57 @@ interface ToastNotification {
 
 @Component({
   selector: 'app-teams',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './teams.html',
   styleUrl: './teams.css',
 })
 export class Teams implements OnInit{
-  private fb = inject(FormBuilder);
+  private appService = inject(AppService);
+
   activeModal = signal<'addMember' | 'deleteAccount' | null>(null);
   searchQuery = signal<string>('');
   toasts = signal<ToastNotification[]>([]);
   deleteConfirmText = signal<string>('');
-  
-  // Reactive Forms
-  profileForm: FormGroup;
-  addMemberForm: FormGroup;
-  securityForm: FormGroup;
 
-  constructor() {
-    this.profileForm = this.fb.group({
-      fullName: ['Sarah Jenkins', Validators.required],
-      email: ['sarah.jenkins@acme.io', [Validators.required, Validators.email]],
-      jobTitle: ['Lead Product Designer'],
-      phone: ['+1 (555) 234-5678'],
-      bio: ['Product Lead with 8+ years experience crafting digital user experiences and interactive design systems.']
-    });
-
-    this.addMemberForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      role: ['Viewer', Validators.required],
-      status: ['Active', Validators.required]
-    });
-
-    this.securityForm = this.fb.group({
-      currentPassword: ['', Validators.required],
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required]
-    });
-  }
+  roles = AdminRoles;
+  adminRoles = Object.keys(AdminRoles);
+  accountStatus = AccountStatus;
+  status = Object.keys(AccountStatus);
+  teamMembers = signal<IAdminTeamMate[]>([]);
+  newMember = signal<IAdminTeamMate | null>({
+    email: '',
+    roles: [],
+    firstname: '',
+    lastname: '',
+    countryCode: '',
+    tel: '',
+    country: '',
+    state: '',
+    profileImg: '',
+    formattedPhoneNo: '',
+    fullname: '',
+    status: ''
+  })
 
   ngOnInit(): void {
-    return;
+    this.fetchAdmins();
+  }
+
+  fetchAdmins() {
+    this.appService.getAdminAccounts().subscribe({
+      next: (response: IResponse<IAdminTeamMate[]>) => {
+        if(response.data) {
+          this.teamMembers.update(currentTeammates => [
+            ...currentTeammates ?? [],
+            ...response.data ?? []
+          ]);
+          this.filteredTeamMembers();
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
   }
 
   // Search & Team Table Handlers
@@ -68,29 +81,21 @@ export class Teams implements OnInit{
     this.searchQuery.set(val);
   }
 
-  // Initial Team Directory State
-  teamMembers = signal<TeamMember[]>([
-    { id: 1, name: 'Sarah Jenkins', email: 'sarah.jenkins@acme.io', role: 'Admin', status: 'Active', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
-    { id: 2, name: 'Marcus Chen', email: 'm.chen@acme.io', role: 'Manager', status: 'Active', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
-    { id: 3, name: 'Elena Rostova', email: 'elena@acme.io', role: 'Editor', status: 'Active', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
-    { id: 4, name: 'David Miller', email: 'd.miller@acme.io', role: 'Billing', status: 'Pending', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' }
-  ]);
-
   // Derived Filtered Team Signal
   filteredTeamMembers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.teamMembers();
     return this.teamMembers().filter(m => 
-      m.name.toLowerCase().includes(q) || 
+      m.fullname?.toLowerCase().includes(q) || 
       m.email.toLowerCase().includes(q) || 
-      m.role.toLowerCase().includes(q)
+      m.roles.includes(q.toLowerCase())
     );
   });
 
-  updateMemberRole(id: number, event: Event) {
+  updateMemberRole(id: string, event: Event) {
     const newRole = (event.target as HTMLSelectElement).value as TeamMember['role'];
     this.teamMembers.update(members => 
-      members.map(m => m.id === id ? { ...m, role: newRole } : m)
+      members.map(m => m._id === id ? { ...m, role: newRole } : m)
     );
     this.triggerToast('Member role permissions updated');
   }
@@ -116,29 +121,29 @@ export class Teams implements OnInit{
   }
 
   submitAddMember() {
-    if (this.addMemberForm.valid) {
-      const val = this.addMemberForm.value;
-      const newMember: TeamMember = {
-        id: Date.now(),
-        name: val.name,
-        email: val.email,
-        role: val.role,
-        status: val.status,
-        avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150`
-      };
-
-      this.teamMembers.update(list => [...list, newMember]);
-      this.closeModal();
-      this.addMemberForm.reset({ role: 'Viewer', status: 'Active' });
-      this.triggerToast(`Invitation sent to ${val.email}`);
-    }
+    this.closeModal();
+    this.appService.createAdminAccount(JSON.parse(sessionStorage.getItem('user')!)._id).subscribe({
+      next: (response: IResponse<any>) => {
+        if(response.data) {
+          this.teamMembers.update(currentTeammates => [
+            ...currentTeammates ?? [],
+            ...response.data ?? []
+          ]);
+          this.filteredTeamMembers();
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
+    this.triggerToast(`Invitation sent to ${this.newMember()?.email}`);
   }
 
-  removeTeamMember(id: number) {
-    const target = this.teamMembers().find(m => m.id === id);
-    this.teamMembers.update(members => members.filter(m => m.id !== id));
+  removeTeamMember(id: string) {
+    const target = this.teamMembers()?.find(m => m._id === id);
+    this.teamMembers.update(members => members.filter(m => m._id !== id));
     if (target) {
-      this.triggerToast(`Removed ${target.name} from team`);
+      this.triggerToast(`Removed ${target.fullname} from team`);
     }
   }
 

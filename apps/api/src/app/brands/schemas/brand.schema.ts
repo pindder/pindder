@@ -1,40 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AccountStatus, AccountTypes } from '@pindder/contracts';
+import { AccountStatus } from '@pindder/contracts';
 import { HydratedDocument } from 'mongoose';
+import { TailorSnapshot } from '../../tailors/schemas/tailor.schema';
 
 export type BrandDocument = HydratedDocument<Brand>;
 
 @Schema({ timestamps: true })
 export class Brand {
   @Prop({ type: String, required: true })
-  brandName?: string;
+  name!: string;
 
-  @Prop({ type: String, maxLength: 1000 })
+  @Prop({ type: String, maxLength: 1500 })
   description?: string;
 
-  @Prop({ type: String, required: true })
-  adminFullname?: string;
+  @Prop({ type: TailorSnapshot, required: true })
+  admin!: TailorSnapshot;
 
-  @Prop({ type: String })
-  username?: string;
-
-  @Prop({ type: String, required: true, unique: true, index: true })
+  @Prop({ type: String, unique: true, required: true })
   email!: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, default: null })
   phoneNo!: string;
 
-  @Prop({ type: String, required: false })
-  logoUri?: string;
+  @Prop({ type: String, default: null })
+  logo?: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: null})
   website?: string;
 
-  @Prop({ type: String, required: true, enum: AccountStatus })
+  @Prop({ type: String, required: true, enum: AccountStatus, default: AccountStatus.ACTIVE })
   status!: string;
-
-  @Prop({ type: String, enum: AccountTypes, required: true })
-  accountType!: string;
 }
 
 export const BrandSchema = SchemaFactory.createForClass(Brand);

@@ -1,0 +1,22 @@
+ion-button {
+    --border-color: var(--ion-color-border);
+    --border-radius: 16px;
+    --padding-top: 5px;
+    --padding-bottom: 5px;
+    --color: gray;
+    width: 174px;
+}
+
+ion-card {
+  --background: var(--ion-color-primary);
+  --color: #9efff0;
+  border-radius: 24px;
+}
+
+ion-card-title {
+  --color: #d1fff8;
+}
+
+ion-card-subtitle {
+  --color: #d1fff8;
+}

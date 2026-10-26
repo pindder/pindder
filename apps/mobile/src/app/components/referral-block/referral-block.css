@@ -1,14 +1,22 @@
 .rounded-rectangle {
-  width: 90%;
-  border-radius: 8px;
+  width: 100%;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  border-radius: 16px;
   color: gray;
   border: .01em solid var(--ion-color-border);
+}
+
+.w-full {
+  width: 100%;
 }
 
 .border {
   padding: 8px;
   border: .01em solid var(--ion-color-primary);
-  border-radius: 8px;
+  border-radius: 24px;
 }
 
 .ml {
@@ -17,10 +25,18 @@
 
 ion-button {
     --border-color: var(--ion-color-border);
-    --border-radius: 8px;
+    --border-radius: 12px;
     --padding-top: 5px;
     --padding-bottom: 5px;
     --color: gray;
+}
+
+ion-card-content {
+  display: flex; 
+  flex-direction: column; 
+  align-items: start; 
+  justify-content: center; 
+  text-align: start;
 }
 
 .custom-button {

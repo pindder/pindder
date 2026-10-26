@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IOrderItem, IOrderType, IResponse, OrderStatus, QuotationLog } from '@pindder/contracts';
@@ -7,7 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-order',
-  imports: [DecimalPipe, DatePipe],
+  imports: [DecimalPipe, TitleCasePipe],
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
@@ -15,6 +15,8 @@ export class Order implements OnInit{
   private router = inject(Router);
   private orderService = inject(OrderService);
 
+  orderStatus = OrderStatus;
+  orderStatuses = Object.keys(OrderStatus);
   timeRange = signal<'7d' | '30d' | '90d'>('30d');
 
   setTimeRange(range: '7d' | '30d' | '90d') {
@@ -23,7 +25,6 @@ export class Order implements OnInit{
 
   // Navigation State
   currentView = signal<'dashboard' | 'details'>('dashboard');
-  selectedOrderId = signal<string | null>('ORD-8821');
 
   // Search & Filter Signals
   searchQuery = signal<string>('');
@@ -31,11 +32,12 @@ export class Order implements OnInit{
   selectedTypeFilter = signal<string>('All');
   toastMessage = signal<string | null>(null);
 
-  statusFilterOptions = ['All', 'Ongoing', 'Completed', 'Overdue', 'Pending', 'Cancelled'];
+  statusFilterOptions = this.orderStatuses;
   orders = signal<IOrderItem[]>([]);
 
   ngOnInit(): void {
     this.fetchOrders();    
+    this.statusFilterOptions.unshift('All');
   }
 
   fetchOrders() {
@@ -47,6 +49,7 @@ export class Order implements OnInit{
             ...currentOrders ?? [],
             ...response.data ?? []
           ])
+          this.filteredOrders();
         }
       },
       error: (error: HttpErrorResponse) => {
@@ -54,12 +57,6 @@ export class Order implements OnInit{
       }
     })
   }
-
-  // Derived Selected Order Signal
-  selectedOrder = computed(() => {
-    const id = this.selectedOrderId();
-    return this.orders().find(o => o._id === id) || null;
-  });
 
   // KPI Statistics Computation
   stats = computed(() => {
@@ -118,13 +115,12 @@ export class Order implements OnInit{
 
   setTypeFilter(event: Event) {
     const select = event.target as HTMLSelectElement;
-    this.selectedTypeFilter.set(select.value);
+    this.selectedStatusFilter.set(select.value);
   }
 
   resetFilters() {
     this.searchQuery.set('');
     this.selectedStatusFilter.set('All');
-    this.selectedTypeFilter.set('All');
   }
 
   // Visual Utility Helpers

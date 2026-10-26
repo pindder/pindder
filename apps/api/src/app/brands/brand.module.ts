@@ -4,13 +4,15 @@ import { BrandController } from './brand.controller';
 import { Brand, BrandSchema } from './schemas/brand.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { Client, ClientSchema } from '../clients/schemas/client.schema';
+import { TailorModule } from '../tailors/tailor.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([
-    { name: Brand.name, schema: BrandSchema },
-    { name: Client.name, schema: ClientSchema }
-  ])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Brand.name, schema: BrandSchema },
+    ]),
+    TailorModule
+  ],
   controllers: [BrandController],
   providers: [BrandService, JwtService],
   exports: [MongooseModule],

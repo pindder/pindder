@@ -73,10 +73,10 @@ export class OrderStyleSnapshot {
     amount!: number;
 
     @Prop({ type: Number })
-    productionDuration?: number; 
+    estimatedProductionPerod?: number; 
 
     @Prop({ type: Number })
-    deliveryDuration?: number; 
+    estimatedTimeArrival?: number; 
 
     @Prop({ type: Number })
     quantity!: number;
@@ -124,10 +124,10 @@ export class Design {
     colors?: [ColorSnapshot];
 
     @Prop({ type: Number })
-    productionDuration?: number; 
+    estimatedProductionPeriod?: number; 
 
     @Prop({ type: Number })
-    deliveryDuration?: number; 
+    estimatedTimeArrival?: number; 
 
     @Prop({ type: Number })
     units!: number; 

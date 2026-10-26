@@ -39,7 +39,7 @@ export class TokenService {
   }
 
   async setProfile(profile: IProfile) {
-
+    return;
   }
 
   async isAuthenticated(): Promise<boolean> {

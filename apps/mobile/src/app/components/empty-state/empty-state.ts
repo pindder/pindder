@@ -16,7 +16,7 @@ export class EmptyState implements OnInit{
   @Input() desc!: string;
   @Input() buttonText!: string;
   @Input() parentComponent!: string; 
-  @Input() hideButton: boolean = false;
+  @Input() hideButton = false;
   @Output() action = new EventEmitter();
 
   dataTypes = DataTypes;

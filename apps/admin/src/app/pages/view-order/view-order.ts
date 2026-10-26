@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe, Location } from '@angular/common';
+import { DatePipe, DecimalPipe, Location, TitleCasePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { IAdminOrder, IOrderItem, IOrderType, IResponse, OrderStatus, OrderStatuses, QuotationLog } from '@pindder/contracts';
 import { OrderService } from '../../services/order.service';
@@ -7,7 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-view-order',
-  imports: [DecimalPipe, DatePipe],
+  imports: [DecimalPipe, DatePipe, TitleCasePipe],
   templateUrl: './view-order.html',
   styleUrl: './view-order.css',
 })
