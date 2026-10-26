@@ -100,9 +100,9 @@ export class PlanService {
     } 
   }
 
-  // async synchronizePlans() {
-
-  // }
+  async synchronizePlans() {
+    return;
+  }
 
   async findAll() {
     try {

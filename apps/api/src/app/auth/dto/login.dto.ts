@@ -1,6 +1,6 @@
 export class LoginDto {
     email!: string;
-    password!: string;
+    password?: string;
     rememberMe?: string;
     phone?: string;
 }

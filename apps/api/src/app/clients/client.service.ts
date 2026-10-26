@@ -23,53 +23,38 @@ export class ClientService {
 
   async create(createClientDto: CreateClientDto, referee_id?: string) {
     try{
-      //check if the email already is in the system
-      const existing_client = await this.clientModel.findOne({ email: createClientDto.email }).lean();
+      const tailor = await this.tailorModel.findById(referee_id).exec();
 
-      if(existing_client) {
-        console.log(existing_client);
-        const res:IResponse<any> = { 
-          statusCode: 409,
-          data: existing_client, 
-          msg: `The email provided currently exists on pindder,
-          would you like to verify the information and add the client to your client list?`
-        }
-
-        return res;  
-      } else {
-        const tailor = await this.tailorModel.findById(referee_id);
-
-        if(!tailor) {
-          return;
-        }
-
-        const client = new this.clientModel(createClientDto);
-        client.fullname = client.firstname + ' ' + client.lastname;
-        client.referee = tailor;
-
-        await client.save();
-
-        await this.notificationService.create({
-          client: client,
-          tailor: client.referee,
-          type: DataTypes.CLIENT,
-          action: NotificationActions.CLIENT_CREATED,
-          icon: DataTypesIcon.CLIENT,
-          title: 'New Client',
-          message: `Client #${client.fullname} has been created.`,
-          data: {
-            ...client
-          },
-        });
-        
-        const res: IResponse<any> = {
-          statusCode: 200,
-          msg: 'Client added successfully.',
-          data: client
-        };
-
-        return res;
+      if(!tailor) {
+        throw new NotFoundException(`Designer account not found!`);
       }
+
+      const client = new this.clientModel(createClientDto);
+      client.fullname = client.firstname + ' ' + client.lastname;
+      client.referee = tailor;
+
+      await client.save();
+
+      await this.notificationService.create({
+        client: client,
+        tailor: client.referee,
+        type: DataTypes.CLIENT,
+        action: NotificationActions.CLIENT_CREATED,
+        icon: DataTypesIcon.CLIENT,
+        title: 'New Client',
+        message: `${client.fullname} has been added to your client created.`,
+        data: {
+          ...client
+        },
+      });
+      
+      const res: IResponse<any> = {
+        statusCode: 200,
+        msg: 'Client added successfully.',
+        data: client
+      };
+
+      return res;
     } catch (error: any) {
       this.logger.error(error);
       throw new InternalServerErrorException(`${error}`);
@@ -133,8 +118,9 @@ export class ClientService {
       const clients = await this.clientModel
       .find({ 'referee._id': acct_id })
       .sort({ createdAt: -1 })
-      .populate('referee', '-_v')
       .exec();
+
+      console.log(clients);
 
       // 1. Throw directly instead of returning
       if (!clients || clients.length === 0) {

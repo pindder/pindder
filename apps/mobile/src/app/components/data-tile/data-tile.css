@@ -12,3 +12,20 @@
   color: gray;
   border: .01em solid var(--ion-color-border);
 }
+
+ion-card-content {
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  text-align: center;
+}
+
+ion-card {
+  background-color: var(--ion-color-primary-fade);
+  border-radius: 16px;
+}
+
+ion-card.shadow-none {
+  box-shadow: none;
+}

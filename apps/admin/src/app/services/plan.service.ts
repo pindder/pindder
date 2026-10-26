@@ -25,4 +25,8 @@ export class PlanService {
   createPlan(plan: IPlan): Observable<IResponse<IPlan>> {
     return this.http.post<IResponse<IPlan>>(`${environment.apiUrl}/plans`, plan);
   }
+
+  assignPlan(data: any): Observable<IResponse<IPlan>> {
+    return this.http.post<IResponse<IPlan>>(`${environment.apiUrl}/subscription/assign`, data);
+  }
 }

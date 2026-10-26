@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, 
   IonButton, IonCardContent, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle,
@@ -17,7 +16,7 @@ import { Browser } from '@capacitor/browser';
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
     IonContent,
     IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-    IonButton, IonCardContent, DecimalPipe, IonIcon, 
+    IonButton, IonCardContent, IonIcon, 
   ],
   templateUrl: './premium.html',
   styleUrl: './premium.css',

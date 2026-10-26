@@ -42,9 +42,9 @@ export enum NotificationActions {
 export enum SubscriptionStatus {
     active = 'active', 
     cancelled = 'cancelled', 
-    'past_due' = 'past_due', 
     none = 'none',
-    suspended = 'suspended'
+    suspended = 'suspended',
+    expired = 'expired'
 }
 
 export enum SubscriptionProviders {
@@ -61,8 +61,6 @@ export enum Gender {
 export enum AccountTypes {
     ADMIN = "ADMIN",
     TAILOR = "TAILOR",
-    BRAND = "BRAND",
-    BUSINESS = "BUSINESS",
     USER = "USER"
 }
 

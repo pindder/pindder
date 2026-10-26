@@ -1,7 +1,6 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef, Component, EnvironmentInjector, inject, signal } from '@angular/core';
-import { IonContent, IonFabButton, IonFab, IonIcon, IonList, IonActionSheet, IonCol, IonRow, 
-  IonGrid, IonListHeader, ViewWillEnter, ModalController, ToastController } from "@ionic/angular";
+import { IonContent, IonFabButton, IonFab, IonIcon, IonList, IonActionSheet, IonListHeader, ViewWillEnter, ModalController, ToastController, IonLabel } from "@ionic/angular";
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
 import { NotificationTile } from "../../components/notification-tile/notification-tile";
@@ -17,13 +16,11 @@ import { NotificationService } from '../../services/notification.service';
 import { SseService } from '../../services/sse.service';
 import { Subscription } from 'rxjs';
 import { IonNote } from "@ionic/angular";
+import { EarningsCard } from '../../components/earnings-card/earnings-card';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [IonNote,
-    IonGrid,
-    IonRow,
-    IonCol,
+  imports: [IonLabel, IonNote,
     IonActionSheet,
     IonList,
     IonIcon,
@@ -36,8 +33,7 @@ import { IonNote } from "@ionic/angular";
     NotificationTile,
     IonListHeader,
     ProfileCard,
-    EmptyState,
-  ],
+    EmptyState, EarningsCard],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -102,25 +98,31 @@ export class Dashboard implements ViewWillEnter{
     {
       title: "Pending",
       icon: "hourglass-outline",
-      count: 24,
+      count: 3,
       color: "medium"
     },
     {
       title: "Ongoing",
       icon: "time-outline",
-      count: 24,
+      count: 2,
       color: "warning"
     },
     {
       title: "Completed",
       icon: "bag-check-outline",
-      count: 24,
+      count: 5,
       color: "success"
     },
     {
       title: "Overdue",
       icon: "alarm-outline",
-      count: 24,
+      count: 2,
+      color: "danger"
+    },
+    {
+      title: "Cancelled",
+      icon: "bag-remove-outline",
+      count: 1,
       color: "danger"
     }
   ];
@@ -178,6 +180,14 @@ export class Dashboard implements ViewWillEnter{
 
   gotoOrder($event: any) {
     this.router.navigate(['app/orders'], { queryParams: { status: $event }});
+  }
+
+  gotoEarn() {
+    this.router.navigate(['app/profile/referrals']);
+  }
+
+  gotoPayout() {
+    return;
   }
 
   async openActionSheet() {

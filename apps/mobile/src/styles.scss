@@ -19,6 +19,23 @@
   --secondary-text-color: #00000080;
 }
 
+.bg-primary {
+    background-color: #F1641D;
+}
+
+.overflow-scroll {
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+.overflow-auto {
+    overflow: auto;
+}
+
+.no-scrollbar {
+    scrollbar-width: none;
+}
+
 p {
     color: var(--secondary-text-color);
 }
@@ -173,6 +190,18 @@ p {
     margin-bottom: 42px;
 }
 
+.mt-1 {
+    margin-top: 4px;
+}
+
+.mt-2 {
+    margin-top: 8px;
+}
+
+.mt-3 {
+    margin-top: 16px;
+}
+
 .pt-2 {
     padding-top: 8px;
 }
@@ -211,6 +240,14 @@ p {
 
 .flex-col {
     flex-direction: column;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
+}
+
+.flex-shrink {
+    flex-shrink: 0;
 }
 
 .items-center {
@@ -318,4 +355,21 @@ img {
 .center {
     height: 70dvh;
     translate: 0% 25%;
+}
+
+.no-shrink-card {
+  flex-shrink: 0;
+  width: 6rem;
+  margin: 0;
+}
+
+/* Tighter margin for stacked cards */
+ion-card.tight-card {
+  margin-top: 8px;    /* Adjust this value smaller (e.g., 4px or 0) to close the gap */
+  margin-bottom: 8px;
+}
+
+ion-card {
+  border-radius: 24px;
+  border: 1px solid var(--ion-color-primary);
 }

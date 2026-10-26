@@ -1,7 +1,15 @@
-<div class="flex flex-col gap-2 p-2 tile-border" (click)="action.emit(data.title)">
+<!-- <div class="flex flex-col gap-2 p-2 tile-border" (click)="action.emit(data.title)">
     <ion-label>{{ data.title }} Orders</ion-label>
     <div class="flex flex-row gap-2 items-center"> 
         <ion-icon class="circle p-1" [color]="data.color" size="large" slot="icon-only" [name]="data.icon"></ion-icon>    
         <h1>{{ data.count }}</h1> 
     </div>
-</div>
+</div> -->
+<ion-card class="no-shrink-card shadow-none" button (click)="action.emit(data.title)">
+    <ion-card-content>
+        <ion-icon [color]="data.color" size="large" slot="icon-only" [name]="data.icon"></ion-icon>  
+        <ion-label class="mt-2">
+            <p><ion-text>{{ data.title }}</ion-text></p>
+        </ion-label>
+    </ion-card-content>
+</ion-card>

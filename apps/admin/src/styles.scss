@@ -3,14 +3,31 @@
 @import url('https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css');
 
 @theme {
+  /* Base & RGB */
   --color-pindder-primary: #F1641D;
   --color-pindder-primary-rgb: 241, 100, 29;
+
+  /* Contrast (White text / elements) */
   --color-pindder-primary-contrast: #ffffff;
   --color-pindder-primary-contrast-rgb: 255, 255, 255;
-  --color-pindder-primary-shade: #d4581a;
-  --color-pindder-primary-tint: #f27435;
+
+  /* Standard UI variables you provided */
   --color-pindder-primary-border: #E7E7E7;
   --color-pindder-primary-fade: #FEF0E8;
 
-  --secondary-text-color: #00000080;
+  /* Full Scale Shades & Tints */
+  --color-pindder-primary-50: #FDF4F0;
+  --color-pindder-primary-100: #FCE3D8;
+  --color-pindder-primary-200: #F8C3AC;
+  --color-pindder-primary-300: #F49F7B;
+  --color-pindder-primary-400: #F07F47;
+  --color-pindder-primary-500: #F1641D; /* Base primary */
+  --color-pindder-primary-600: #D55113; /* Shade / Hover */
+  --color-pindder-primary-700: #A83E0C;
+  --color-pindder-primary-800: #7B2C07;
+  --color-pindder-primary-900: #521D04;
+
+  /* Semantic aliases */
+  --color-pindder-primary-tint: #F27435;
+  --color-pindder-primary-shade: #D55113;
 }

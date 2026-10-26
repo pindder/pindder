@@ -6,6 +6,7 @@ export class CreateAdminDto {
     countryCode?: string;
     tel?: string;
     formattedPhoneNo?: string;
+    profileImg?: string;
     roles!: string[];
     status?: string;
     country?: string;

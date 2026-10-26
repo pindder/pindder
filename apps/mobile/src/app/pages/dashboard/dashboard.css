@@ -5,3 +5,15 @@
   z-index: 999;
   touch-action: none; /* critical: prevents the page from scrolling while dragging on touch devices */
 }
+
+.scroll-container-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.scrollable-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0; /* Crucial for flex containers to allow inner scrolling */
+}

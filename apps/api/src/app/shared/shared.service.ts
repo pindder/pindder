@@ -2,7 +2,7 @@ import { Global, Injectable, InternalServerErrorException, NotFoundException } f
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Token } from '../tokens/schemas/token.schema';
-import { AccountTypes, TokenStatus, TokenTypes } from '@pindder/contracts';
+import { TokenStatus, TokenTypes } from '@pindder/contracts';
 import { generateCode } from './helpers';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
@@ -36,38 +36,33 @@ export class SharedService {
         }
     }
 
-    async hasValidToken(acct_id: any) {
+    async hasValidToken(acct: any) {
         try {
-            const acct_token = await this.tokenModel.findOne({ 
-                $or: [
-                    { tailor: acct_id,}, 
-                    { user: acct_id }, 
-                    { brand: acct_id}
-                ]}
-            );
-
+            const acct_token = await this.tokenModel.findOne({ 'account.email': acct.email }).exec();
+            
             if(!acct_token) {
                 return { hasToken: false };
             } else {
-                return { hasToken: true, existing_token: acct_token };;
+                if(acct_token && acct_token.status === TokenStatus.ACTIVE) {
+                    return { hasToken: true, existing_token: acct_token, status: TokenStatus.ACTIVE };
+                }
+                return { hasToken: true, existing_token: acct_token, status: TokenStatus.INVALIDATED };
             }
         } catch(error: any){
             throw new InternalServerErrorException(`${error}`);
         }
     }
 
-    async createToken(acctType: string, acct_id: any, tokenType = '', token?: string) {
+    async createToken(acctType: string, acct: any, tokenType = '', tkn = '') {
         try {
             const token = new this.tokenModel();
 
             token.type = tokenType ?? TokenTypes.CODE;
-            token.token = generateCode();
+            token.token = tkn ?? generateCode();
             token.status = TokenStatus.ACTIVE;
             token.accountType = acctType;
 
-            if(acctType === AccountTypes.TAILOR) token.tailor = acct_id;
-            if(acctType === AccountTypes.ADMIN) token.admin = acct_id;
-            if(acctType === AccountTypes.USER) token.user = acct_id;
+            token.account = acct;
 
             await token.save(); 
 
@@ -77,10 +72,12 @@ export class SharedService {
         }
     }
 
-    async updateToken(acct_id: any, tokenType: string, newToken?: string) {
+    async updateToken(acctType: string, acct: any, tokenType: string, newToken?: string) {
         try {
-            const token = await this.tokenModel.findOneAndUpdate({ $or: [{ tailor: acct_id }, { user: acct_id }, { brand: acct_id }] }, {
+            const token = await this.tokenModel.findOneAndUpdate({ 'account.email': acct.email }, {
                 type: tokenType,
+                accountType: acctType,
+                account: acct,
                 token: newToken ?? generateCode(),
                 status: TokenStatus.ACTIVE
             }, { upsert: true, returnDocument: "after" });

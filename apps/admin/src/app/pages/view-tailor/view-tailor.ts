@@ -1,25 +1,32 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Payment, Referral, ITailor, IResponse } from '@pindder/contracts';
+import { Payment, Referral, ITailor, IResponse, IPlan } from '@pindder/contracts';
 import { TailorService } from '../../services/tailor.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { DatePipe, Location } from '@angular/common';
+import { DatePipe, Location, TitleCasePipe } from '@angular/common';
+import { PlanService } from '../../services/plan.service';
 
 @Component({
   selector: 'app-view-tailor',
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, TitleCasePipe],
   templateUrl: './view-tailor.html',
   styleUrl: './view-tailor.css',
 })
 export class ViewTailor implements OnInit{
   private tailorService = inject(TailorService);
+  private planService = inject(PlanService);
+
   private location = inject(Location);
   private ar = inject(ActivatedRoute);
 
+  toastMessage = signal<string | null>(null);
   activeTab = signal<'info' | 'clients' | 'orders' | 'payments' | 'referrals'>('info');
   tailor = signal<ITailor | null>(null);
+  packages = signal<IPlan[]>([]);
+  selectedPackageId = signal<string>('');
   currentView = signal<'list' | 'detail'>('list');
+  displayModal = signal<boolean>(false);
 
   // Email Modal State
   showEmailModal = signal<boolean>(false);
@@ -57,6 +64,7 @@ export class ViewTailor implements OnInit{
 
   ngOnInit(): void {
     this.fetchTailor();
+    this.fetchPlans();
   }
 
   fetchTailor() {
@@ -72,6 +80,50 @@ export class ViewTailor implements OnInit{
           this.tailor.set(response.data);
           console.log(this.tailor());
         }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
+  }
+
+  fetchPlans() {
+    this.planService.getPlans().subscribe({
+      next: (response: IResponse<IPlan[]>) => {
+        if(response.data) {
+          this.packages.update(pkgs => [...pkgs ?? [], ...response.data ?? []]);
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
+  }
+
+  openPlanAssignmentModal() {
+
+    this.displayModal.set(true);
+  }
+
+  closeModal() {
+    this.displayModal.set(false);
+  }
+
+  assignPlan() {
+    const selectedPkg = this.packages().find(p => p._id === this.selectedPackageId())
+    console.log(selectedPkg);
+    if(!selectedPkg && !this.tailor()) {
+      return this.triggerToast('Please select a plan');
+    }
+
+    const data = {
+      plan_id: selectedPkg?._id,
+      user_id: this.tailor()?._id
+    };
+
+    this.planService.assignPlan(data).subscribe({
+      next: (response: IResponse<IPlan>) => {
+        console.log(response.data);
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);
@@ -98,5 +150,12 @@ export class ViewTailor implements OnInit{
 
   viewTailorDetails() {
     this.activeTab.set('info');
+  }
+
+  triggerToast(msg: string) {
+    this.toastMessage.set(msg);
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 3000);
   }
 }

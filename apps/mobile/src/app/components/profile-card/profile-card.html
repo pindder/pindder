@@ -1,9 +1,13 @@
 <ion-item class="pt-4" lines="none">
   <ion-avatar aria-hidden="true" slot="start">
-    <img [sizes]="" src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
+    @if(profile.profileImg){
+      <img [sizes]="" [src]="profile.profileImg" alt="Portrait of Connor Smith" />
+    }@else{
+      <img [sizes]="" src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
+    }
   </ion-avatar>
   <ion-label>
-    <h2>{{ profile.firstname + ' ' + profile.lastname }} @if(profile.subscription){<ion-badge slot="start">{{ profile.subscription[0].plan.name }}</ion-badge>}</h2>
+    <h2>{{ profile.firstname + ' ' + profile.lastname }} @if(profile.subscription){<ion-badge slot="start">{{ profile.subscription.plan.name }}</ion-badge>}</h2>
     <p>{{ profile.email }}</p>
   </ion-label>
   @if(!hideNotification){

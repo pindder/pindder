@@ -32,20 +32,24 @@ export class AuthService {
 
   async adminLogin(loginDto: LoginDto) {
     try {
+      if(!loginDto.password) {
+        throw new UnauthorizedException('Incorrect email or password entered');
+      }
+
       const admin = await this.adminModel.findOne({
         email: loginDto.email
       }).lean();
 
       if(!admin) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('Incorrect email or password entered');
       }
 
       const {password, ...adminData} = admin;
-
+      
       const matched = await this.sharedService.comparePassword(loginDto.password, password);
 
       if(!matched) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('Incorrect email or password entered');
       }
 
       // generate payload for token
@@ -80,21 +84,21 @@ export class AuthService {
   async tailorLogin(loginDto: LoginDto) {
     try {
       let token;
-      const tailor = await this.tailorModel.findOne({ email: loginDto.email });
+      const tailor = await this.tailorModel.findOne({ email: loginDto.email }).exec();
 
       // 1. Pass an explicit, meaningful message instead of ''
       if (!tailor) {
-        throw new UnauthorizedException('Invalid email or account does not exist');
+        throw new UnauthorizedException('Incorrect email or password');
       }
 
-      const hasToken = await this.sharedService.hasValidToken(tailor._id);
+      const hasToken = await this.sharedService.hasValidToken(tailor);
 
       if (hasToken) {
-        token = await this.sharedService.updateToken(tailor.id, TokenTypes.CODE);
+        token = await this.sharedService.updateToken(AccountTypes.TAILOR, tailor, TokenTypes.CODE);
       } else {
         token = await this.sharedService.createToken(
           AccountTypes.TAILOR, 
-          tailor.id, 
+          tailor, 
           TokenTypes.CODE
         );
       }
@@ -134,7 +138,7 @@ export class AuthService {
       await tailor.save();
 
       // await this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
-      const token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE);
+      const token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor, TokenTypes.CODE);
 
       await this.emailService.sendOneTimeLoginCode(tailor, token.token);
 
@@ -161,12 +165,12 @@ export class AuthService {
         throw new NotFoundException('User not found');
       }
 
-      const hasToken = await this.sharedService.hasValidToken(user._id);
+      const hasToken = await this.sharedService.hasValidToken(user);
 
       if(hasToken) {
-        token = await this.sharedService.updateToken(user._id, TokenTypes.CODE);
+        token = await this.sharedService.updateToken(user.accountType, user, TokenTypes.CODE);
       } else {
-        token = await this.sharedService.createToken(AccountTypes.TAILOR, user._id, TokenTypes.CODE,);
+        token = await this.sharedService.createToken(AccountTypes.TAILOR, user, TokenTypes.CODE,);
       }
       
       this.emailService.sendOneTimeLoginCode(user, token.token);
@@ -183,7 +187,7 @@ export class AuthService {
     await user.save();
 
     this.emailService.sendWelcomeEmail(user.email, user.username);
-    const token = await this.sharedService.createToken(AccountTypes.TAILOR, user._id, TokenTypes.CODE);
+    const token = await this.sharedService.createToken(AccountTypes.TAILOR, user, TokenTypes.CODE);
 
     this.emailService.sendOneTimeLoginCode(user, token.token);
 
@@ -200,19 +204,19 @@ export class AuthService {
 
       // if token is not found throw an exception
       if(!token) {
-        throw new NotFoundException();
+        throw new NotFoundException('Invalid token. Kindly, request a new token!');
       }
 
       // check for the associated acct on the token against all acctTypes
       if(token.accountType === AccountTypes.TAILOR) {
-        acct = await this.tailorModel.findOne({ _id: token.tailor });
+        acct = await this.tailorModel.findOne({ email: token.account.email });
       } 
       else if(token.accountType === AccountTypes.USER) {
-        acct = await this.userModel.findById(token.user);
+        acct = await this.userModel.findOne({ email: token.account.email });
       }
 
       // throw an error if the acct associated with the token could not be found
-      if(!acct) throw new NotFoundException();
+      if(!acct) throw new NotFoundException('Account not found!');
 
       // generate payload for token
       const payload = { sub: acct._id, username: acct.username, email: acct.email, acctType: acct.accountType }
@@ -221,7 +225,7 @@ export class AuthService {
       const auth_token = await this.jwtService.signAsync(payload);
       
       // update token and token type
-      const result = await this.sharedService.updateToken(acct._id, TokenTypes.JWT, auth_token);
+      const result = await this.sharedService.updateToken(acct.accountType, acct, TokenTypes.JWT, auth_token);
       
       // update acct status to ACTIVE From PENDING
       if(acct && acct.status == AccountStatus.PENDING) {
@@ -230,8 +234,8 @@ export class AuthService {
 
         if(acct.accountType === AccountTypes.TAILOR) {
           await this.paystackService.createCustomer(acct);
-          await this.emailService.sendWelcomeEmail(acct.email, acct.username!);
-          await this.subscriptionService.assignSubscription(acct);
+          await this.emailService.sendWelcomeEmail(acct.email, acct.username);
+          await this.subscriptionService.assignSubscription({ user_id: acct._id });
         }
       }
 
@@ -266,7 +270,7 @@ export class AuthService {
         return false;
       }
 
-      const token = await this.sharedService.updateToken(acct._id, TokenTypes.CODE);
+      const token = await this.sharedService.updateToken(acct.accountType, acct._id, TokenTypes.CODE);
 
       await this.emailService.sendOneTimeLoginCode(acct, token.token);
 

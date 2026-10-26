@@ -28,6 +28,7 @@ export interface IProfile {
   tel?: string;
   username?: string;
   status?: string;
+  referralCode?: string;
   subscription?: any;
   profileImg?: string;
   roles?: string[]

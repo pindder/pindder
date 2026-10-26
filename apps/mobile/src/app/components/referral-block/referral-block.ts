@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IonIcon, IonButton, IonLabel, IonItem } from "@ionic/angular";
+import { IonIcon, IonButton, IonLabel, IonCard, IonCardContent } from "@ionic/angular";
 
 @Component({
   selector: 'app-referral-block',
-  imports: [
+  imports: [IonCard,
     IonLabel,
     IonButton,
-    IonIcon, IonItem],
+    IonIcon, IonCardContent],
   templateUrl: './referral-block.html',
   styleUrl: './referral-block.css',
 })

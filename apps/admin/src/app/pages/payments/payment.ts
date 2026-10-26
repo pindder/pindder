@@ -15,10 +15,12 @@ export class Payment implements OnInit{
   private router = inject(Router);
 
   payments = signal<IPayment[]>([]);
+  paymentStatus = PaymentStatus;
+  paymentStatuses = Object.keys(PaymentStatus);
 
   timeRange = signal<'7d' | '30d' | '90d'>('30d');
   currentView = signal<'payments' | 'orders'>('payments');
-  statusTab = signal<'ALL' | 'PROCESSING' | 'SUCCESS' | 'ABANDONED'>('ALL');
+  selectedStatus = signal<string>('');
   searchQuery = signal<string>('');
   toastMessage = signal<string | null>(null);
 
@@ -40,7 +42,7 @@ export class Payment implements OnInit{
             ...currentPayments ?? [],
             ...response.data ?? []
           ]);
-          console.log(this.payments);
+          console.log(this.payments());
           console.log(response.data);
         }
       },
@@ -56,7 +58,6 @@ export class Payment implements OnInit{
 
   filteredOrders = computed(() => {
     const query = this.searchQuery().toLowerCase();
-    const tab = this.statusTab();
 
     return this.payments().filter(payment => {
       const matchesSearch =
@@ -65,14 +66,14 @@ export class Payment implements OnInit{
         payment.tailor?.fullname.toLowerCase().includes(query) ||
         payment.responsePayload.reference.toLowerCase().includes(query);
 
-      const matchesStatus = tab === 'ALL' || payment.status === tab;
-      return matchesSearch && matchesStatus;
+      //const matchesStatus = tab === 'ALL' || payment.status === tab;
+      return matchesSearch; //&& matchesStatus;
     });
   });
 
   metrics = computed(() => {
     const list = this.payments();
-    const totalRevenueCollected = list.reduce((sum, p) => sum + p.amount!, 0);
+    const totalRevenueCollected = list.reduce((sum, p) => sum + (p.status === PaymentStatus.SUCCESS ? p.amount! : 0), 0);
     const totalPendingBalance = list.reduce((sum, p) => sum + (p.status === PaymentStatus.PROCESSING ? p.amount! : 0), 0);
     const completedPaymentsCount = list.filter(p => p.status === PaymentStatus.SUCCESS).length;
     const pendingPaymentsCount = list.filter(p => p.status === PaymentStatus.PROCESSING).length;
@@ -93,11 +94,16 @@ export class Payment implements OnInit{
     this.searchQuery.set(input.value);
   }
 
+  setActiveStatus(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.selectedStatus.set(select.value)
+  }
+
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Completed':
+      case PaymentStatus.SUCCESS:
         return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-      case 'Pending':
+      case PaymentStatus.PROCESSING:
         return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
       default:
         return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';

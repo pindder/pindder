@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonIcon, IonLabel } from "@ionic/angular";
+import { IonIcon, IonCardContent, IonText, IonCard } from "@ionic/angular";
+import { IonLabel } from "@ionic/angular";
+
 //import { IonButton, IonButtons } from "@ionic/angular";
 
 @Component({
   selector: 'app-data-tile',
-  imports: [IonLabel, IonIcon],
+  imports: [IonLabel, IonCardContent, IonCard, IonIcon, IonText],
   templateUrl: './data-tile.html',
   styleUrl: './data-tile.css',
 })

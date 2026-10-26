@@ -11,7 +11,7 @@ export interface IClient {
     email: string;
     phoneNo: string;
     gender: string;
-    referee: string;
+    referee?: string;
     createdAt?: string;
     measurements?: IMeasurement[];
     orders?: IOrderItem[];

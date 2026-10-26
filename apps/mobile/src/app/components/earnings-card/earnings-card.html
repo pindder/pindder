@@ -1,0 +1,39 @@
+<!-- <div class="bg-primary rounded m-3 flex flex-col gap-1 border">    
+    <ion-label class="">
+        <ion-text color="light">Earnings</ion-text>
+    </ion-label>
+
+    <div class="flex gap-2">
+        <ion-icon slot="icon-only" size="large" name="wallet-outline" color="light"></ion-icon>
+        <ion-label color="light">
+            <ion-text>20,000</ion-text>
+        </ion-label>
+    </div>
+    
+    <div class="flex">
+        <ion-button (click)="action.emit()" color="light" class="ml" expand="true" size="medium" fill="solid">
+            <ion-icon name="copy-outline" color="primary" size="small" slot="start"></ion-icon> 
+            <ion-text color="primary">Hide</ion-text>
+        </ion-button>
+        <ion-button (click)="action.emit()" color="light" class="ml" size="medium" fill="outline">
+            <ion-icon name="copy-outline" size="small" slot="start"></ion-icon> Earn
+        </ion-button>
+    </div>
+</div> -->
+
+<ion-card class="tight-card">
+    <ion-card-header>
+        <ion-card-title>20,000</ion-card-title>
+        <ion-card-subtitle>Earnings</ion-card-subtitle>
+    </ion-card-header>
+
+    <div class="flex gap-2 m-2">
+        <ion-button (click)="withdraw.emit()" color="light" size="medium" fill="solid">
+            <ion-icon name="card-outline" color="primary" size="small" slot="start"></ion-icon> 
+            <ion-text color="primary">Withdraw</ion-text>
+        </ion-button>
+        <ion-button (click)="earn.emit()" color="light" size="medium" fill="outline">
+            <ion-icon name="gift-outline" size="small" slot="start"></ion-icon> Earn
+        </ion-button>
+    </div>
+</ion-card>

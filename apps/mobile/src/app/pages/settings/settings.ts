@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, 
   IonTitle, IonToggle, IonToolbar, IonBackButton, IonButtons, 
-  IonListHeader, ViewWillEnter, IonNote 
+  ViewWillEnter,
+  AlertController
 } from '@ionic/angular';
 import { ProfileCard } from "../../components/profile-card/profile-card";
 import { TokenService } from '../../services/token.service';
@@ -22,7 +23,7 @@ const initialProfile: IProfile = {
 
 @Component({
   selector: 'app-settings',
-  imports: [IonNote, 
+  imports: [
     IonBackButton,
     IonContent,
     IonHeader,
@@ -39,7 +40,6 @@ const initialProfile: IProfile = {
     IonButtons,
     ProfileCard,
     RouterLink,
-    IonListHeader,
     ProfileCard
 ],
   templateUrl: './settings.html',
@@ -49,6 +49,7 @@ export class Settings implements ViewWillEnter{
   private router = inject(Router);
   private tokenService = inject(TokenService);
   private cdr = inject(ChangeDetectorRef);
+  private alertCtrl = inject(AlertController);
 
   profile: IProfile = { ...initialProfile };
 
@@ -65,6 +66,28 @@ export class Settings implements ViewWillEnter{
 
   openProfileEdit() {
     this.router.navigate(['app/profile/edit']);
+  }
+
+  async presentLogoutConfirmationAlert() {
+    const alert = await this.alertCtrl.create({
+      header: `Confirm Logout`,
+      message: `Are you sure you want to logout?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Logout',
+          role: 'confirm',
+          handler: () => {
+            this.logout();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   logout() {

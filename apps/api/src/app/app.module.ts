@@ -24,6 +24,7 @@ import { WebhookModule } from './webhooks/webhook.module';
 import { NotificationModule } from './notifications/notification.module';
 import { PlanModule } from './plans/plan.module';
 import { BankDetailModule } from './bank-details/bank-detail.module';
+import { AddressModule } from './addresses/address.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { BankDetailModule } from './bank-details/bank-detail.module';
     NotificationModule,
     PlanModule,
     BankDetailModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService, SharedService],
