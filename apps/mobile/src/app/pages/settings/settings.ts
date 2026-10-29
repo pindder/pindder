@@ -10,6 +10,7 @@ import { IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList,
 import { ProfileCard } from "../../components/profile-card/profile-card";
 import { TokenService } from '../../services/token.service';
 import { IProfile } from '@pindder/contracts';
+import { SseService } from '../../services/sse.service';
 
 const initialProfile: IProfile = {
   firstname: '',
@@ -48,6 +49,7 @@ const initialProfile: IProfile = {
 export class Settings implements ViewWillEnter{
   private router = inject(Router);
   private tokenService = inject(TokenService);
+  private sseService = inject(SseService);
   private cdr = inject(ChangeDetectorRef);
   private alertCtrl = inject(AlertController);
 
@@ -92,6 +94,8 @@ export class Settings implements ViewWillEnter{
 
   logout() {
     this.tokenService.clearToken();
+    // START THE REAL-TIME STREAM IMMEDIATELY
+    this.sseService.disconnect();
     this.router.navigate(["auth"]);
   }
 }

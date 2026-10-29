@@ -11,8 +11,7 @@
   </ion-fab-button>
 </ion-fab>
 
-<ion-content [scrollY]="false" [fullscreen]="true">
-  <div class="scroll-container-wrapper">
+<ion-content [fullscreen]="true">
   @if(profile){
     <!-- Profile Header-->
     <app-profile-card 
@@ -29,10 +28,10 @@
   }
 
   <!-- Quick Access-->
-  <div class="mx-3 mt-2">
+  <div class="mx-3 mt-3">
     <div class="">
       <ion-label>
-        <h3>Quick Access</h3>
+        <h2>Quick Access</h2>
       </ion-label>
     </div>
   
@@ -46,28 +45,24 @@
   </div>
 
   <!-- Recent Notifications-->
-  <div class="scrollable-body">
-    <ion-list lines="none">
-      <ion-list-header>
-        <ion-note>Recent Activities</ion-note>
-        <!-- <ion-buttons>
-          <ion-button fill="light" (click)="clearRecentNotifications()">
-            <ion-icon name="close-circle" slot="icon-only"></ion-icon>
-          </ion-button>
-        </ion-buttons> -->
-      </ion-list-header>
-
-      @for(notification of notifications; track $index){
-        <app-notification-tile [notification]="notification"></app-notification-tile>
-      } @empty { 
-        <app-empty-state
-        [hideButton]="true"
-        [icon]="'notifications-off-outline'"
-        [title]="'No Activity'"
-        ></app-empty-state>
-      }
-    </ion-list>
+  <div class="mx-3 mt-3">
+    <div class="">
+      <ion-label>
+        <h2>Recent Activities</h2>
+      </ion-label>
+    </div>
   </div>
+  <ion-list lines="none">
+    @for(notification of notifications; track $index){
+      <app-notification-tile [notification]="notification"></app-notification-tile>
+    } @empty { 
+      <app-empty-state
+      [hideButton]="true"
+      [icon]="'notifications-off-outline'"
+      [title]="'No Activity'"
+      ></app-empty-state>
+    }
+  </ion-list>
 
   <!-- Action Sheet -->
   <ion-action-sheet
@@ -77,5 +72,4 @@
     [buttons]="actionSheetButtons"
     (didDismiss)="isActionSheetOpen.set(false)">
   </ion-action-sheet>
-</div>
 </ion-content>

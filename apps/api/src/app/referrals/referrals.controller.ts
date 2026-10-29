@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ReferralsService } from './referrals.service';
 import { CreateReferralDto } from './dto/create-referral.dto';
 import { UpdateReferralDto } from './dto/update-referral.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('referrals')
 export class ReferralsController {
@@ -20,9 +23,10 @@ export class ReferralsController {
     return this.referralsService.create(createReferralDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.referralsService.findAll();
+  findAll(@Req() req: any) {
+    return this.referralsService.findAll(req.user.sub);
   }
 
   @Get(':id')

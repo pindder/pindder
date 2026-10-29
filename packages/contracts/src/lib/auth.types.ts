@@ -19,6 +19,7 @@ export interface TailorReg {
 }
 
 export interface IProfile {
+  _id?: string;
   fullname?: string;
   firstname?: string;
   lastname?: string;

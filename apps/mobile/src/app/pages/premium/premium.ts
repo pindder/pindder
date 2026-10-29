@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, 
-  IonButton, IonCardContent, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle,
+  IonCardContent, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle,
   IonIcon,
   ViewWillEnter,
   AlertController
@@ -16,7 +16,7 @@ import { Browser } from '@capacitor/browser';
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
     IonContent,
     IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-    IonButton, IonCardContent, IonIcon, 
+    IonCardContent, IonIcon, 
   ],
   templateUrl: './premium.html',
   styleUrl: './premium.css',

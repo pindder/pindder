@@ -39,6 +39,10 @@ export const pagesRoutes: Route[] = [
         loadComponent: () => import('./settings/settings').then((m) => m.Settings),
     },
     {
+        path: 'profile/brand',
+        loadComponent: () => import('./brand/brand').then((m) => m.Brand),
+    },
+    {
         path: 'profile/edit',
         loadComponent: () => import('./edit-profile/edit-profile').then((m) => m.EditProfile),
     },
@@ -51,7 +55,7 @@ export const pagesRoutes: Route[] = [
         loadComponent: () => import('./bank-details/bank-detail').then((m) => m.BankDetail),
     },
     {
-        path: 'profile/referrals',
+        path: 'referrals',
         loadComponent: () => import('./referrals/referrals').then((m) => m.Referrals),
     },
     {

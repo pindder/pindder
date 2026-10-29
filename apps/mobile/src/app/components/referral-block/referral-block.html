@@ -2,8 +2,8 @@
     <ion-card class="flex mx-3 tight-card">
         <ion-card-content>
             <div class="flex flex-row items-center gap-2" lines="none">
-                <ion-button fill="outline" size="large">
-                    <ion-icon slot="icon-only" name="link-outline" color="primary"></ion-icon>
+                <ion-button fill="outline" size="default" color="primary">
+                    <ion-icon slot="icon-only" name="arrow-redo-outline"></ion-icon>
                 </ion-button>
                 <ion-label>
                     <h2>Catalog Link</h2>
@@ -11,10 +11,10 @@
                 </ion-label>
             </div>
             <div class="w-full flex mt-2">
-                <div class="p-3 rounded-rectangle">
+                <div class="px-3 rounded-rectangle">
                     <p>https://pindder.com/{{ profile.username }}</p>
                 </div>
-                <ion-button (click)="action.emit()" class="ml" size="large" fill="outline">
+                <ion-button (click)="action.emit()" class="ml" size="default" fill="outline">
                     <ion-icon name="copy-outline" size="small" slot="icon-only"></ion-icon>
                 </ion-button>
             </div>

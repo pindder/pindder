@@ -7,6 +7,10 @@ ion-button {
     width: 174px;
 }
 
+w-full {
+  width: 100%;
+}
+
 ion-card {
   --background: var(--ion-color-primary);
   --color: #9efff0;
@@ -19,4 +23,9 @@ ion-card-title {
 
 ion-card-subtitle {
   --color: #d1fff8;
+}
+
+div ion-button {
+  flex: 1; /* Tells both buttons to grow and share the full width equally */
+  margin: 0; /* Clears out any default Ionic margins */
 }

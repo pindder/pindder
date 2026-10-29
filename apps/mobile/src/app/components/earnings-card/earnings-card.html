@@ -27,12 +27,12 @@
         <ion-card-subtitle>Earnings</ion-card-subtitle>
     </ion-card-header>
 
-    <div class="flex gap-2 m-2">
-        <ion-button (click)="withdraw.emit()" color="light" size="medium" fill="solid">
+    <div class="w-full flex gap-2 m-2">
+        <ion-button (click)="withdraw.emit()" expand="block" color="light" fill="solid">
             <ion-icon name="card-outline" color="primary" size="small" slot="start"></ion-icon> 
             <ion-text color="primary">Withdraw</ion-text>
         </ion-button>
-        <ion-button (click)="earn.emit()" color="light" size="medium" fill="outline">
+        <ion-button (click)="earn.emit()" expand="block" color="light" fill="outline">
             <ion-icon name="gift-outline" size="small" slot="start"></ion-icon> Earn
         </ion-button>
     </div>

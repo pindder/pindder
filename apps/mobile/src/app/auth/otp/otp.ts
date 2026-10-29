@@ -9,6 +9,7 @@ import { AuthService } from '../auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { TokenService } from '../../services/token.service';
+import { SseService } from '../../services/sse.service';
 
 @Component({
   imports: [
@@ -31,6 +32,7 @@ import { TokenService } from '../../services/token.service';
 export class Otp implements OnInit{
   private authService = inject(AuthService);
   private tokenService = inject(TokenService);
+  private sseService = inject(SseService);
   private router = inject(Router);
 
   verificationData!: IVerification;
@@ -46,8 +48,9 @@ export class Otp implements OnInit{
     console.log(this.verificationData);
     this.authService.verifyCode(this.verificationData).subscribe({
       next: (data) => {
-        console.log(data);
         this.tokenService.setPreferenceValue('account', JSON.stringify(data.account));
+        // START THE REAL-TIME STREAM IMMEDIATELY
+        this.sseService.connectToNotificationStream(data.account._id);
         this.router.navigate(['app'])
       }, 
       error: (error: HttpErrorResponse) => {

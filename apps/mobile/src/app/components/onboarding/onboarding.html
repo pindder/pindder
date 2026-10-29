@@ -1,0 +1,42 @@
+<ion-content [scrollY]="false">
+  
+  <!-- Skip Button Top Right -->
+  <div class="onboarding-header">
+    <button class="skip-btn" (click)="finishOnboarding()">Skip</button>
+  </div>
+
+  <!-- Scrollable Slides Container -->
+  <div class="slides-container" #slidesContainer>
+    <div class="slide">
+      <div class="slide-image-placeholder">
+        <ion-icon name="rocket-outline" color="primary"></ion-icon>
+      </div>
+      <h2>Manage Everything in One Place</h2>
+      <p>Streamline your workflow with powerful tools built for tailors and modern admins.</p>
+    </div>
+
+    <div class="slide">
+      <div class="slide-image-placeholder">
+        <ion-icon name="card-outline" color="primary"></ion-icon>
+      </div>
+      <h2>Secure & Instant Payments</h2>
+      <p>Track subscriptions, process transactions safely, and avoid duplicate charges effortlessly.</p>
+    </div>
+
+    <div class="slide">
+      <div class="slide-image-placeholder">
+        <ion-icon name="people-outline" color="primary"></ion-icon>
+      </div>
+      <h2>Grow Your Network</h2>
+      <p>Invite peers, track referrals, and scale your business with ease.</p>
+    </div>
+  </div>
+
+  <!-- Footer Navigation / Get Started Button -->
+  <div class="onboarding-footer">
+    <ion-button expand="block" color="primary" (click)="finishOnboarding()">
+      Get Started
+    </ion-button>
+  </div>
+
+</ion-content>

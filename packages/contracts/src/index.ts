@@ -7,3 +7,4 @@ export * from './lib/client.types';
 export * from './lib/design.types';
 export * from './lib/generic.types';
 export * from './lib/notification.type';
+export * from './lib/brand.interface';

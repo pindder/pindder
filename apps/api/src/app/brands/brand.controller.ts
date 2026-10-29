@@ -6,7 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards
+  UseGuards,
+  Req
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -17,11 +18,13 @@ import { AuthGuard } from '../auth/auth.guard';
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createBrandDto: CreateBrandDto) {
-    return this.brandService.create(createBrandDto);
+  create(@Body() createBrandDto: CreateBrandDto, @Req() req: any) {
+    return this.brandService.create(createBrandDto, req.user.sub); 
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.brandService.findAll();

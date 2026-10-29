@@ -63,6 +63,7 @@ export interface ITailor {
   location: string;
   clients?: IClient[];
   orders?: IOrderItem[];
+  referrals?: any[];
   metrics: {
     totalClients: number;
     totalOrders: number;

@@ -1,13 +1,12 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/mongoose';
-import { Plan } from './schema/plan.schema';
-import { Model } from 'mongoose';
-import { IResponse } from '@pindder/contracts';
+import { IPlanModel, Plan } from './schema/plan.schema';
+import { AccountTypes, IResponse } from '@pindder/contracts';
 
 @Injectable()
 export class PlanService {
@@ -22,7 +21,7 @@ export class PlanService {
   constructor(
     private httpService: HttpService,
     private readonly configService: ConfigService,
-    @InjectModel(Plan.name) private readonly planModel: Model<Plan>
+    @InjectModel(Plan.name) private readonly planModel: IPlanModel
   ) {}
 
   async create(createPlanDto: CreatePlanDto, type?: string) {
@@ -104,18 +103,27 @@ export class PlanService {
     return;
   }
 
-  async findAll() {
+  async findAll(user: any) {
+    let filtered_plans;
+
     try {
-      const plans = await this.planModel.find();
+      const plans = await this.planModel.getPlansWithStatistics();
 
       if(!plans) {
         throw new NotFoundException(`No available plans at this time!`);
       }
 
+      
+      if(user.acctType === AccountTypes.TAILOR) {
+         filtered_plans = plans.filter(plan => {
+          return plan.free === false
+        });
+      } 
+      
       const res: IResponse<Plan[]> = {
         statusCode: 200,
         msg: 'List of available plans',
-        data: plans
+        data: user.acctType === AccountTypes.TAILOR ? filtered_plans : plans
       };
 
       return res;
@@ -129,8 +137,25 @@ export class PlanService {
     return `This action returns a #${id} plan`;
   }
 
-  update(id: number, updatePlanDto: UpdatePlanDto) {
-    return `This action updates a #${id} plan`;
+  async update(id: string, updatePlanDto: UpdatePlanDto) {
+    try {
+      const plan = await this.planModel.findByIdAndUpdate(id, updatePlanDto, { returnDocument: 'after', upsert: true });
+
+      if(!plan) {
+        return new HttpException(`Plan not found!`, HttpStatus.NOT_FOUND);
+      }
+
+      const res:IResponse<any> = {
+        statusCode: 200,
+        msg: 'Plan updated successfully',
+        data: plan
+      };
+
+      return res;
+    } catch(error: any) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 
   remove(id: number) {

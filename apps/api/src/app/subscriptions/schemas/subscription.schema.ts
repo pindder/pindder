@@ -6,7 +6,11 @@ import { PlanSnapshot } from "../../plans/schema/plan.schema";
 
 export type SubscriptionDocument = HydratedDocument<Subscription>;
 
-@Schema({ timestamps: true })
+@Schema({ 
+    timestamps: true, 
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+})
 export class Subscription {
     @Prop({ type: () => TailorSnapshot, required: true })
     tailor!: TailorSnapshot;
@@ -29,5 +33,7 @@ export class Subscription {
     @Prop({ type: Object })
     paystackSubscriptionMetadata?: Record<string, any>;
 }
+@Schema({ })
+export class SubscriptionSnapshot extends Subscription{ }
 
 export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);

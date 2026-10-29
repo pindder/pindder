@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
     <ion-toolbar>
         <ion-buttons slot="start">
-            <ion-back-button default-href="app/profile"></ion-back-button>
+            <ion-back-button default-href="#"></ion-back-button>
         </ion-buttons>
         <ion-title>Referrals</ion-title>
     </ion-toolbar>
@@ -69,7 +69,12 @@
         </ion-item>
     </ion-list>
 
-    <div class="m-3">
+    <div class="flex flex-col gap-2 m-3">
+        <app-primary-button
+        [buttonText]="'Redeem Rewards'"
+        [fill]="'outline'"
+        ></app-primary-button>
+
         <app-primary-button
         [buttonText]="'Invite Friends & Earn'"
         ></app-primary-button>

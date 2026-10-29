@@ -22,7 +22,7 @@ export class Subscription implements OnInit{
   plans = signal<IPlan[]>([]);
 
   searchQuery = signal<string>('');
-  selectedStatusFilter = signal<string>('all');
+  selectedStatusFilter = signal<string>('All');
   selectedPlanFilter = signal<string>('All');
   timeRange = signal<'7d' | '30d' | '90d'>('30d');
   subscriptions = signal<any[]>([]);
@@ -34,6 +34,7 @@ export class Subscription implements OnInit{
 
   ngOnInit(): void {
     this.fetchSubscriptions();
+    this.fetchPlans();
   }
 
   fetchPlans() {
@@ -60,7 +61,7 @@ export class Subscription implements OnInit{
             ...subList ?? [],
             ...response.data ?? []
           ]);
-          console.log('Subscription List:::', this.subscriptions());
+          //console.log('Subscription List:::', this.subscriptions());
           this.filteredSubscriptions();
         }
       },
@@ -77,8 +78,8 @@ export class Subscription implements OnInit{
     const query = this.searchQuery().toLowerCase().trim();
     if (query) {
       result = result.filter(s => 
-        s.plan.name.toLowerCase().includes(this.searchQuery().toLowerCase()) ||
-        s.plan.amount.includes(this.searchQuery().toLowerCase())
+        s.plan.name.toLowerCase().includes(this.searchQuery().toLowerCase()) //||
+        //s.plan.amount.includes(this.searchQuery().toLowerCase())
       );
     }
 

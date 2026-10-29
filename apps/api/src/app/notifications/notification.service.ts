@@ -14,6 +14,7 @@ export class NotificationService {
   
   // Central event bus for notifications
   private readonly notificationSubject$ = new Subject<Notification>();
+  private notificationStream: any;
 
   constructor(
     @InjectModel(Notification.name)
@@ -38,9 +39,8 @@ export class NotificationService {
       // 1. Filter notifications where the user is either client or tailor
       filter(
         (notification) =>
-          notification.client?._id === userId ||
-          notification.tailor?._id === userId ||
-          notification.customer?._id === userId,
+          notification.initiator?._id === userId ||
+          notification.dependent?._id === userId
       ),
       // 2. Map to standard MessageEvent structure for SSE
       map((notification) => ({
@@ -53,13 +53,37 @@ export class NotificationService {
           message: notification.message,
           type: notification.type,
           action: notification.action,
-          client: notification.client || null,
-          tailor: notification.tailor || null,
-          customer: notification.customer || null,
+          initiator: notification.initiator || null,
+          dependent: notification.dependent || null,
           payload: notification.data || null,
         },
       } as MessageEvent)),
     );
+  }
+
+  onModuleInit() {
+    // Watch the notifications collection for inserts (new records)
+    this.notificationStream = this.notificationModel.watch([], { fullDocument: 'default' });
+
+    this.notificationStream.on('change', (change: any) => {
+      // Check if a brand new document was inserted
+      if (change.operationType === 'insert') {
+        const newNotification = change.fullDocument;
+
+        // Push it into our RxJS stream
+        this.notificationSubject$.next(newNotification);
+      }
+    });
+
+    this.notificationStream.on('error', (error: any) => {
+      this.logger.error('Notification: MongoDB Change Stream error', error);
+    });
+  }
+
+  async onModuleDestroy() {
+    if (this.notificationStream) {
+      await this.notificationStream.close();
+    }
   }
 
   async create(createNotificationDto: CreateNotificationDto) {

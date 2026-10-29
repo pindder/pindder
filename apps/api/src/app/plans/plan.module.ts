@@ -4,6 +4,7 @@ import { PlanController } from './plan.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Plan, PlanSchema } from './schema/plan.schema';
 import { HttpModule } from '@nestjs/axios';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { HttpModule } from '@nestjs/axios';
     ])
   ],
   controllers: [PlanController],
-  providers: [PlanService],
+  providers: [PlanService, JwtService],
   exports: [MongooseModule, PlanService]
 })
 export class PlanModule {}

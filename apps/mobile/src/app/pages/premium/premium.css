@@ -15,7 +15,7 @@
 }
 
 .sub-card {
-  flex: 0 0 520px; /* Fixed card width ensures horizontal scrolling */
+  flex: 0 0 400px; /* Fixed card width ensures horizontal scrolling */
   scroll-snap-align: center;
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
