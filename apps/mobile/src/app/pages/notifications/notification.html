@@ -15,7 +15,7 @@
   </ion-header>
 
   <ion-list [inset]="true">
-    @for(notification of notifications; track notification._id) {
+    @for(notification of notifications(); track notification._id) {
       <app-notification-tile [notification]="notification"></app-notification-tile>
       <!-- <ion-item-sliding>
         <ion-item>

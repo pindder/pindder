@@ -85,6 +85,9 @@ export class Tailor {
 
     @Prop({ type: String, required: true, enum: AccountStatus, default: AccountStatus.PENDING })
     status!: string;
+
+    @Prop({ type: Number, required: true, default: 0 })
+    currentBalance!: number;
 }
 
 export const TailorSchema = SchemaFactory.createForClass(Tailor);
@@ -139,13 +142,50 @@ TailorSchema.statics.getTailorWithStats = async function (tailorId: string) {
     {
       $lookup: {
         from: 'referrals', // Database collection name for subscriptions (check exact name in Mongo)
-        localField: '_id',
-        foreignField: 'referrer._id', // Or 'tailor._id' depending on Subscription schema
+        let: { userId: tailorId },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$referrer._id', '$$userId'] } } },
+          // Now, for each referral found, lookup its subscription document
+          {
+            $lookup: {
+              from: 'subscriptions',
+              localField: '_id', // The field inside the referral document holding the subscription ID
+              foreignField: 'refereeSubscription',
+              as: 'subscription'
+            }
+          },
+          // Optional: Turn the subscription array into a single object (like .populate())
+          {
+            $unwind: {
+              path: '$subscription',
+              preserveNullAndEmptyArrays: true
+            }
+          }
+        ],
         as: 'referrals'
+        //localField: '_id',
+        //foreignField: 'referrer._id', // Or 'tailor._id' depending on Subscription schema
+        //as: 'referrals'
       }
     },
     {
       $addFields: {
+        referrals: {
+          $map: {
+            input: '$referrals',
+            as: 'ref',
+            in: {
+              $mergeObjects: [
+                '$$ref',
+                { 
+                  // We will replace or enrich the subscription field here if needed, 
+                  // or perform a lookup. Alternatively, if 'subscription' is just an ID:
+                  // (Note: To do a full sub-lookup per item, MongoDB's pipeline lookup is best)
+                }
+              ]
+            }
+          }
+        },
         subscription: { $arrayElemAt: ['$subscription', 0] },
         metrics: {
             totalRevenue: { $sum: '$orders.totalAmount' },

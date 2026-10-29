@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('plans')
 export class PlanController {
@@ -21,9 +24,10 @@ export class PlanController {
     return this.planService.create(createPlanDto, type);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.planService.findAll();
+  findAll(@Req() req: any) {
+    return this.planService.findAll(req.user);
   }
 
   @Get(':id')
@@ -33,7 +37,7 @@ export class PlanController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePlanDto: UpdatePlanDto) {
-    return this.planService.update(+id, updatePlanDto);
+    return this.planService.update(id, updatePlanDto);
   }
 
   @Delete(':id')

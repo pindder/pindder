@@ -45,7 +45,7 @@ export class Register implements OnInit{
     this.registrationData = {
       fullname: '',
       email: '',
-      countryCode: countries[0].code,
+      countryCode: countries[38].code,
       tel: '',
       gender: '',
       referralCode: ''

@@ -39,4 +39,6 @@ export class Payment {
     metadata?: Record<string, any>;
 }
 
+export class PaymentSnapshot extends Payment { };
+
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

@@ -27,6 +27,8 @@ export interface IPlan {
   plan_id?: number;
   plan_code?: string;
   metadata?: any;
+  totalSubscribers?: number;
+  subscribers?: any[];
 }
 
 export interface IBankDetail {

@@ -1,13 +1,25 @@
-// import { Capacitor } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
 
-// const isAndroid = Capacitor.getPlatform() === 'android';
-// const baseHost = isAndroid ? '10.0.2.2' : 'localhost';
+export const localUri = 'http://localhost:4000/api';
+export const serverUri = 'https://pindder-api.onrender.com/api';
+
+// Define a proper full base URL depending on environment
+export const getApiUrl = () => {
+  const isNative = Capacitor.isNativePlatform(); // True for Android/iOS
+
+  if (!isNative) {
+    // Running in web browser during local development
+    return serverUri;
+  }
+  
+  // Running on a real phone or emulator -> use your cloud backend
+  return serverUri;
+};
 
 export const environment = {
   production: true,
-  //liveApiUrl: 'https://pindder-api.onrender.com/api',
-  //apiUrl: `http://${baseHost}:4000/api`,
-  apiUrl: 'https://pindder-api.onrender.com/api',
+  apiUrl: getApiUrl(),
   cloudName: 'w28vsff3',
   presetName: 'pindder'
 };
+

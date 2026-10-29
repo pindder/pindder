@@ -25,6 +25,7 @@ import { NotificationModule } from './notifications/notification.module';
 import { PlanModule } from './plans/plan.module';
 import { BankDetailModule } from './bank-details/bank-detail.module';
 import { AddressModule } from './addresses/address.module';
+import { LedgerModule } from './ledger/ledger.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { AddressModule } from './addresses/address.module';
     PlanModule,
     BankDetailModule,
     AddressModule,
+    LedgerModule,
   ],
   controllers: [AppController],
   providers: [AppService, SharedService],

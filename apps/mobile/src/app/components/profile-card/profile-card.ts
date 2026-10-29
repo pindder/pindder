@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonAvatar, IonBadge, IonLabel, IonIcon, IonItem, IonButton } from "@ionic/angular";
 import { IProfile } from '@pindder/contracts';
 
@@ -12,4 +13,10 @@ export class ProfileCard {
   @Input() profile!: IProfile;
   @Input() hideNotification = true;
   @Output() action = new EventEmitter();
+
+  private router = inject(Router);
+
+  launchProfile() {
+    this.router.navigate(['app/profile/edit']);
+  }
 }

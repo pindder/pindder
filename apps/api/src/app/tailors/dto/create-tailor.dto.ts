@@ -19,5 +19,5 @@ export class CreateTailorDto {
 
     @IsString()
     @IsOptional()
-    referral?: string;
+    referralCode?: string;
 }

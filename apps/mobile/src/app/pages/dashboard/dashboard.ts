@@ -1,6 +1,6 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef, Component, EnvironmentInjector, inject, signal } from '@angular/core';
-import { IonContent, IonFabButton, IonFab, IonIcon, IonList, IonActionSheet, IonListHeader, ViewWillEnter, ModalController, ToastController, IonLabel } from "@ionic/angular";
+import { IonContent, IonFabButton, IonFab, IonIcon, IonList, IonActionSheet, ViewWillEnter, ModalController, ToastController, IonLabel } from "@ionic/angular";
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
 import { NotificationTile } from "../../components/notification-tile/notification-tile";
@@ -15,12 +15,11 @@ import { INotification } from '@pindder/contracts';
 import { NotificationService } from '../../services/notification.service';
 import { SseService } from '../../services/sse.service';
 import { Subscription } from 'rxjs';
-import { IonNote } from "@ionic/angular";
 import { EarningsCard } from '../../components/earnings-card/earnings-card';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [IonLabel, IonNote,
+  imports: [IonLabel,
     IonActionSheet,
     IonList,
     IonIcon,
@@ -31,7 +30,6 @@ import { EarningsCard } from '../../components/earnings-card/earnings-card';
     ReferralBlock,
     DataTile,
     NotificationTile,
-    IonListHeader,
     ProfileCard,
     EmptyState, EarningsCard],
   templateUrl: './dashboard.html',
@@ -51,6 +49,7 @@ export class Dashboard implements ViewWillEnter{
   profile!: any;
   environmentInjector = inject(EnvironmentInjector);
   presentingElement!: HTMLElement | null;
+  userBalance = signal<number>(0);
   
   modalContent = signal<string>("");
   isActionSheetOpen = signal<boolean>(false);
@@ -156,18 +155,7 @@ export class Dashboard implements ViewWillEnter{
     // Prevent duplicate connections if already connected
     if (this.sseSubscription) return;
 
-    this.sseSubscription = this.sseService
-      .connectToNotificationStream(userId)
-      .subscribe({
-        next: (notification) => {
-          console.log('New notification received:', notification);
-          // Show toast alert, trigger local notification badge count, etc.
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          console.error('SSE Connection Error:', err);
-        },
-      });
+    this.sseService.connectToNotificationStream(userId)
   }
 
   openNotifications() {
@@ -183,7 +171,7 @@ export class Dashboard implements ViewWillEnter{
   }
 
   gotoEarn() {
-    this.router.navigate(['app/profile/referrals']);
+    this.router.navigate(['app/referrals']);
   }
 
   gotoPayout() {

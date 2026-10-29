@@ -58,7 +58,11 @@ export class SharedService {
             const token = new this.tokenModel();
 
             token.type = tokenType ?? TokenTypes.CODE;
-            token.token = tkn ?? generateCode();
+            if(tkn) {
+                token.token = tkn
+            } else {
+                token.token = generateCode();
+            }
             token.status = TokenStatus.ACTIVE;
             token.accountType = acctType;
 

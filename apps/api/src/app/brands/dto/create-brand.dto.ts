@@ -1,9 +1,14 @@
 export class CreateBrandDto {
-    tailor!: string;
+    _id?: string;
     name!: string;
-    email!: string;
-    adminFullname!: string;
-    phoneNo!: string;
-    logoUri?: string;
-    password!: string;
+    bio?: string;
+    logo?: string;
+    status?: string;
+    website?: string;
+    email?: string;
+    countryCode?: string;
+    tel?: string;
+    country?: string;
+    state?: string;
+    region?: string;
 }

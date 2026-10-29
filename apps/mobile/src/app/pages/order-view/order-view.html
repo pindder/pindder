@@ -19,6 +19,28 @@
         </ion-toolbar>
     </ion-header>}
 
+    <!-- Order Status-->
+    @if(order.status !== orderStatuses.CANCELLED){
+    <ion-list [inset]="true">
+        <ion-item lines="none">
+            <ion-select 
+                [(ngModel)]="order.status" 
+                name="countryCode" 
+                [interfaceOptions]="customModalOptions" 
+                interface="modal" 
+                [toggleIcon]="'chevron-down-outline'"
+                class="country-code-select"
+                aria-label="Country Code">
+                    @for(status of orderStatus; track status) {
+                        <ion-select-option [value]="status">
+                            {{ status | titlecase }}
+                        </ion-select-option>
+                    }
+            </ion-select>
+            <ion-note>Order Status</ion-note>
+        </ion-item>
+    </ion-list>}
+    
     <!-- Client Information-->
     <ion-list [inset]="true">
         <ion-list-header>
@@ -277,28 +299,6 @@
             </ion-item-options>
         </ion-item-sliding>}
     </ion-list>
-
-    <!-- Order Status-->
-    @if(order.status !== orderStatuses.CANCELLED){
-    <ion-list [inset]="true">
-        <ion-item lines="none">
-            <ion-select 
-                [(ngModel)]="order.status" 
-                name="countryCode" 
-                [interfaceOptions]="customModalOptions" 
-                interface="modal" 
-                [toggleIcon]="'chevron-down-outline'"
-                class="country-code-select"
-                aria-label="Country Code">
-                    @for(status of orderStatus; track status) {
-                        <ion-select-option [value]="status">
-                            {{ status | titlecase }}
-                        </ion-select-option>
-                    }
-            </ion-select>
-            <ion-note>Order Status</ion-note>
-        </ion-item>
-    </ion-list>}
 
     @if(isPreview){
     <div class="p-3">

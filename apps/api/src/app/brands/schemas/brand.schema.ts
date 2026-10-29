@@ -7,11 +7,11 @@ export type BrandDocument = HydratedDocument<Brand>;
 
 @Schema({ timestamps: true })
 export class Brand {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   name!: string;
 
-  @Prop({ type: String, maxLength: 1500 })
-  description?: string;
+  @Prop({ type: String, maxLength: 1800, default: null})
+  bio?: string;
 
   @Prop({ type: TailorSnapshot, required: true })
   admin!: TailorSnapshot;
@@ -20,7 +20,19 @@ export class Brand {
   email!: string;
 
   @Prop({ type: String, default: null })
-  phoneNo!: string;
+  countryCode?: string;
+
+  @Prop({ type: String, default: null })
+  tel?: string;
+  
+  @Prop({ type: String, default: null })
+  country?: string;
+
+  @Prop({ type: String, default: null })
+  state?: string;
+
+  @Prop({ type: String, default: null })
+  region?: string;
 
   @Prop({ type: String, default: null })
   logo?: string;
@@ -31,5 +43,7 @@ export class Brand {
   @Prop({ type: String, required: true, enum: AccountStatus, default: AccountStatus.ACTIVE })
   status!: string;
 }
+
+export class BrandSnapshot extends Brand { };
 
 export const BrandSchema = SchemaFactory.createForClass(Brand);

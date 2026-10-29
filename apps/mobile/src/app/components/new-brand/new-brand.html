@@ -1,0 +1,149 @@
+<!-- <ion-header>
+    <ion-toolbar>
+        <ion-title>New Business</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header> -->
+<ion-content color="light">
+  <form #loginForm="ngForm" (ngSubmit)="submit()" class="my-2">
+    <ion-list [inset]="true" lines="full">
+        <ion-item>
+            <ion-input 
+            name="name"
+            type="text"
+            [(ngModel)]="brand().name" 
+            label="Business name" 
+            labelPlacement="stacked"
+            ></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-textarea 
+            name="bio"
+            label="Bio (optional)"
+            labelPlacement="stacked"  
+            rows="5"
+            [(ngModel)]="brand().bio"
+            ></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+            <ion-select 
+            name="country"
+            label="Country"
+            labelPlacement="stacked" 
+            [(ngModel)]="brand().country"
+            (ngModelChange)="updateCountryCode($event)"
+            >
+                @for(country of countries; track country){
+                    <ion-select-option [value]="country.name">{{ country.name }}</ion-select-option>
+                }
+            </ion-select>
+        </ion-item>
+
+        <ion-item>
+            <ion-input
+            name="email"
+            type="email"
+            label="Business email (optional)"
+            labelPlacement="stacked"
+            [(ngModel)]="brand().email"
+            ></ion-input>
+        </ion-item>
+
+        <ion-item fill="outline" class="custom-input phone-container-item">
+            <div class="flex flex-col">
+                <ion-text class="text-xs pt-2" [color]="'dark'" slot="start">Phone No</ion-text>
+                <div class="phone-input-wrapper">
+                    <!-- Country Code Selector -->
+                    <ion-select 
+                    [(ngModel)]="brand().countryCode" 
+                    name="countryCode" 
+                    [interfaceOptions]="customModalOptions" 
+                    interface="modal" 
+                    [toggleIcon]="'chevron-down-outline'"
+                    class="country-code-select"
+                    aria-label="Country Code">
+                        @for(c of countries; track c.name) {
+                            <ion-select-option [value]="c.code">
+                                {{ c.flag }} {{ c.code }}
+                            </ion-select-option>
+                        }
+                    </ion-select>
+
+                    <!-- Phone Digits Input -->
+                    <ion-input 
+                    label-placement="stacked" 
+                    type="tel" 
+                    [(ngModel)]="brand().tel" 
+                    name="tel"
+                    placeholder="800 000 0000" 
+                    class="phone-digits-input"
+                    required>
+                    </ion-input>
+                </div>
+            </div>
+        </ion-item>
+
+        <ion-item>
+            <ion-input 
+            name="website"
+            type="text"
+            [(ngModel)]="brand().website" 
+            label="Website (optional)" 
+            labelPlacement="stacked"
+            ></ion-input>
+        </ion-item>
+    </ion-list>
+
+    @if(brand()._id){<ion-list [inset]="true" lines="none">
+        <ion-list-header>
+            <ion-label>Locations</ion-label>
+            <ion-buttons>
+                <ion-button (click)="openNewAddressModal()">
+                    <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+            </ion-buttons>
+        </ion-list-header>
+
+        @for(address of addresses; track address._id){
+            <ion-item-sliding>
+                <ion-item button lines="none" (click)="openNewAddressModal(address)">
+                    <ion-label>
+                    <h4>{{ address.addressLine1 + ', ' + address.addressLine2 }}</h4>
+                    <!-- <p>{{ address.city }}</p> -->
+                    </ion-label>
+                    <ion-note>{{ address.country }}</ion-note>
+                </ion-item>
+                <ion-item-options slot="end">
+                    <ion-item-option (click)="presentDeleteAlert(address)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-item-option>
+                </ion-item-options>
+            </ion-item-sliding>
+        } @empty {
+            <app-empty-state
+            [buttonText]="'New Address'"
+            [icon]="'business-outline'"
+            [title]="'No Address yet'"
+            (action)="openNewAddressModal()"
+            >
+            </app-empty-state>
+        }
+
+        <ion-item></ion-item>
+    </ion-list>}
+
+    <div class="p-3">
+      <app-primary-button
+        [buttonText]="'Save'"
+        [icon]="'save-outline'"
+        (action)="submit()"
+      ></app-primary-button>
+    </div>
+  </form>
+</ion-content>

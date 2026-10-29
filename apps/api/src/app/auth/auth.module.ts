@@ -11,6 +11,7 @@ import { SharedModule } from '../shared/shared.module';
 import { PaymentModule } from '../payments/payment.module';
 import { SubscriptionModule } from '../subscriptions/subscription.module';
 import { AdminModule } from '../admins/admin.module';
+import { ReferralsModule } from '../referrals/referrals.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminModule } from '../admins/admin.module';
     SharedModule,
     PaymentModule,
     SubscriptionModule,
+    ReferralsModule
   ],
   controllers: [AuthController],
   providers: [AuthService],

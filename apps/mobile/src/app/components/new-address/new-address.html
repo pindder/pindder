@@ -1,0 +1,83 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{ address()._id ? 'Update' : 'New' }} Address</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+  <form #loginForm="ngForm" (ngSubmit)="submit()" class="my-2">
+    <ion-list lines="full">
+      <ion-item>
+        <ion-input 
+        name="addressLine1"
+        type="text"
+        [(ngModel)]="address().addressLine1" 
+        label="Address Line 1" 
+        labelPlacement="stacked"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input 
+          name="addressLine2"
+          type="text" 
+          label="Address Line 2 (optional)"
+          labelPlacement="stacked"  
+          [(ngModel)]="address().addressLine2"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          name="country"
+          type="text"
+          label="Country"
+          labelPlacement="stacked"
+          [(ngModel)]="address().country"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input 
+          name="state"
+          label="State (optional)"
+          type="text" 
+          labelPlacement="stacked" 
+          [(ngModel)]="address().state"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input 
+          name="city"
+          label="City (optional)"
+          type="text" 
+          labelPlacement="stacked" 
+          [(ngModel)]="address().city"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input 
+          name="zipCode"
+          label="Zip code (optional)"
+          type="text" 
+          labelPlacement="stacked" 
+          [(ngModel)]="address().zipCode"
+        ></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <div class="p-3">
+      <app-primary-button
+        [buttonText]="'Save'"
+        [icon]="'save-outline'"
+        (action)="submit()"
+      ></app-primary-button>
+    </div>
+  </form>
+</ion-content>

@@ -1,1 +1,102 @@
-<p>contact works!</p>
+<ion-header [translucent]="true">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button default-href="app/profile"></ion-back-button>
+        </ion-buttons>
+        <ion-title>Get in touch</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content color="light" [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar color="light">
+        <ion-title size="large">Get in touch</ion-title>
+        </ion-toolbar>
+    </ion-header>
+
+    <div class="mx-3 mt-3">
+        <div class="">
+            <ion-label>
+                <h2>Direct Channels</h2>
+            </ion-label>
+        </div>
+    </div>
+    <ion-list [inset]="true">
+        <ion-item href="tel:+2349042333108" target="_blank">
+            <ion-icon name="call-outline" slot="start"></ion-icon>
+            <ion-label>
+                Phone
+            </ion-label>
+        </ion-item>
+        <ion-item href="https://wa.me/2349042333108?text=Hello,%20I%20need%20help%20with%20my%20order" target="_blank" rel="noopener noreferrer">
+            <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+            <ion-label>
+                Whatsapp
+            </ion-label>
+        </ion-item>
+        <ion-item href="mailto:hello@pindder.com?subject=App%20Support&body=Hi%20Team," target="_blank">
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            <ion-label>
+                Email
+            </ion-label>
+        </ion-item>
+        <ion-item href="https://pindder.com/support" target="_blank">
+            <ion-icon name="globe-outline" slot="start"></ion-icon>
+            <ion-label>
+                Website
+            </ion-label>
+        </ion-item>
+    </ion-list>
+
+    <div class="mx-3 mt-3">
+        <div class="">
+        <ion-label>
+            <h2>Social Media</h2>
+        </ion-label>
+        </div>
+    </div>
+    <ion-list [inset]="true">
+        <ion-item href="https://www.linkedin.com/company/pindder/" [detailIcon]="'open-outline'">
+            <ion-icon name="logo-linkedin" slot="start"></ion-icon>
+            <ion-label>
+                LinkedIn
+            </ion-label>
+        </ion-item>
+        <ion-item href="https://web.facebook.com/profile.php?id=61586141444014" [detailIcon]="'open-outline'">
+            <ion-icon name="logo-facebook" slot="start"></ion-icon>
+            <ion-label>
+                Facebook
+            </ion-label>
+        </ion-item>
+        <ion-item href="https://www.instagram.com/pindder.app" [detailIcon]="'open-outline'">
+            <ion-icon name="logo-instagram" slot="start"></ion-icon>
+            <ion-label>
+                Instagram
+            </ion-label>
+        </ion-item>
+        <!-- <ion-item href="https://pindder.com" [detailIcon]="'open-outline'">
+            <ion-icon name="logo-pinterest" slot="start"></ion-icon>
+            <ion-label>
+                Pinterest
+            </ion-label>
+        </ion-item> -->
+        <!-- <ion-item href="https://pindder.com" [detailIcon]="'open-outline'">
+            <ion-icon name="logo-threads" slot="start"></ion-icon>
+            <ion-label>
+                Threads
+            </ion-label>
+        </ion-item> -->
+        <ion-item href="https://www.tiktok.com/@pindder" [detailIcon]="'open-outline'">
+            <ion-icon name="logo-tiktok" slot="start"></ion-icon>
+            <ion-label>
+                Tiktok
+            </ion-label>
+        </ion-item>
+        <ion-item href="https://x.com/usepindder" [detailIcon]="'open-outline'">
+            <ion-icon name="logo-x" slot="start"></ion-icon>
+            <ion-label>
+                Twitter
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>

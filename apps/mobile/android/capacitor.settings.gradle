@@ -5,11 +5,17 @@ project(':capacitor-android').projectDir = new File('../../../node_modules/@capa
 include ':capacitor-community-photoviewer'
 project(':capacitor-community-photoviewer').projectDir = new File('../../../node_modules/@capacitor-community/photoviewer/android')
 
+include ':capacitor-browser'
+project(':capacitor-browser').projectDir = new File('../../../node_modules/@capacitor/browser/android')
+
 include ':capacitor-camera'
 project(':capacitor-camera').projectDir = new File('../../../node_modules/@capacitor/camera/android')
 
 include ':capacitor-http'
 project(':capacitor-http').projectDir = new File('../../../node_modules/@capacitor/http/android')
+
+include ':capacitor-local-notifications'
+project(':capacitor-local-notifications').projectDir = new File('../../../node_modules/@capacitor/local-notifications/android')
 
 include ':capacitor-preferences'
 project(':capacitor-preferences').projectDir = new File('../../../node_modules/@capacitor/preferences/android')

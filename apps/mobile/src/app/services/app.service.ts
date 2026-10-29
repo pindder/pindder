@@ -153,4 +153,8 @@ export class AppService {
   fetchPayoutDetails(): Observable<IResponse<IBankDetail[]>> {
     return this.http.get<IResponse<IBankDetail[]>>(`${environment.apiUrl}/banks/search`);
   }
+
+  getReferrals(): Observable<IResponse<any>> {
+    return this.http.get<IResponse<any>>(`${environment.apiUrl}/referrals`);
+  }
 }

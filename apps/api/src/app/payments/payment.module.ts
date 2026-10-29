@@ -9,6 +9,8 @@ import { Order, OrderSchema } from '../orders/schemas/order.schema';
 import { HttpModule } from '@nestjs/axios';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SharedModule } from '../shared/shared.module';
+import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
+import { LedgerModule } from '../ledger/ledger.module';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { SharedModule } from '../shared/shared.module';
     MongooseModule.forFeature([
       { name: Payment.name, schema: PaymentSchema },
       { name: Order.name, schema: OrderSchema },
+      { name: Tailor.name, schema: TailorSchema }
     ]),
+    LedgerModule,
     SharedModule
   ],
   controllers: [PaymentController, PaymentWebhookController],

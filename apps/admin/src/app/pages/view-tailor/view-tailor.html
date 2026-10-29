@@ -341,15 +341,15 @@
         </div>
 
         <div class="divide-y divide-slate-100 dark:divide-slate-800">
-            @for (ref of mockReferrals; track ref.id) {
+            @for (referral of tailor()?.referrals; track referral._id) {
             <div class="py-3 flex items-center justify-between text-xs">
                 <div>
-                <p class="font-bold text-slate-800 dark:text-slate-200">{{ ref.tailorName }}</p>
-                <p class="text-[10px] text-slate-400">Joined {{ ref.joinedDate }}</p>
+                <p class="font-bold text-slate-800 dark:text-slate-200">{{ referral.referee.fullname }}</p>
+                <p class="text-[10px] text-slate-400">Joined {{ referral.createdAt }}</p>
                 </div>
                 <div class="text-right">
-                <p class="font-bold text-emerald-500">+{{ ref.commissionEarned }}</p>
-                <span class="text-[10px] text-slate-400">{{ ref.status }}</span>
+                <p class="font-bold text-emerald-500">+{{ referral.commissionEarned }}</p>
+                <span class="text-[10px] text-slate-400">{{ referral.refereeSubscription.status }}</span>
                 </div>
             </div>
             }

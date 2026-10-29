@@ -1,9 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, Model } from "mongoose";
 
 export type PlanDocument = HydratedDocument<Plan>;
 
-@Schema({ timestamps: true })
+@Schema({ 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+})
 export class Plan {
     @Prop({ type: String, required: true })
     name!: string;
@@ -58,3 +62,48 @@ export class Plan {
 export class PlanSnapshot extends Plan { }
 
 export const PlanSchema = SchemaFactory.createForClass(Plan);
+
+PlanSchema.statics.getPlansWithStatistics = async function (options?: {
+    limit?: number,
+    skip?: number,
+    search?: string
+}) {
+    const { limit = 20, skip = 0, search } = options || {};
+
+    const pipeline: any[] = [];
+
+    if (search) {
+        pipeline.push({
+            $match: {
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                ]
+            }
+        });
+    }
+
+    pipeline.push(
+        {
+            $lookup: {
+                from: 'subscriptions', // MongoDB collection name for subscriptions
+                localField: '_id',
+                foreignField: 'plan._id', // Field in Subscription document
+                as: 'subscribers'
+            }
+        },
+        {
+            $addFields: {
+                totalSubscribers: { $size: '$subscribers' },
+            }
+        },
+        { $skip: skip },
+        { $limit: limit }
+    );
+
+    return await this.aggregate(pipeline);
+}
+
+// Custom Model Interface for NestJS Dependency Injection
+export interface IPlanModel extends Model<PlanDocument> {
+  getPlansWithStatistics(options?: { limit?: number; skip?: number; search?: string }): Promise<any[]>;
+}

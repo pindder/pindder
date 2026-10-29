@@ -1,24 +1,31 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Payment } from './schemas/payment.schema';
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { RedisService } from '../shared/redis.service';
 import { IResponse, PaymentStatus, PaymentTypes } from '@pindder/contracts';
 import { PaystackService } from '../shared/paystack.service';
 import { Order } from '../orders/schemas/order.schema';
 import { OnEvent } from '@nestjs/event-emitter';
+import { Ledger } from '../ledger/schema/ledger.schema';
+import { Tailor } from '../tailors/schemas/tailor.schema';
+import { StreamerService } from '../shared/streamer.service';
 
 @Injectable()
 export class PaymentService {
   private logger = new Logger(PaymentService.name);
 
   constructor(
-    @InjectModel(Payment.name) private paymentModel: Model<Payment>,
+    @InjectConnection() private readonly connection: Connection,
+    @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
+    @InjectModel(Ledger.name) private readonly ledgerModel: Model<Ledger>,
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
+    @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
     private redisService: RedisService,
-    private paystackService: PaystackService
+    private paystackService: PaystackService,
+    private streamerService: StreamerService
   ) {}
 
   @OnEvent('order.payment.successful')
@@ -30,7 +37,7 @@ export class PaymentService {
   }) {
     this.logger.log(`Processing successful order payment for ${payload}`);
     
-    const payment = await this.paymentModel.findOne({ providerTransactionId: payload.reference });
+    const payment = await this.paymentModel.findOne({ providerTransactionId: payload.reference }).exec();
 
     if(!payment) {
       this.logger.error(`Payment not found:`, payload.metadata);
@@ -41,6 +48,8 @@ export class PaymentService {
     payment.metadata = payload.metadata;
 
     await payment.save()
+
+    this.creditUserBalance(payment);
     return;
   }
 
@@ -311,5 +320,58 @@ export class PaymentService {
 
   remove(id: number) {
     return `This action removes a #${id} payment`;
+  }
+
+  async creditUserBalance(paymentInfo: any) {
+    // 1. start mongodb session
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
+    try {
+      // 2. Create the immutable ledger entry (Note: pass inside an array and provide { session })
+      const ledgerEntry = await this.ledgerModel.create(
+        [
+          {
+            account: paymentInfo.tailor,
+            balance: paymentInfo.amount,
+            transactionType: 'CREDIT',
+            transaction: paymentInfo,
+            status: 'SUCCESS',
+          },
+        ],
+        { session }
+      );
+
+      // 3. Atomically update the user's cached balance
+      const updatedUser = await this.tailorModel.findByIdAndUpdate(
+        paymentInfo.tailor._id,
+        { $inc: { currentBalance: paymentInfo.amount } },
+        { upsert: true, returnDocument: 'after', session } // Must include session here too!
+      );
+
+      if (!updatedUser) {
+        throw new Error('User not found during transaction.');
+      }
+
+      // 4. If everything succeeded, commit the transaction
+      await session.commitTransaction();
+      return { 
+        success: true, 
+        newBalance: updatedUser.currentBalance,
+        ledgerId: ledgerEntry[0]._id 
+      };
+
+      // 5. Trigger sse to update balance in app
+      this.streamerService.streamUserBalance(paymentInfo);
+
+    } catch (error: any) {
+      // 5. If any error occurs, abort and roll back all changes
+      await session.abortTransaction();
+      throw new InternalServerErrorException(`Payment transaction rolled back: ${error.message}`);
+      
+    } finally {
+      // 6. Always end the session to release database connections
+      session.endSession();
+    }
   }
 }

@@ -14,6 +14,7 @@ import { PaystackService } from '../shared/paystack.service';
 import { generateCode } from '../shared/helpers';
 import { SubscriptionService } from '../subscriptions/subscription.service';
 import { Admin } from '../admins/schemas/admin.schema';
+import { ReferralsService } from '../referrals/referrals.service';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,8 @@ export class AuthService {
     private readonly paystackService: PaystackService,
     private readonly emailService: EmailService,
     private readonly sharedService: SharedService,
-    private readonly subscriptionService: SubscriptionService
+    private readonly subscriptionService: SubscriptionService,
+    private readonly referralService: ReferralsService
   ) {}
 
   async adminLogin(loginDto: LoginDto) {
@@ -142,6 +144,13 @@ export class AuthService {
 
       await this.emailService.sendOneTimeLoginCode(tailor, token.token);
 
+      console.log(tailorRegistrationDto);
+      // if tailor was referred capture referral info
+      if(tailorRegistrationDto.referralCode) {
+        await this.subscriptionService.assignSubscription({ user_id: tailor._id });
+        await this.referralService.create({ referee: tailor, referrer: tailorRegistrationDto.referralCode });
+      }
+
       const res: IResponse<Tailor> = {
         statusCode: 200,
         msg: `Account created successfully!`,
@@ -235,7 +244,6 @@ export class AuthService {
         if(acct.accountType === AccountTypes.TAILOR) {
           await this.paystackService.createCustomer(acct);
           await this.emailService.sendWelcomeEmail(acct.email, acct.username);
-          await this.subscriptionService.assignSubscription({ user_id: acct._id });
         }
       }
 
@@ -270,7 +278,7 @@ export class AuthService {
         return false;
       }
 
-      const token = await this.sharedService.updateToken(acct.accountType, acct._id, TokenTypes.CODE);
+      const token = await this.sharedService.updateToken(acct.accountType, acct, TokenTypes.CODE);
 
       await this.emailService.sendOneTimeLoginCode(acct, token.token);
 

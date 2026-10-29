@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@angular/core';
-import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton, IonIcon, IonAlert, ViewWillEnter, IonInput, IonTextarea, IonSelect, IonList, IonSelectOption, IonItem, IonActionSheet, IonToggle, ModalController, ToastController, IonLabel, IonListHeader } from '@ionic/angular';
+import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton, IonIcon, IonAlert, ViewWillEnter, IonInput, IonTextarea, IonSelect, IonList, IonSelectOption, IonItem, IonActionSheet, IonToggle, ModalController, ToastController, IonLabel, IonListHeader, IonNote } from '@ionic/angular';
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +15,7 @@ import { Specification } from '../../components/specification/specification';
   imports: [IonToggle, IonActionSheet, IonList, IonTextarea, IonInput, IonAlert, IonIcon, IonButton,
     IonHeader, IonToolbar, IonButtons, IonBackButton,
     IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, IonItem,
-    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, PrimaryButton, IonLabel, IonListHeader],
+    IonTitle, IonContent, IonSelect, IonSelectOption, FormsModule, PrimaryButton, IonLabel, IonListHeader, IonNote],
   templateUrl: './design-view.html',
   styleUrl: './design-view.css',
 })
@@ -59,14 +59,14 @@ export class DesignView implements ViewWillEnter, OnInit{
         })
       },
     },
-    {
-      text: 'Remove Style',
-      icon: 'trash-outline',
-      // role: 'destructive',
-      handler: () => {
-        return;
-      },
-    },
+    // {
+    //   text: 'Remove Style',
+    //   icon: 'trash-outline',
+    //   // role: 'destructive',
+    //   handler: () => {
+    //     return;
+    //   },
+    // },
   ];
 
   dataTypes = Object.keys(DataTypes);

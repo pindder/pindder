@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonContent, IonList, IonItem, IonInput, 
-  ViewWillEnter, IonButton, IonSelect, IonSelectOption, IonButtons, 
-  IonTitle, IonBackButton, IonSpinner, IonIcon, IonActionSheet, 
+  ViewWillEnter, IonSelect, IonSelectOption, IonButtons, 
+  IonTitle, IonBackButton, IonSpinner, IonActionSheet, 
   IonLabel, 
   ModalController
 } from '@ionic/angular';
@@ -16,18 +16,18 @@ import { ClientOrders } from '../../components/client-orders/client-orders';
 
 @Component({
   imports: [
-    IonActionSheet, IonIcon, IonSpinner, IonButtons, 
+    IonActionSheet, IonSpinner, IonButtons, 
     IonBackButton, IonTitle,
     IonContent, IonHeader, IonToolbar,
     IonList, IonItem, IonInput, FormsModule,
-    IonButton, IonSelect, IonSelectOption,
-    IonSpinner, IonIcon,
-    IonIcon, IonLabel, PrimaryButton
+    IonSelect, IonSelectOption,
+    IonSpinner,
+    IonLabel, PrimaryButton
   ],
   templateUrl: './client-view.html',
   styleUrl: './client-view.css',
 })
-export class ClientView implements ViewWillEnter, OnInit{
+export class ClientView implements ViewWillEnter{
   private ar = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private clientService = inject(ClientService);
@@ -61,24 +61,20 @@ export class ClientView implements ViewWillEnter, OnInit{
     //     })
     //   },
     // },
-    {
-      text: 'Delete Client',
-      icon: 'trash-outline',
-      role: 'destructive',
-      handler: () => {
+    // {
+    //   text: 'Delete Client',
+    //   icon: 'trash-outline',
+    //   role: 'destructive',
+    //   handler: () => {
     
-      },
-    },
+    //   },
+    // },
   ];
 
   ionViewWillEnter(): void {
     this.presentingElement = document.querySelector('.ion-page');
     this.client_id = this.ar.snapshot.params['id'];
     this.fetchClient();
-  }
-
-  ngOnInit(): void {
-    
   }
 
   fetchClient() {

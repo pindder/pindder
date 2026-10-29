@@ -69,19 +69,31 @@ export class SubscriptionService {
         throw new NotFoundException(`Tailor not found!`);
       }
 
-      const newSubscription = await this.subscriptionModel.create({
-        tailor: tailor,
-        plan: selected_plan,
-        provider: SubscriptionProviders.paystack,
-        status: SubscriptionStatus.active,
-      });
+      let subscription;
+      subscription = await this.subscriptionModel.findOne({ 'tailor._id': tailor._id });
 
-      await newSubscription.save();
+      if(subscription) {
+        subscription.plan = selected_plan;
+        subscription.status = SubscriptionStatus.active;
+        
+        await subscription.save()
+
+      } else {
+        subscription = await this.subscriptionModel.create({
+          tailor: tailor,
+          plan: selected_plan,
+          provider: SubscriptionProviders.paystack,
+          status: SubscriptionStatus.active,
+        });
+
+        await subscription.save();
+
+      }
 
       const res: IResponse<any> = {
         statusCode: 200,
-        msg: `${newSubscription.plan.name} subscription activated for ${newSubscription.tailor.fullname}`,
-        data: newSubscription
+        msg: `${subscription.plan.name} subscription activated for ${subscription.tailor.fullname}`,
+        data: subscription
       }
 
       return res;
