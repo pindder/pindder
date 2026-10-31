@@ -1,23 +1,22 @@
 // import { MeasurementTypes, Sizes } from '@pindder/contracts';
-import { IsNotEmpty, IsObject, IsMongoId, IsOptional, IsString, } from 'class-validator';
+import { IsNotEmpty, IsMongoId, IsOptional, IsString, } from 'class-validator';
 
 export class CreateMeasurementDto {
     @IsOptional()
     @IsMongoId()
     _id?: string;
 
-    @IsOptional()
-    client?: string; 
-
-    @IsOptional()
-    user?: string;
+    @IsString()
+    owner?: string;
 
     @IsString()
     @IsNotEmpty()
     name!: string;
 
     @IsString()
+    @IsOptional()
     description?: string;
+
 //   @IsNotEmpty()
 //   @IsEnum(MeasurementTypes)
 //   measurementType!: string;
@@ -26,7 +25,6 @@ export class CreateMeasurementDto {
 //   @IsOptional()
 //   size?: string;
 
-    @IsObject()
     @IsNotEmpty()
     @IsOptional()
     // Validates that all values inside the measurements map are strings or numbers

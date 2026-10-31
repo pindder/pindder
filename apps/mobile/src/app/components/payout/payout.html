@@ -1,0 +1,41 @@
+<div class="flex justify-start px-3 pt-2">
+    <ion-label>
+        <h1>Payout Details</h1>
+    </ion-label>
+</div>
+<form #withdrawalForm="ngForm" (ngSubmit)="submit()">
+    <div class="p-3">
+        <ion-item lines="none" fill="outline" class="custom-input">
+            <ion-input
+            name="amount"
+            [(ngModel)]="withdraw().amount"
+            label="Amount"
+            type="text"
+            labelPlacement="stacked"
+            placeholder="1,000"
+            ></ion-input>
+        </ion-item>
+
+        <ion-select 
+        [(ngModel)]="withdraw().account" 
+        name="account" 
+        interface="popover" 
+        [toggleIcon]="'chevron-down-outline'"
+        class="custom-input px-3 py-1"
+        placeholder="Select your preferred payout account"
+        aria-label="Country Code">
+            @for(bank of bankDetails(); track bank._id) {
+                <ion-select-option [value]="bank._id">
+                    {{ bank.bankName }}
+                </ion-select-option>
+            }
+        </ion-select>
+
+        <app-primary-button
+        [buttonText]="'Withdraw'"
+        [icon]="'send-outline'"
+        (action)="submit()"
+        [disabled]="!withdraw().amount && !withdraw().account"
+        ></app-primary-button>
+    </div>
+</form>

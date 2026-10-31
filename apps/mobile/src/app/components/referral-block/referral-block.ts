@@ -13,4 +13,6 @@ import { IonIcon, IonButton, IonLabel, IonCard, IonCardContent } from "@ionic/an
 export class ReferralBlock {
   @Input() profile: any;
   @Output() action = new EventEmitter();
+  @Output() share = new EventEmitter();
+  
 }

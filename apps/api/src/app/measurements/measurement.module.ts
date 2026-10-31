@@ -19,6 +19,6 @@ import { User, UserSchema } from '../users/schemas/user.schema';
   ],
   controllers: [MeasurementController],
   providers: [MeasurementService, JwtService],
-  exports: [MongooseModule]
+  exports: [MongooseModule, MeasurementService]
 })
 export class MeasurementModule {}

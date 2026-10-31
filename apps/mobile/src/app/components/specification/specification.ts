@@ -59,9 +59,14 @@ export class Specification implements OnInit, ViewWillEnter {
     this.specifications.splice(index, 1);
   }
 
+  openNewSpecificationModal() {
+    this.specification = new ISpecification();
+    this.modal.present();
+  }
+
   editSpecification(index: number) {
     this.activeIndex = index;
-    console.log(this.activeIndex);
+    // console.log(this.activeIndex);
     this.specification = this.specifications[index];
     if(this.specifications[index].colors) {
       this.selectedColors = this.specifications[index].colors;
@@ -105,7 +110,9 @@ export class Specification implements OnInit, ViewWillEnter {
     this.modalCtrl.dismiss(this.specifications, 'data');
   }
 
-  closeModalSheet() {}
+  closeModalSheet() {
+    this.modalCtrl.dismiss(null, 'cancel');
+  }
 
   saveSpecification() {
     console.log(this.activeIndex)

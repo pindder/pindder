@@ -9,6 +9,7 @@ import { ClientAssociationDto } from './dto/client-association.dto';
 import { DataTypes, DataTypesIcon, IResponse, NotificationActions } from '@pindder/contracts';
 import { NotificationService } from '../notifications/notification.service';
 import { Tailor } from '../tailors/schemas/tailor.schema';
+import { MeasurementService } from '../measurements/measurement.service';
 
 @Injectable()
 export class ClientService {
@@ -18,7 +19,8 @@ export class ClientService {
     @InjectModel(Follow.name) private readonly followModel: Model<Follow>,
     @InjectModel(Client.name) private readonly clientModel:  Model<Client>,
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    private readonly measurementService: MeasurementService
   ) {}
 
   async create(createClientDto: CreateClientDto, referee_id?: string) {
@@ -34,10 +36,19 @@ export class ClientService {
       client.referee = tailor;
 
       await client.save();
+      
+      //if measurement was provided create it
+      if(createClientDto.measurements && createClientDto.measurements.length > 0) {
+        const measurements = createClientDto.measurements.map(m => ({
+          ...m,
+          owner: client.toObject()
+        }));
+        await this.measurementService.createBulkMeasurements(measurements);
+      }
 
       await this.notificationService.create({
-        client: client,
-        tailor: client.referee,
+        dependent: client,
+        initiator: client.referee,
         type: DataTypes.CLIENT,
         action: NotificationActions.CLIENT_CREATED,
         icon: DataTypesIcon.CLIENT,
@@ -120,8 +131,6 @@ export class ClientService {
       .sort({ createdAt: -1 })
       .exec();
 
-      console.log(clients);
-
       // 1. Throw directly instead of returning
       if (!clients || clients.length === 0) {
         throw new NotFoundException(`No clients found`);
@@ -184,7 +193,9 @@ export class ClientService {
 
   async remove(id: string) {
     try {
+      await this.measurementService.bulkDelete(id);
       const client = await this.clientModel.findByIdAndDelete(id);
+
 
       const res: IResponse<any> = {
         statusCode: 200,

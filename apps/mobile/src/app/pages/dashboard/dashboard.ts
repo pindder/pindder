@@ -1,6 +1,8 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectorRef, Component, EnvironmentInjector, inject, signal } from '@angular/core';
-import { IonContent, IonFabButton, IonFab, IonIcon, IonList, IonActionSheet, ViewWillEnter, ModalController, ToastController, IonLabel } from "@ionic/angular";
+import { IonContent, IonFabButton, IonFab, IonIcon, IonList, IonActionSheet,
+  ViewWillEnter, ModalController, ToastController, IonLabel, IonModal 
+} from "@ionic/angular";
 import { ReferralBlock } from "../../components/referral-block/referral-block";
 import { DataTile } from "../../components/data-tile/data-tile";
 import { NotificationTile } from "../../components/notification-tile/notification-tile";
@@ -16,10 +18,12 @@ import { NotificationService } from '../../services/notification.service';
 import { SseService } from '../../services/sse.service';
 import { Subscription } from 'rxjs';
 import { EarningsCard } from '../../components/earnings-card/earnings-card';
+import { Share } from '@capacitor/share';
+import { Payout } from '../../components/payout/payout';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [IonLabel,
+  imports: [IonModal, IonLabel,
     IonActionSheet,
     IonList,
     IonIcon,
@@ -31,7 +35,7 @@ import { EarningsCard } from '../../components/earnings-card/earnings-card';
     DataTile,
     NotificationTile,
     ProfileCard,
-    EmptyState, EarningsCard],
+    EmptyState, EarningsCard, Payout],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -128,6 +132,7 @@ export class Dashboard implements ViewWillEnter{
   notifications: INotification[] = [];
   catalog!: string;
   referralLink!: string;
+  isSharingSupported = signal<boolean>(false);
   
   ionViewWillEnter(): void {
     this.loadProfile();
@@ -140,6 +145,16 @@ export class Dashboard implements ViewWillEnter{
     this.cdr.markForCheck();
     this.fetchNotifications();
     this.connectNotifications(this.profile._id);
+
+
+    try {
+      // Check if the current platform/browser supports sharing
+      const result = await Share.canShare();
+      this.isSharingSupported.set(result.value);
+    } catch (error) {
+      console.error('Error checking share capability:', error);
+      this.isSharingSupported.set(false);
+    }
   }
 
   fetchNotifications() {
@@ -186,29 +201,24 @@ export class Dashboard implements ViewWillEnter{
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  async shareLink(): Promise<void> {
-    const shareData = {
-      title: 'Join me on YourAppName!',
-      text: `Use my referral code ${this.profile.username} to get 10% off your first order!`,
-      url: this.referralLink
-    };
+  async shareLink() {
+    if (!this.isSharingSupported()) return;
 
-    // Use Native Web Share API if supported
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        // User canceled or sharing failed silently
-      }
-    } else {
-      // Fallback: Copy link to clipboard
-      await this.copyToClipboard();
+    try {
+      await Share.share({
+        title: 'Check out pindder!',
+        text: 'Hey, kindly check out my design catalog on pindder.',
+        url: `https://pindder.com/${this.profile.username}`, // The link you want to share
+        dialogTitle: 'Share pindder with friends', // Android only title for the popup
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
     }
   }
 
   async copyToClipboard(): Promise<void> {
     try {
-      await navigator.clipboard.writeText(this.referralLink);
+      await navigator.clipboard.writeText(this.catalog);
       await this.showToast('Referral link copied to clipboard!');
     } catch (err) {
       await this.showToast('Failed to copy link. Please copy manually.');

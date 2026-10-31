@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateMeasurementDto } from './dto/create-measurement.dto';
 import { UpdateMeasurementDto } from './dto/update-measurement.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,6 +10,8 @@ import { User } from '../users/schemas/user.schema';
 
 @Injectable()
 export class MeasurementService {
+  private logger = new Logger(MeasurementService.name);
+
   constructor(
     @InjectModel(Client.name) private readonly clientModel: Model<Client>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
@@ -27,11 +29,15 @@ export class MeasurementService {
         return;
       }
 
-      // Safely query only if the ID is provided to avoid Mongoose CastErrors
-      const client = dto.client ? await this.clientModel.findById(dto.client).lean() : null;
-      const user = dto.user ? await this.userModel.findById(dto.user).lean() : null;
-
-      if (!client && !user) {
+      let client; 
+      
+      client = await this.clientModel.findById(dto.owner).lean();
+      
+      if(!client) {
+        client = await this.userModel.findById(dto.owner).lean();
+      }
+    
+      if (!client) {
         return;
       }
 
@@ -40,8 +46,7 @@ export class MeasurementService {
         description: dto.description,
         notes: dto.notes, 
         measurements: measurementsMap,
-        client: client ?? null,
-        user: user ?? null,
+        owner: client
       });
 
       const res: IResponse<any> = {
@@ -58,15 +63,31 @@ export class MeasurementService {
   }
 
   /**
+   * Save multiple client measurements at once
+   */
+  async createBulkMeasurements(measurements: CreateMeasurementDto[]) {
+    try {
+      const measurementList = await this.measurementModel.insertMany(measurements);
+
+      if(!measurementList) {
+        this.logger.log('Failed to save measurements:');
+      }
+
+      return measurementList;
+    } catch(error: any) {
+      this.logger.error('Failed to save client measurements:', error);
+      return;    
+    }
+  }
+
+  /**
    * Get measurement by Client ID
    */
   async findClientMeasurements(id: string): Promise<IResponse<Measurement[]>> {
     try {
       const records = await this.measurementModel.find({
-        'client._id': id,
+        'owner._id': id,
       }).sort({ createdAt: -1 });
-
-      console.log(records);
 
       if (!records) {
         throw new NotFoundException(`No measurements found for this client`);
@@ -121,7 +142,7 @@ export class MeasurementService {
 
   async findMyMeasurements(id: string) {
     try {
-      const measurements = await this.measurementModel.find({ owner: id });
+      const measurements = await this.measurementModel.find({ 'owner._id': id });
 
       const res: IResponse<any> = {
         statusCode: 200,
@@ -141,8 +162,8 @@ export class MeasurementService {
 
   async update(id: string, updateMeasurementDto: UpdateMeasurementDto) {
     try {
-      const client = await this.clientModel.findById(updateMeasurementDto.client);
-      const user = await this.userModel.findById(updateMeasurementDto.user);
+      const client = await this.clientModel.findById(updateMeasurementDto.owner);
+      const user = await this.userModel.findById(updateMeasurementDto.owner);
       
       // Convert standard JS object to a Map for Mongoose
       const measurementsMap = new Map(Object.entries(updateMeasurementDto.measurements!));
@@ -190,6 +211,22 @@ export class MeasurementService {
       return res;
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
+  async bulkDelete(clientId: string) {
+    try {
+      const deleted = await this.measurementModel.deleteMany({ 'owner._id': clientId });
+
+      if(!deleted) {
+        this.logger.log('Failure while deleting client measurments');
+        return;
+      }
+
+      return;
+    } catch(error: any) {
+      this.logger.error(error);
+      return;
     }
   }
 }

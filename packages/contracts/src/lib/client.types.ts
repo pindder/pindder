@@ -21,8 +21,7 @@ export interface IMeasurement {
     _id?: string;
     name: string;
     description?: string;
-    client?: string;
-    User?: string;
+    owner: string;
     measurements: any;
     notes?: string;
 }

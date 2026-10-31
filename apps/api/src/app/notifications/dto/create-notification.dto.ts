@@ -1,8 +1,7 @@
 export class CreateNotificationDto {
     data!: any;
-    client?: any;
-    tailor!: any;
-    customer?: any;
+    initiator!: any;
+    dependent!: any;
     type!: string;
     action!: string;
     title!: string;

@@ -13,11 +13,11 @@
         </ion-toolbar>
     </ion-header>
 
-    @if(profile){
+    @if(profile()){
         <div class="flex justify-center items-center my-5">
-            @if(profile.profileImg){
+            @if(profile().profileImg){
             <ion-avatar aria-hidden="true" slot="start">
-                <img [sizes]="" [src]="profile.profileImg" alt="profile-pic" />
+                <img [sizes]="" [src]="profile().profileImg" alt="profile-pic" />
             </ion-avatar>}
             @else{
                 <div></div>
@@ -29,7 +29,7 @@
                     <ion-input 
                     name="firstname"
                     type="text"
-                    [(ngModel)]="profile.firstname" 
+                    [(ngModel)]="profile().firstname" 
                     label="Firstname" 
                     label-placement="stacked"
                     ></ion-input>
@@ -41,7 +41,7 @@
                     type="text" 
                     label="Lastname"
                     label-placement="stacked"  
-                    [(ngModel)]="profile.lastname"
+                    [(ngModel)]="profile().lastname"
                     ></ion-input>
                 </ion-item>
 
@@ -51,25 +51,49 @@
                     type="email"
                     label="Email address"
                     label-placement="stacked"
-                    [(ngModel)]="profile.email"
+                    [(ngModel)]="profile().email"
                     ></ion-input>
                 </ion-item>
 
-                <ion-item>
-                    <ion-input 
-                    name="tel"
-                    label="Phone No"
-                    type="tel" 
-                    label-placement="stacked" 
-                    [(ngModel)]="profile.tel"
-                    ></ion-input>
+                <ion-item fill="outline" class="custom-input phone-container-item">
+                    <div class="flex flex-col">
+                        <ion-text class="text-xs pt-2" [color]="'dark'" slot="start">Phone No</ion-text>
+                        <div class="phone-input-wrapper">
+                            <!-- Country Code Selector -->
+                            <ion-select 
+                            [(ngModel)]="profile().countryCode" 
+                            name="countryCode" 
+                            [interfaceOptions]="customModalOptions" 
+                            interface="modal" 
+                            [toggleIcon]="'chevron-down-outline'"
+                            class="country-code-select"
+                            aria-label="Country Code">
+                                @for(c of countries; track c.name) {
+                                    <ion-select-option [value]="c.code">
+                                        {{ c.flag }} {{ c.code }}
+                                    </ion-select-option>
+                                }
+                            </ion-select>
+
+                            <!-- Phone Digits Input -->
+                            <ion-input 
+                            label-placement="stacked" 
+                            type="tel" 
+                            [(ngModel)]="profile().tel" 
+                            name="tel"
+                            placeholder="800 000 0000" 
+                            class="phone-digits-input"
+                            required>
+                            </ion-input>
+                        </div>
+                    </div>
                 </ion-item>
 
                 <ion-item>
                     <ion-input 
                     name="username"
                     type="text"
-                    [(ngModel)]="profile.username" 
+                    [(ngModel)]="profile().username" 
                     label="Username" 
                     label-placement="stacked"
                     ></ion-input>

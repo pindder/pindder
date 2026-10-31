@@ -2,7 +2,7 @@
     <ion-card class="flex mx-3 tight-card">
         <ion-card-content>
             <div class="flex flex-row items-center gap-2" lines="none">
-                <ion-button fill="outline" size="default" color="primary">
+                <ion-button (click)="share.emit()" fill="outline" size="default" color="primary">
                     <ion-icon slot="icon-only" name="arrow-redo-outline"></ion-icon>
                 </ion-button>
                 <ion-label>

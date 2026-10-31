@@ -12,6 +12,7 @@ import { NotificationService } from '../notifications/notification.service';
 import { NotificationModule } from '../notifications/notification.module';
 import { Notification, NotificationSchema } from '../notifications/schema/notification.schema';
 import { TailorModule } from '../tailors/tailor.module';
+import { MeasurementModule } from '../measurements/measurement.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { TailorModule } from '../tailors/tailor.module';
     ]),
     TokenModule,
     TailorModule,
-    NotificationModule
+    NotificationModule,
+    MeasurementModule
   ],
   controllers: [ClientController],
   providers: [ClientService, JwtService, SharedService, NotificationService],

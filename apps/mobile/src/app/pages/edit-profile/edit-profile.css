@@ -3,3 +3,36 @@ ion-avatar{
     width: 120px;
     height: 120px;
 }
+
+/* Phone Number Field Specific Layout */
+.phone-container-item {
+  /* --padding-start: 12px;
+  --padding-end: 12px; */
+
+  .phone-input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    padding: 0px;
+
+    .country-code-select {
+      flex: 0 0 82px;
+      font-weight: 500;
+      font-size: 16px;
+      border-right: 1px solid rgba(var(--ion-color-medium-rgb), 0.3);
+      padding-right: 4px;
+      margin-inline-end: 4px;
+      --padding-start: 4px;
+      --padding-end: 4px;
+    }
+
+    .phone-digits-input {
+      flex: 1;
+    }
+
+    ion-input, ion-select {
+        min-height: 36px;
+    }
+  }
+}

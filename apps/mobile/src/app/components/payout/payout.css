@@ -1,0 +1,13 @@
+/* Customizing the Bordered Inputs */
+.custom-input {
+    border-radius: 12px;
+    --highlight-color-focused: var(--ion-color-primary);
+    margin-bottom: 20px;
+    background: var(--ion-background-color, #ffffff);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    
+    ion-icon[slot="start"] {
+      /* margin-inline-end: 10px; */
+      color: var(--ion-color-medium);
+    }
+}
