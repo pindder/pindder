@@ -21,10 +21,10 @@
     ></app-profile-card>
 
     <!-- Earnings -->
-    <app-earnings-card [profile]="profile" (withdraw)="gotoPayout()" (earn)="gotoEarn()"></app-earnings-card>
+    <app-earnings-card [profile]="profile" (withdraw)="modal.present()" (earn)="gotoEarn()"></app-earnings-card>
 
     <!-- Referral Block-->
-    <app-referral-block [profile]="profile" (action)="copyToClipboard()"></app-referral-block>
+    <app-referral-block [profile]="profile" (action)="copyToClipboard()" (share)="shareLink()"></app-referral-block>
   }
 
   <!-- Quick Access-->
@@ -72,4 +72,18 @@
     [buttons]="actionSheetButtons"
     (didDismiss)="isActionSheetOpen.set(false)">
   </ion-action-sheet>
+
+  <!-- Withdraw Modal -->
+  <ion-modal 
+  #modal 
+  [initialBreakpoint]="0.3" 
+  [breakpoints]="[0.3, 0.5]"
+  (didDismiss)="dismissModal()"
+  >
+      <ng-template>
+          <ion-content color="light">
+            <app-payout></app-payout>
+          </ion-content>
+      </ng-template>
+  </ion-modal>
 </ion-content>

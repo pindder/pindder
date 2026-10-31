@@ -8,4 +8,5 @@ export class CreateClientDto {
     referee?: string;
     password?: string;
     gender!: string;
+    measurements?: any[]
 }

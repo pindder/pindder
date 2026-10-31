@@ -80,4 +80,8 @@ export class ClientService {
   updateClientMeasurement(measurement_id: string, measurement: IMeasurement): Observable<IResponse<any>> {
     return this.http.patch<IResponse<any>>(`${environment.apiUrl}/measurements/${measurement_id}`, measurement);
   }
+
+  deleteClientMeasurement(measurement_id: string): Observable<IResponse<any>> {
+    return this.http.delete<IResponse<any>>(`${environment.apiUrl}/measurements/${measurement_id}`);
+  }
 }

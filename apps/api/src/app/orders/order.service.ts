@@ -90,8 +90,8 @@ export class OrderService {
       }
 
       await this.notificationService.create({
-        client: newOrder.client,
-        tailor: newOrder.tailor,
+        initiator: user.acctType === AccountTypes.TAILOR ? newOrder.tailor : newOrder.user,
+        dependent: user.acctType === AccountTypes.TAILOR ? newOrder.client : newOrder.tailor, 
         type: DataTypes.ORDER,
         action: NotificationActions.ORDER_CREATED,
         title: 'New Order',

@@ -1,23 +1,17 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonButton, IonInput, IonSelectOption, 
-  ViewWillEnter, IonSelect, ToastController, IonList,
-  IonItem,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonIcon,
-  ModalController
-} from "@ionic/angular";
-import { Gender, IClient, IResponse } from '@pindder/contracts';
+import { IonContent, IonButton, IonInput, IonSelectOption, ViewWillEnter, IonSelect, ToastController, IonList, IonItem, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, ModalController, IonNote } from "@ionic/angular";
+import { DataTypes, Gender, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PrimaryButton } from '../primary-button/primary-button';
+import { IonLabel } from "@ionic/angular";
+import { Measurement } from '../measurement/measurement';
 
 @Component({
   selector: 'app-new-client',
   imports: [
+    IonLabel,
     IonList,
     IonItem,
     IonInput,
@@ -31,7 +25,8 @@ import { PrimaryButton } from '../primary-button/primary-button';
     IonTitle,
     IonButtons,
     IonIcon,
-    PrimaryButton
+    PrimaryButton,
+    IonNote
 ],
   templateUrl: './new-client.html',
   styleUrl: './new-client.css',
@@ -43,6 +38,7 @@ export class NewClient implements ViewWillEnter{
   private clientService = inject(ClientService);
   private toastController = inject(ToastController);
   private modalCtrl = inject(ModalController);
+  private cdr = inject(ChangeDetectorRef);
 
   client: IClient = {
     firstname: '',
@@ -52,6 +48,7 @@ export class NewClient implements ViewWillEnter{
     referee: '',
     gender: '',
     address: '',
+    measurements: [],
   };
 
   genders: string[] = Object.keys(Gender);
@@ -74,6 +71,27 @@ export class NewClient implements ViewWillEnter{
     });
 
     await toast.present();
+  }
+
+  async openMeasurementModal() {
+    const modal = await this.modalCtrl.create({
+      component: Measurement,
+      componentProps: {
+        parent: DataTypes.CLIENT,
+        client_gender: this.client.gender,
+        measurement_list: this.client.measurements
+      }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if(data) {
+      console.log(data);
+      this.client.measurements = data;
+      this.cdr.markForCheck();
+    }
   }
 
   dismissModal() {

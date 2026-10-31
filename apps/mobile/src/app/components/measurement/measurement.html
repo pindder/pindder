@@ -12,7 +12,7 @@
   @if(measurementList.length > 0){
     <div class="px-3 py-2">
       <ion-button 
-      (click)="modal.present()"
+      (click)="openMeasurementModal()"
       expand="block"
       color="primary"
       fill="outline">
@@ -53,7 +53,7 @@
       [title]="'No Measurements Added'" 
       [desc]="'click the button to add measurement for this client.'" 
       [buttonText]="'Add Measurement'"
-      (action)="modal.present()"
+      (action)="openMeasurementModal()"
       ></app-empty-state>
     </div>
   }
@@ -137,6 +137,7 @@
                       [buttonText]="'Save Measurements'"
                       [icon]="'save-outline'"
                       (action)="submit()"
+                      [disabled]="form.invalid"
                       ></app-primary-button>
                     </div>
                   </form>

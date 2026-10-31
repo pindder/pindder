@@ -15,11 +15,8 @@ export class MeasurementSnapshot {
     @Prop({ type: String })
     description?: string;
 
-    @Prop({ type: () => ClientSnapshot, default: null })
-    client?: ClientSnapshot | null;
-
-    @Prop({ type: () => UserSnapshot, default: null })
-    user?: UserSnapshot | null;
+    @Prop({ type: () => ClientSnapshot || UserSnapshot, required: true })
+    owner!: ClientSnapshot | UserSnapshot;
 
     @Prop({ type: String, enum: MeasurementTypes, default: MeasurementTypes.CUSTOM })
     measurementType!: string;
@@ -42,11 +39,8 @@ export class Measurement {
     @Prop({ type: String, default: null})
     description?: string | null;
 
-    @Prop({ type: () => ClientSnapshot, default: null })
-    client?: ClientSnapshot | null;
-
-    @Prop({ type: () => UserSnapshot, default: null })
-    user?: UserSnapshot | null;
+    @Prop({ type: () => ClientSnapshot || UserSnapshot, required: true })
+    owner!: ClientSnapshot | UserSnapshot;
 
     @Prop({ type: String, enum: MeasurementTypes, default: MeasurementTypes.CUSTOM })
     measurementType!: string;

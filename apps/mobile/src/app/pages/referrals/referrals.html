@@ -73,10 +73,26 @@
         <app-primary-button
         [buttonText]="'Redeem Rewards'"
         [fill]="'outline'"
+        (action)="modal.present()"
         ></app-primary-button>
 
         <app-primary-button
+        (action)="shareLink()"
         [buttonText]="'Invite Friends & Earn'"
         ></app-primary-button>
     </div>
+
+    <!-- Modal sheet for quantity and color selection-->
+    <ion-modal 
+    #modal 
+    [initialBreakpoint]="0.3" 
+    [breakpoints]="[0.3, 0.5]"
+    (didDismiss)="dismissModal()"
+    >
+        <ng-template>
+            <ion-content color="light">
+                <app-payout></app-payout>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
 </ion-content>

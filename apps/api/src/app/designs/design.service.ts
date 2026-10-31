@@ -47,7 +47,8 @@ export class DesignService {
       await newDesign.save();
 
       await this.notificationService.create({
-        tailor: newDesign.owner,
+        initiator: newDesign.owner,
+        dependent: null,
         type: DataTypes.DESIGN,
         action: NotificationActions.STYLE_CREATED,
         icon: DataTypesIcon.DESIGN,

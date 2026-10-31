@@ -9,7 +9,7 @@
     </ion-toolbar>
 </ion-header>
 <ion-content>
-  <form #loginForm="ngForm" (ngSubmit)="submit()" class="my-2">
+  <form #newClientForm="ngForm" (ngSubmit)="submit()" class="my-2">
     <ion-list lines="full">
       <ion-item>
         <ion-input 
@@ -35,7 +35,7 @@
         <ion-input
           name="email"
           type="email"
-          label="Email address"
+          label="Email address (optional)"
           labelPlacement="stacked"
           [(ngModel)]="client.email"
         ></ion-input>
@@ -65,6 +65,15 @@
           }
         </ion-select> 
       </ion-item>
+
+      <ion-item class="py-2" button (click)="openMeasurementModal()">
+        <ion-label>
+            {{ client.measurements && client.measurements.length > 0 ? 'View' : 'Add' }} Measurement
+        </ion-label>
+        @if(client.measurements && client.measurements.length > 0){
+          <ion-note>{{ client.measurements.length }}</ion-note>
+        }
+      </ion-item>
     </ion-list>
 
     <div class="p-3">
@@ -72,6 +81,7 @@
         [buttonText]="'Save Client'"
         [icon]="'save-outline'"
         (action)="submit()"
+        [disabled]="!client.gender && !client.firstname && !client.lastname && !client.phoneNo"
       ></app-primary-button>
     </div>
   </form>

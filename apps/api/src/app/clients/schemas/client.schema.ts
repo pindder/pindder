@@ -58,12 +58,7 @@ export class Client {
     @Prop({ type: String, required: true })
     lastname?: string;
 
-    @Prop({ 
-        type: String, 
-        required: true, 
-        unique: true, 
-        index: true 
-    })
+    @Prop({ type: String, unique: true })
     email!: string;
 
     @Prop({ type: String })

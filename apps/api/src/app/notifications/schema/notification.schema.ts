@@ -25,8 +25,8 @@ export class Notification {
     @Prop({ type: () => ClientSnapshot || TailorSnapshot || UserSnapshot, required: true })
     initiator!: ClientSnapshot | TailorSnapshot | UserSnapshot
 
-    @Prop({ type: () => ClientSnapshot || TailorSnapshot || UserSnapshot, required: true })
-    dependent!: ClientSnapshot | TailorSnapshot | UserSnapshot
+    @Prop({ type: () => ClientSnapshot || TailorSnapshot || UserSnapshot, default: null })
+    dependent?: ClientSnapshot | TailorSnapshot | UserSnapshot
 
     @Prop({ type: String, required: true })
     title!: string;

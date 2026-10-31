@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, 
   IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, 
   IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, IonNote, 
@@ -14,6 +14,7 @@ import { PrimaryButton } from '../../components/primary-button/primary-button';
 import { Measurement } from '../../components/measurement/measurement';
 import { AppService } from '../../services/app.service';
 import { FormsModule } from '@angular/forms';
+import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-order-view',
@@ -61,6 +62,8 @@ export class OrderView implements ViewWillEnter, OnInit{
     initialBreakpoint: 0.5,
   };
 
+  isSharingSupported = signal<boolean>(false);
+
   ionViewWillEnter(): void {
     console.log(this.order);
     const client = this.ar.snapshot.paramMap.get('id');
@@ -71,8 +74,15 @@ export class OrderView implements ViewWillEnter, OnInit{
     }
   }
 
-  ngOnInit(): void {
-    return;
+  async ngOnInit() {
+    try {
+      // Check if the current platform/browser supports sharing
+      const result = await Share.canShare();
+      this.isSharingSupported.set(result.value);
+    } catch (error) {
+      console.error('Error checking share capability:', error);
+      this.isSharingSupported.set(false);
+    }
   }
 
   fetchOrder() {
@@ -89,6 +99,21 @@ export class OrderView implements ViewWillEnter, OnInit{
         console.log(error);
       }
     })
+  }
+
+  async sharePaymentLink(payment_link?: string) {
+    if (!this.isSharingSupported()) return;
+
+    try {
+      await Share.share({
+        title: 'Pindder: Order Payment!',
+        text: 'Hey, kindly complete your payment through the link.',
+        url: `${payment_link ?? this.payment[0].responsePayload.authorization_url}`, // The link you want to share
+        dialogTitle: 'Pindder payment', // Android only title for the popup
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
   }
 
   dismissModal() {
@@ -110,12 +135,33 @@ export class OrderView implements ViewWillEnter, OnInit{
       this.appService.generatePaymentLink(payment).subscribe({
         next: (response: IResponse<any>) => {
           this.payment[0] = response.data
+          this.sharePaymentLink(response.data.responsePayload.authorization_url)
         },
         error: (error: HttpErrorResponse) => {
           console.log(error);
         }
       }) 
     }
+  }
+
+  async copyPaymentLinkToClipboard(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(this.payment[0].responsePayload.authorization_url);
+      await this.showToast('Payment link copied to clipboard!');
+    } catch (err) {
+      await this.showToast('Failed to copy link. Please copy manually.');
+      console.log(err);
+    }
+  }
+
+  private async showToast(message: string): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color: 'dark'
+    });
+    await toast.present();
   }
 
   async presentDeleteAlert() {

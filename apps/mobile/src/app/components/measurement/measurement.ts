@@ -4,7 +4,8 @@ import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } fr
 import { IonContent, IonItem, IonInput, IonButton, IonIcon, IonHeader, 
   IonTitle, IonToolbar, IonButtons, ModalController, ToastController, 
   IonModal, IonList, IonListHeader, IonNote, IonItemSliding, IonLabel, 
-  IonItemOptions, IonItemOption 
+  IonItemOptions, IonItemOption, 
+  ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { trashOutline, addOutline } from 'ionicons/icons';
@@ -30,9 +31,11 @@ import { EmptyState } from '../empty-state/empty-state';
   templateUrl: './measurement.html',
   styleUrl: './measurement.css',
 })
-export class Measurement implements OnInit{
+export class Measurement implements OnInit, ViewWillEnter{
+  @Input() parent!: string; 
   @Input() client_id!: string;
   @Input() client_gender!: string;
+  @Input() measurement_list!: IMeasurement[]; 
 
   @ViewChild('modal') modalSheet!: IonModal;
 
@@ -44,7 +47,7 @@ export class Measurement implements OnInit{
 
   measurementList: IMeasurement[] = [];
   measurement!: IMeasurement;
-  editingMeasurement: boolean = false;
+  editingMeasurement = false;
 
   form!: FormGroup;
   isLoading = signal<boolean>(true);
@@ -55,20 +58,35 @@ export class Measurement implements OnInit{
     addIcons({ trashOutline, addOutline });
   }
 
+  ionViewWillEnter(): void {
+    if(this.parent){
+      if(this.measurement_list.length > 0) this.measurementList = this.measurement_list;
+      this.modalSheet.present();
+    }
+  }
+
   ngOnInit() {
     this.initForm();
-
     // Fetch existing client measurements from NestJS API
-    this.loadClientMeasurements();
+    if(!this.parent){
+      this.loadClientMeasurements();
+    }
   }
 
   initForm() {
     this.form = this.fb.group({
       name: [this.name(), [Validators.required]],
       description: [this.description()],
-      client: [this.client_id, Validators.required],
+      owner: [this.client_id, !this.parent && Validators.required],
       measurements: this.fb.array([])
     });
+  }
+
+  openMeasurementModal() {
+    this.name.set('');
+    this.description.set('');
+    this.initForm();
+    this.modalSheet.present();
   }
 
   loadClientMeasurements() {
@@ -106,20 +124,20 @@ export class Measurement implements OnInit{
     });
   }
 
-  editMeasurement(measure: IMeasurement, index?: number) {
+  editMeasurement(measure: IMeasurement) {
     this.editingMeasurement = true;
     this.measurement = measure;
 
+    console.log(measure);
+    this.name.set(measure.name);
+    if(measure.description) this.description.set(measure.description);
+    
     this.initForm();
 
-    this.name.set(measure.name);
-    this.description.set(measure.description!);
-    
     // Server returns measurements as a map/object: { Chest: "42 in", Waist: "32 in" }
     const dataMap = measure.measurements || {};
     const entries = Object.entries(dataMap);
 
-    // console.log(entries);
     if (entries.length > 0) {
       // Pre-populate FormArray with server values
       entries.forEach(([key, value]) => {
@@ -132,11 +150,20 @@ export class Measurement implements OnInit{
     this.modalSheet.present();
   }
 
-  dismissModalSheet() {
-    this.measurement
+  deleteMeasurement(index: number) {
+    if(this.parent) {
+      this.measurementList.splice(index, 1);
+    } else {
+      this.clientService.deleteClientMeasurement(this.measurementList[index]._id!).subscribe({
+        next: (response: IResponse<any>) => {
+          console.log(response.data);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.log(error);
+        }
+      });
+    }
   }
-
-  deleteMeasurement(index: number) {}
 
   get measurements(): FormArray {
     return this.form.get('measurements') as FormArray;
@@ -167,6 +194,7 @@ export class Measurement implements OnInit{
 
   addMeasurement(key = '', value = '') {
     this.measurements.push(this.createMeasurementGroup(key, value));
+    console.log(this.measurements);
   }
 
   removeMeasurement(index: number) {
@@ -174,7 +202,43 @@ export class Measurement implements OnInit{
   }
 
   dismissModal() {
-    this.modalCtrl.dismiss(null, 'cancel');
+    if(this.parent) {
+      this.initForm();
+      this.modalCtrl.dismiss(this.measurementList, 'cancel');
+      console.log(this.measurementList);
+    } else {
+      this.modalCtrl.dismiss(null, 'cancel');
+    }
+  }
+
+  createMeasurement(formattedPayload: any) {
+    this.clientService.createMeasurement(formattedPayload).subscribe({
+        next: (res: IResponse<any>) => {
+          this.measurementList.push(res.data);
+          this.presentToast(res.msg, 'primary', 'top');
+          this.dismissModal();
+          this.cdr.markForCheck();
+        },
+        error: (error: HttpErrorResponse) => {
+          console.log(error);
+          this.presentToast(error.error.msg, 'danger', 'top');
+        }
+      });
+  }
+
+  updateMeasurement(formattedPayload: any) {
+    this.clientService.updateClientMeasurement(this.measurement._id!, formattedPayload).subscribe({
+      next: (res: IResponse<any>) => {
+        const measurementIndex = this.measurementList.indexOf(this.measurement);
+        this.measurementList[measurementIndex] = res.data;
+
+        this.presentToast(res.msg, 'primary', 'top');
+        this.dismissModal();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.presentToast(error.message, 'danger', 'top');
+      }
+    });
   }
 
   submit() {
@@ -193,38 +257,29 @@ export class Measurement implements OnInit{
     const formattedPayload = {
       name: name,
       description: description,
-      client: formValue.client,
+      owner: formValue.client ?? this.client_id,
       measurements: formValue.measurements.reduce((acc: Record<string, string>, item: { key: string; value: string }) => {
         if (item.key) acc[item.key] = item.value;
         return acc;
       }, {})
     };
 
+    if(this.parent && !this.editingMeasurement) {
+      this.measurementList.push(formattedPayload);
+      this.dismissModal();
+      return;
+    } else if(this.parent && this.editingMeasurement){
+      const measurementIndex = this.measurementList.indexOf(this.measurement);
+      this.measurementList[measurementIndex] = formattedPayload;
+      this.dismissModal();
+      return;
+    }
     console.log('Sending Payload:', formattedPayload);
 
     if(this.editingMeasurement) {
-      this.clientService.updateClientMeasurement(this.measurement._id!, formattedPayload).subscribe({
-        next: (res: IResponse<any>) => {
-          this.presentToast(res.msg, 'primary', 'top');
-          this.dismissModal();
-        },
-        error: (error: HttpErrorResponse) => {
-          this.presentToast(error.message, 'danger', 'top');
-        }
-      })
+      this.updateMeasurement(formattedPayload);
     } else { 
-      this.clientService.createMeasurement(formattedPayload).subscribe({
-        next: (res: IResponse<any>) => {
-          console.log('Saved successfully:', res)
-          this.measurementList.push(res.data);
-          this.presentToast(res.msg, 'primary', 'top');
-          this.dismissModal();
-          this.cdr.markForCheck();
-        },
-        error: (error: HttpErrorResponse) => {
-          console.log(error);
-        }
-      });
+      this.createMeasurement(formattedPayload);
     }
   }
 }

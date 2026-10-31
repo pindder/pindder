@@ -15,7 +15,7 @@
             <ion-item lines="full" [button]="true" (click)="editSpecification($index)">
                 <ion-label>
                     <h2>{{ specification.size }}</h2>
-                    <p>In stock: {{ specification.inStock }}</p>
+                    <!-- <p>In stock: {{ specification.inStock }}</p> -->
                 </ion-label>
                 @if(specification.amount){
                 <ion-note>
@@ -36,7 +36,7 @@
 
     <div class="p-2">
         <ion-button 
-        (click)="modal.present()"
+        (click)="openNewSpecificationModal()"
         expand="block"
         color="primary"
         fill="outline">
@@ -47,8 +47,8 @@
 
     <ion-modal 
     #modal
-    [initialBreakpoint]="0.75" 
-    [breakpoints]="[0.5, 0.75]" 
+    [initialBreakpoint]="0.99" 
+    [breakpoints]="[0.99]" 
     (didDismiss)="closeModalSheet()"
     [expandToScroll]="false">
         <ng-template>
@@ -62,6 +62,8 @@
                         name="sizes" 
                         [(ngModel)]="specification.size" 
                         (ionChange)="onSizesChange($event)"
+                        interface="popover" 
+                        [toggleIcon]="'chevron-down-outline'"
                         label="Available Sizes" 
                         aria-label="sizes" 
                         placeholder="Select sizes" 
@@ -116,13 +118,13 @@
                         type="number"
                         placeholder="Amount"
                         [min]="0"
-                        label="Amount"
+                        label="Custom Price (specification)"
                         label-placement="floating"
                         [(ngModel)]="specification.amount"
                         ></ion-input>
                     </ion-item>
 
-                    <ion-item>
+                    <!-- <ion-item>
                         <ion-input
                         label="Quantity In stock"
                         name="inStock"
@@ -132,12 +134,13 @@
                         label-placement="floating"
                         [(ngModel)]="specification.inStock"
                         ></ion-input>
-                    </ion-item>
+                    </ion-item> -->
                 </ion-list>
                 <div class="p-2">
                     <app-primary-button
                     [buttonText]="'Save Specification'"
                     [icon]="'save-outline'"
+                    [disabled]="!specification.amount"
                     (action)="saveSpecification(); modal.dismiss();"
                     ></app-primary-button>
                 </div>

@@ -290,10 +290,10 @@
                 </ion-label>
             </ion-item>
             <ion-item-options>
-                <ion-item-option color="secondary">
+                <ion-item-option color="secondary" (click)="copyPaymentLinkToClipboard()">
                     <ion-icon slot="start" name="copy-outline"></ion-icon>
                 </ion-item-option>
-                <ion-item-option>
+                <ion-item-option (click)="sharePaymentLink()">
                     <ion-icon slot="start" name="arrow-redo-outline"></ion-icon>
                 </ion-item-option>
             </ion-item-options>

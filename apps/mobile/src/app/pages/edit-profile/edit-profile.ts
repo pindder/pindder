@@ -1,33 +1,26 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonButtons, IonContent, IonHeader, IonTitle, IonToolbar,
-  IonBackButton, IonInput,
+  IonBackButton, IonInput, IonText,
   ViewWillEnter,
   ToastController,
   IonList, IonAvatar,
-  IonItem
+  IonItem,
+  IonSelect,
+  IonSelectOption
 } from '@ionic/angular';
 import { ProfileService } from '../../services/profile.service';
-import { IProfile, IResponse } from '@pindder/contracts';
+import { countries, IProfile, IResponse } from '@pindder/contracts';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TokenService } from '../../services/token.service';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
 
-const initialProfile: IProfile = {
-  firstname: '',
-  lastname: '',
-  email: '',
-  address: '',
-  countryCode: '',
-  tel: '',
-  username: ''
-};
-
 @Component({
   selector: 'app-edit-profile',
-  imports: [IonHeader, IonContent, FormsModule, IonToolbar,
-    IonTitle, IonBackButton, IonButtons, IonList, IonInput,
-    IonItem, PrimaryButton, IonAvatar],
+  imports: [IonText, IonHeader, IonContent, FormsModule, IonToolbar,
+    IonTitle, IonBackButton, IonButtons, IonList, IonInput, IonSelect,
+    IonItem, PrimaryButton, IonAvatar, IonSelectOption
+  ],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
 })
@@ -37,7 +30,23 @@ export class EditProfile implements OnInit, ViewWillEnter{
   private toastCtrl = inject(ToastController);
   private cdr = inject(ChangeDetectorRef);
 
-  profile: IProfile = { ...initialProfile };
+  profile = signal<IProfile>({
+    firstname: '',
+    lastname: '',
+    email: '',
+    address: '',
+    countryCode: countries[38].code,
+    phoneNo: '',
+    tel: '',
+    username: '',
+  });
+  countries = countries;
+  
+  customModalOptions = {
+    header: 'Select Country Code',
+    breakpoints: [0, 0.75],
+    initialBreakpoint: 0.5,
+  };
 
   ionViewWillEnter(): void {
     this.loadProfile();
@@ -50,7 +59,7 @@ export class EditProfile implements OnInit, ViewWillEnter{
   async loadProfile() {
     const profileStr = await this.tokenService.getProfile();
     // Fall back to initialProfile instead of null to prevent template errors
-    this.profile = profileStr ? JSON.parse(profileStr) : { ...initialProfile };
+    if(profileStr) this.profile = JSON.parse(profileStr);
     this.cdr.markForCheck();
   }
 
@@ -74,7 +83,7 @@ export class EditProfile implements OnInit, ViewWillEnter{
   submit() {
     if (!this.profile) return;
 
-    this.profileService.updateProfile(this.profile).subscribe({
+    this.profileService.updateProfile(this.profile()).subscribe({
       next: (res: IResponse<any>) => {
         this.profile = res.data;
         // Keep TokenService local storage in sync with updated profile
