@@ -18,7 +18,8 @@
     "customConditions": ["@org/source"],
     "noUncheckedSideEffectImports": false,
     "paths": {
-      "@pindder/contracts": ["./packages/contracts/src/index.ts"]
+      "@pindder/contracts": ["./packages/contracts/src/index.ts"],
+      "@pindder/shared-ui": ["./packages/shared-ui/src/index.ts"]
     }
   }
 }

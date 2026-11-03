@@ -30,6 +30,11 @@ export class PlanController {
     return this.planService.findAll(req.user);
   }
 
+  @Get('list')
+  listPlans() {
+    return this.planService.listPlans();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.planService.findOne(+id);

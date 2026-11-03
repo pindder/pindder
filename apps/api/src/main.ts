@@ -15,7 +15,11 @@ async function bootstrap() {
     origin: [
       'https://pindder-buisness.onrender.com',
       'https://pindder-admin.onrender.com',
+      'https://pindder.com',
+      'https://app.pindder.com',
+      'https://pindder-web.onrender.com',
       'http://localhost:4200',
+      'http://localhost:4800',
       'http://localhost:4500',
       'http://localhost:8100',
       'http://localhost',       // Capacitor Android

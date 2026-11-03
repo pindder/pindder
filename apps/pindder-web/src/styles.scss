@@ -1,0 +1,28 @@
+/* You can add global styles to this file, and also import other style files */
+/* Tailwind v4 CSS-first configuration */
+@import "tailwindcss";
+@import url('https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css');
+
+@import "@ionic/angular/css/core.css"; 
+@import "@ionic/angular/css/normalize.css"; 
+@import "@ionic/angular/css/structure.css"; 
+@import "@ionic/angular/css/typography.css"; 
+@import "@ionic/angular/css/display.css";
+@import 'remixicon/fonts/remixicon.css';
+
+:root {
+  --ion-color-primary: #F1641D;
+  --ion-color-primary-rgb: 241, 100, 29;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #d4581a;
+  --ion-color-primary-tint: #f27435;
+  --ion-color-border: #E7E7E7;
+  --ion-color-primary-fade: #FEF0E8;
+
+  --secondary-text-color: #00000080;
+}
+
+.bg-primary {
+    background-color: #F1641D;
+}

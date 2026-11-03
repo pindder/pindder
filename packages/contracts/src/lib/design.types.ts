@@ -5,6 +5,8 @@ export interface IDesign {
     amount: number;
     description: string;
     type: string;
+    estimatedProductionPeriod?: number; 
+    estimatedTimeArrival?: number; 
     specifications: ISpecification[];
     selections?: ISpecification[];
     colors: any;

@@ -1,0 +1,33 @@
+<div class="bg-white rounded-3xl p-8 sm:p-10 flex flex-col justify-between space-y-8"
+    [ngClass]="{'border-2 border-[#F1641D]': plan.recommended, 'border border-slate-200': !plan.recommended }"
+>
+    <!-- Badge -->
+    @if(plan.recommended){
+    <div class="absolute -top-4 right-8 bg-[#F1641D] text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+        <ion-icon name="sparkles"></ion-icon>
+        <span>Popular</span>
+    </div>}
+    
+    <div class="space-y-6">
+        <div>
+        <h3 class="text-xl font-bold text-slate-900">{{ plan.name }}</h3>
+        <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-4xl font-extrabold text-slate-900">{{ plan.amount.toLocaleString() }}</span>
+            <span class="text-slate-500 font-medium text-sm">/{{ plan.interval }}</span>
+        </div>
+        </div>
+
+        <!-- Feature Checkmarks -->
+        <ul class="space-y-3.5 text-sm font-medium text-slate-600">
+            @for(feat of plan.features; track feat){
+            <li class="flex items-center gap-3">
+                <ion-icon name="checkmark-outline" class="text-brand text-lg"></ion-icon>
+                <span>{{ feat }}</span>
+            </li>}
+        </ul>
+    </div>
+
+    <a routerLink="/auth/register?acctType=tailor" class="w-full py-3.5 rounded-xl brand-button font-bold text-center block text-sm shadow-md">
+        Get Started Free
+    </a>
+</div>

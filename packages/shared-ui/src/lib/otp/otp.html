@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button default-href="/auth"></ion-back-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+    <div class="login-container">
+        <form #otpForm="ngForm" class="px-3" (ngSubmit)="verify.emit(verificationData)">
+            <ion-label class="flex flex-col gap-1">
+                <h1>Enter the code sent to your email</h1>
+                <p>To verify it is you who are trying to access your account, kindly enter the verification code we sent to your email.</p>
+            </ion-label>
+
+            <br/>
+
+            <ion-input-otp 
+            type="text"
+            inputmode="numeric" 
+            name="code" 
+            [(ngModel)]="verificationData.code" 
+            length="6"> 
+                Didn't get a code? <a (click)="resendOtp.emit()">Resend the code</a> 
+            </ion-input-otp>
+
+            <br/>
+
+            <ion-button expand="block" type="submit" class="submit-btn">
+                Continue
+            </ion-button>
+        </form>
+    </div>
+</ion-content>
