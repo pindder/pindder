@@ -1,0 +1,81 @@
+<ion-split-pane when="md" contentId="main-content">
+    
+    <!-- DESKTOP SIDEBAR -->
+    <ion-menu contentId="main-content" class="ion-hide-md-down">
+        <ion-header>
+            <ion-toolbar color="primary">
+            <ion-title>Menu</ion-title>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <ion-list lines="none">
+            <ion-item routerLink="/app/dashboard" routerDirection="root" lines="none">
+                <ion-icon slot="start" name="grid-outline"></ion-icon>
+                <ion-label>Home</ion-label>
+            </ion-item>
+            <ion-item routerLink="/app/orders" routerDirection="root" lines="none">
+                <ion-icon slot="start" name="bag-handle-outline"></ion-icon>
+                <ion-label>Orders</ion-label>
+            </ion-item>
+            <ion-item routerLink="/app/clients" routerDirection="root" lines="none">
+                <ion-icon slot="start" name="people-outline"></ion-icon>
+                <ion-label>Clients</ion-label>
+            </ion-item>
+            <ion-item routerLink="/app/styles" routerDirection="root" lines="none">
+                <ion-icon slot="start" name="color-palette-outline"></ion-icon>
+                <ion-label>Styles</ion-label>
+            </ion-item>
+            <ion-item routerLink="/app/profile" routerDirection="root" lines="none">
+                <ion-icon slot="start" name="person-outline"></ion-icon>
+                <ion-label>Profile</ion-label>
+            </ion-item>
+            </ion-list>
+        </ion-content>
+    </ion-menu>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="ion-page" id="main-content">
+      
+      <!-- DESKTOP & MOBILE HEADER (Restored and responsive) -->
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Pindder</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      <!-- SINGLE ROUTER OUTLET -->
+      <ion-router-outlet></ion-router-outlet>
+
+      <!-- MOBILE BOTTOM TAB BAR (Visible ONLY on small screens) -->
+      <!-- We use routerLinkActive to automatically highlight the active button -->
+      <ion-tab-bar slot="bottom" class="ion-hide-md-up">
+        
+        <ion-tab-button routerLink="/app/dashboard" routerDirection="root" routerLinkActive="tab-selected">
+          <ion-icon size="medium" name="grid-outline"></ion-icon>
+          <ion-label>Home</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button routerLink="/app/orders" routerDirection="root" routerLinkActive="tab-selected">
+          <ion-icon size="medium" name="bag-handle-outline"></ion-icon>
+          <ion-label>Orders</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button routerLink="/clients" routerDirection="root" routerLinkActive="tab-selected">
+          <ion-icon size="medium" name="people-outline"></ion-icon>
+          <ion-label>Clients</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button routerLink="/app/styles" routerDirection="root" routerLinkActive="tab-selected">
+          <ion-icon size="medium" name="color-palette-outline"></ion-icon>
+          <ion-label>Styles</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button routerLink="/app/profile" routerDirection="root" routerLinkActive="tab-selected">
+          <ion-icon size="medium" name="person-outline"></ion-icon>
+          <ion-label>Profile</ion-label>
+        </ion-tab-button>
+
+      </ion-tab-bar>
+
+    </div>
+</ion-split-pane>

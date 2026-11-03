@@ -133,6 +133,27 @@ export class PlanService {
     }
   }
 
+  async listPlans() {
+    try {
+      const plans = (await this.planModel.find().sort({ amount: 1 })).filter(plan => plan.free === false);
+
+      if(!plans) {
+        throw new NotFoundException(`No available plans at this time!`);
+      }
+      
+      const res: IResponse<Plan[]> = {
+        statusCode: 200,
+        msg: 'List of available plans',
+        data: plans
+      };
+
+      return res;
+    } catch(error: any) {
+      this.logger.log(error);
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} plan`;
   }

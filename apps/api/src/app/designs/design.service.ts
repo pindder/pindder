@@ -21,6 +21,7 @@ export class DesignService {
     private readonly notificationService: NotificationService,
     private readonly cloudinaryService: CloudinaryService
   ) {}
+
   async create(createDesignDto: CreateDesignDto, user: any) {
     try {
       const newDesign = new this.designModel(createDesignDto);
@@ -83,6 +84,33 @@ export class DesignService {
 
       return res;
     } catch(error: any) {
+      throw new InternalServerErrorException(`${error}`);
+    }
+  }
+
+  async findCatalogs(id: string) {
+    try{
+      const tailor = await this.tailorModel.findOne({ username: id });
+
+      if(!tailor) {
+        throw new NotFoundException(`No designer found with username: ${id}`);
+      }
+
+      const catalogs = await this.designModel.find({ 'owner._id': tailor._id, catalogDisplay: true }).sort({ createdAt: -1 });
+
+      if(!catalogs || catalogs.length === 0) {
+        throw new NotFoundException(`No catalog found for this designer`);
+      }
+
+      const res: IResponse<any[]> = {
+        statusCode: 200,
+        msg: `List of ${id} catalogs`,
+        data: catalogs
+      };
+
+      return res;
+    } catch(error: any) {
+      this.logger.error(error);
       throw new InternalServerErrorException(`${error}`);
     }
   }

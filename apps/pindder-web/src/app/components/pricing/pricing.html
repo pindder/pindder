@@ -1,0 +1,25 @@
+<!-- PRICING SECTION -->
+<section id="pricing" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Simple, Transparent Pricing
+          </h2>
+          <p class="text-base text-slate-600">
+            Start with a 14-day free trial. No credit card required.
+          </p>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+          
+          <!-- Monthly Plan -->
+          @for(plan of plans(); track plan._id){
+            <app-pricing-card [plan]="plan"></app-pricing-card>
+          }
+        </div>
+
+      </div>
+</section>

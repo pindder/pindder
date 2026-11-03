@@ -141,7 +141,7 @@ export class Dashboard implements ViewWillEnter{
   async loadProfile() {
     const profile = await this.tokenService.getProfile();
     this.profile = profile ? JSON.parse(profile) : null;
-    this.catalog = `https://pindder.com/${this.profile.username}`;
+    this.catalog = `https://pindder.com/catalogs/${this.profile.username}`;
     this.cdr.markForCheck();
     this.fetchNotifications();
     this.connectNotifications(this.profile._id);
@@ -208,7 +208,7 @@ export class Dashboard implements ViewWillEnter{
       await Share.share({
         title: 'Check out pindder!',
         text: 'Hey, kindly check out my design catalog on pindder.',
-        url: `https://pindder.com/${this.profile.username}`, // The link you want to share
+        url: `https://pindder.com/catalogs/${this.profile.username}`, // The link you want to share
         dialogTitle: 'Share pindder with friends', // Android only title for the popup
       });
     } catch (error) {

@@ -31,6 +31,11 @@ export class DesignController {
     return this.designService.findAll(req.user.sub);
   }
 
+  @Get('catalogs/:id')
+  listCatalog(@Param('id') id: string) {
+    return this.designService.findCatalogs(id);
+  }
+
   @UseGuards(AuthGuard)
   @Get('search')
   search(@Query('q') query: string, @Req() req: any) {
