@@ -26,7 +26,7 @@ export class BankDetailService {
 
       const newBank = new this.bankModel(createBankDetailDto);
 
-      newBank.tailor = tailor;
+      newBank.tailor = tailor._id;
       await newBank.save()
 
       const res: IResponse<any> = {
@@ -88,7 +88,7 @@ export class BankDetailService {
     try {
       const bankDetails = await this.bankModel.find({
         $or: [
-          { 'tailor._id': user }
+          { tailor: user }
         ]
       }).lean();
 
@@ -137,8 +137,8 @@ export class BankDetailService {
     try { 
       const bankDetail = await this.bankModel.findByIdAndDelete(id);
 
-      if(bankDetail) {
-        throw new NotFoundException(``);
+      if(!bankDetail) {
+        throw new NotFoundException(`The provided account was not found!`);
       }
 
       const res: IResponse<any> = {

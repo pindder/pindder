@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { IonTitle, IonHeader, IonToolbar, IonButtons, 
   IonBackButton, IonContent, ViewWillEnter, IonGrid, 
   IonRow, IonCol, ModalController,
-  IonSearchbar
-} from "@ionic/angular";
+  IonSearchbar, IonInfiniteScrollContent, IonInfiniteScroll, 
+  InfiniteScrollCustomEvent} from "@ionic/angular";
 import { DesignService } from '../../services/design.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DataTypes, IDesign, IResponse } from '@pindder/contracts';
@@ -18,7 +18,7 @@ import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-designs',
-  imports: [IonCol, IonRow, IonContent, IonBackButton, IonButtons,
+  imports: [IonInfiniteScroll, IonInfiniteScrollContent, IonCol, IonRow, IonContent, IonBackButton, IonButtons,
     IonToolbar, IonHeader, IonTitle, EmptyState, ListCard,
     IonGrid, IonRow, PrimaryButton, IonSearchbar, AsyncPipe
   ],
@@ -36,6 +36,9 @@ export class Designs implements ViewWillEnter, OnInit{
   dataTypes = DataTypes;
   designs$!: Observable<IDesign[]>;
   isLoading = false;
+  page = 1;
+  limit = 20;
+  hasMoreData = false;
 
   ionViewWillEnter(): void {
     this.fetchDesigns();
@@ -63,7 +66,7 @@ export class Designs implements ViewWillEnter, OnInit{
         this.cdr.markForCheck(); // Trigger change detection for loading state updates
       },
       // Triggered when search bar is CLEARED (query is empty)
-      () => this.designService.fetchDesigns().pipe(
+      () => this.designService.fetchDesigns(this.page, this.limit).pipe(
         map((res: IResponse<IDesign[]>) => res.data || [])
       )
     )
@@ -78,9 +81,14 @@ export class Designs implements ViewWillEnter, OnInit{
   }
 
   fetchDesigns() {
-    this.designs$ = this.designService.fetchDesigns()
+    this.designs$ = this.designService.fetchDesigns(this.page, this.limit)
     .pipe(
-      map((res: IResponse<any>) => res.data || []),
+      map((res: IResponse<any>) => {
+        if(res.meta?.hasNextPage) {
+          this.hasMoreData = true;
+        }
+        return res.data || []
+      }),
       catchError((error: HttpErrorResponse) => {
         console.error('Fetch Orders Error:', error);
         return of([]); // Return empty array on error to keep stream alive
@@ -123,5 +131,14 @@ export class Designs implements ViewWillEnter, OnInit{
   onSearchInput(event: any) {
     const value = event.target.value || '';
     this.searchSubject.next(value);
+  }
+
+  onIonInfinite(event: InfiniteScrollCustomEvent) {
+    this.page += 1;
+
+    this.fetchDesigns();
+    setTimeout(() => {
+      event.target.complete();
+    }, 500);
   }
 }

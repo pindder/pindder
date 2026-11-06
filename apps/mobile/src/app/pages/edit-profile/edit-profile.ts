@@ -31,6 +31,7 @@ export class EditProfile implements OnInit, ViewWillEnter{
   private cdr = inject(ChangeDetectorRef);
 
   profile = signal<IProfile>({
+    fullname: '',
     firstname: '',
     lastname: '',
     email: '',
@@ -59,7 +60,7 @@ export class EditProfile implements OnInit, ViewWillEnter{
   async loadProfile() {
     const profileStr = await this.tokenService.getProfile();
     // Fall back to initialProfile instead of null to prevent template errors
-    if(profileStr) this.profile = JSON.parse(profileStr);
+    if(profileStr) this.profile.set(JSON.parse(profileStr));
     this.cdr.markForCheck();
   }
 

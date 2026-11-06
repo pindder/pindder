@@ -21,7 +21,10 @@ export class ClientController {
 
   @UseGuards(AuthGuard)
   @Post()
-  async create(@Req() req: any, @Body() createClientDto: CreateClientDto) {
+  async create(
+    @Req() req: any, 
+    @Body() createClientDto: CreateClientDto
+  ) {
     return await this.clientService.create(createClientDto, req.user.sub);
   }
 
@@ -33,11 +36,16 @@ export class ClientController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async findAll(@Query('tailor_id') tailor_id: string, @Req() req: any) {
+  async findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('tailor_id') tailor_id: string, 
+    @Req() req: any
+  ) {
     if(tailor_id) {
-      return await this.clientService.findAll(tailor_id);
+      return await this.clientService.findAll(tailor_id, page, limit);
     } else {
-      return await this.clientService.findAll(req.user.sub);
+      return await this.clientService.findAll(req.user.sub, page, limit);
     }
   }
 

@@ -120,16 +120,31 @@
                     </ion-select>
                 </ion-item>
 
+                @if(design.type === designType.BESPOKE){
                 <ion-item>
                     <ion-input 
                     name="production_period" 
                     type="number"
                     min="0"
                     fill="solid"
-                    [(ngModel)]="design.estimatedProductionPeriod" 
+                    [(ngModel)]="design.estimatedProductionDays" 
                     label="Production Period" 
                     aria-label="Production Period" 
                     placeholder="Select period" 
+                    label-placement="stacked">
+                    </ion-input>
+                </ion-item>}
+
+                <ion-item>
+                    <ion-input 
+                    name="delivery_period" 
+                    type="number"
+                    min="0"
+                    fill="solid"
+                    [(ngModel)]="design.estimatedDeliveryDays" 
+                    label="Delivery Period (in days)" 
+                    aria-label="Production Period" 
+                    placeholder="7 days" 
                     label-placement="stacked">
                     </ion-input>
                 </ion-item>

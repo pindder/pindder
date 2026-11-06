@@ -25,16 +25,16 @@
         <ion-item lines="none">
             <ion-select 
                 [(ngModel)]="order.status" 
-                name="countryCode" 
-                [interfaceOptions]="customModalOptions" 
-                interface="modal" 
+                (ngModelChange)="updateOrderStatus()"
+                name="orderStatus" 
+                interface="popover" 
                 [toggleIcon]="'chevron-down-outline'"
-                class="country-code-select"
-                aria-label="Country Code">
+                aria-label="Order Status">
                     @for(status of orderStatus; track status) {
+                        @if(status !== orderStatuses.CANCELLED && status !== orderStatuses.PROCESSING){
                         <ion-select-option [value]="status">
                             {{ status | titlecase }}
-                        </ion-select-option>
+                        </ion-select-option>}
                     }
             </ion-select>
             <ion-note>Order Status</ion-note>
@@ -124,7 +124,9 @@
                         </ion-avatar>
                         <ion-label>
                             <h2>{{ selectedStyle.name }}</h2> 
-                            <p>unit price: {{ selectedStyle.amount.toLocaleString() }}</p>
+                            @if(selectedStyle.amount !== null){
+                                <p>unit price: {{ selectedStyle.amount.toLocaleString() }}</p>
+                            }
                         </ion-label>
                     </ion-item>
                     
@@ -184,7 +186,9 @@
                         </ion-item>
                         <ion-item>
                             <ion-label><p>Total</p></ion-label>
-                            <ion-note>{{ (selectedStyle.amount * selectedStyle.quantity).toLocaleString() }}</ion-note>
+                            @if(selectedStyle.amount !== null){
+                                <ion-note>{{ (selectedStyle.amount * selectedStyle.quantity).toLocaleString() }}</ion-note>
+                            }
                         </ion-item>
                     }
                 </ion-list>
@@ -309,7 +313,14 @@
         ></app-primary-button>
     </div>
     }@else{
-    <div class="p-3">
+    <div class="p-3 flex flex-col gap-2">
+        <app-primary-button
+        [buttonText]="'Order Again'"
+        [icon]="'repeat-outline'"
+        [color]="'primary'"
+        [fill]="'outline'"
+        (action)="repeatOrder()"
+        ></app-primary-button>
         @if(order.status !== orderStatuses.CANCELLED && 
         order.status !== orderStatuses.COMPLETED){
             <app-primary-button

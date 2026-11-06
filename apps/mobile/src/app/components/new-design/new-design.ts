@@ -9,6 +9,7 @@ import { IonContent, IonTextarea, IonButton, IonInput,
   IonToolbar,
   IonHeader,
   ModalController,
+  IonNote,
 } from "@ionic/angular";
 import { DataTypes, DesignTypes, IColors, IDesign, IResponse, Sizes } from '@pindder/contracts';
 import { CloudinaryModule } from '@cloudinary/ng';
@@ -43,7 +44,8 @@ import { Specification } from '../specification/specification';
     IonToolbar,
     IonTitle,
     IonButtons,
-    PrimaryButton
+    PrimaryButton,
+    IonNote,
 ],
   templateUrl: './new-design.html',
   styleUrl: './new-design.css',
@@ -66,7 +68,7 @@ export class NewDesign implements ViewWillEnter, OnInit{
   availableColors: IColors[] = [];
 
   uploadedImageUrls: string[] = [];
-  isUploading: boolean = false;
+  isUploading = false;
 
   ionViewWillEnter(): void { 
     this.fetchColors();

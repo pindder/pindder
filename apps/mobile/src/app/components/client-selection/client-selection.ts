@@ -1,6 +1,6 @@
 // import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { IonContent, IonIcon, IonItem, IonList, IonSearchbar, IonSpinner, ModalController, ViewWillEnter,
+import { IonContent, IonIcon, IonItem, IonList, IonSearchbar, IonSpinner, ModalController,
   IonLabel, IonTitle, IonToolbar, IonButtons, IonButton, IonHeader
 } from '@ionic/angular';
 import { /*catchError, debounceTime, distinctUntilChanged, of, switchMap, tap, Subscription,*/ catchError, map, Observable, of, shareReplay, Subject, tap, } from 'rxjs';
@@ -19,7 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './client-selection.css',
   standalone: true
 })
-export class ClientSelection implements ViewWillEnter, OnInit, OnDestroy{
+export class ClientSelection implements OnInit, OnDestroy{
   private searchSubject = new Subject<string>();
   private modalCtrl = inject(ModalController);
   private clientService = inject(ClientService);
@@ -29,8 +29,8 @@ export class ClientSelection implements ViewWillEnter, OnInit, OnDestroy{
   searchResults$!: Observable<IClient[]>;
   isLoading = false;
   selectedClient!: IClient;
-
-  ionViewWillEnter(): void { }
+  page = 1;
+  limit = 20;
 
   ngOnInit(): void {
     // Set up stream ONCE during component creation
@@ -55,7 +55,7 @@ export class ClientSelection implements ViewWillEnter, OnInit, OnDestroy{
         this.cdr.markForCheck(); // Trigger change detection for loading state updates
       },
       // Triggered when search bar is CLEARED (query is empty)
-      () => this.clientService.fetchClients().pipe(
+      () => this.clientService.fetchClients(this.page, this.limit).pipe(
         map((res: IResponse<IClient[]>) => res.data || [])
       )
     )

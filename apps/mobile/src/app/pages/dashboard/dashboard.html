@@ -12,16 +12,16 @@
 </ion-fab>
 
 <ion-content [fullscreen]="true">
-  @if(profile){
+  @if(profile()){
     <!-- Profile Header-->
     <app-profile-card 
-    [profile]="profile" 
+    [profile]="profile()" 
     [hideNotification]="false"
     (action)="openNotifications()"
     ></app-profile-card>
 
     <!-- Earnings -->
-    <app-earnings-card [profile]="profile" (withdraw)="modal.present()" (earn)="gotoEarn()"></app-earnings-card>
+    <app-earnings-card [profile]="profile()" (withdraw)="modal.present()" (earn)="gotoEarn()"></app-earnings-card>
 
     <!-- Referral Block-->
     <app-referral-block [profile]="profile" (action)="copyToClipboard()" (share)="shareLink()"></app-referral-block>

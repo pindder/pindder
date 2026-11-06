@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, inject, Input, OnInit, signal } from '@angular/core';
 import { PrimaryButton } from '../primary-button/primary-button';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonSelect, IonSelectOption, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { IAddress, IResponse } from '@pindder/contracts';
 import { BrandService } from '../../services/brand.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { countries } from '@pindder/contracts';
 
 @Component({
   selector: 'app-new-address',
@@ -20,7 +21,9 @@ import { HttpErrorResponse } from '@angular/common/http';
     IonTitle,
     IonButtons,
     IonIcon,
-    PrimaryButton
+    PrimaryButton,
+    IonSelect,
+    IonSelectOption
   ],
   templateUrl: './new-address.html',
   styleUrl: './new-address.css',
@@ -42,6 +45,8 @@ export class NewAddress implements OnInit{
     street: '',
     hq: false
   });
+
+  countries = countries;
 
   ngOnInit(): void {
     if(this.location) {

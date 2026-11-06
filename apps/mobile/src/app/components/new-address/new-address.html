@@ -32,13 +32,20 @@
       </ion-item>
 
       <ion-item>
-        <ion-input
-          name="country"
-          type="text"
-          label="Country"
-          labelPlacement="stacked"
-          [(ngModel)]="address().country"
-        ></ion-input>
+        <ion-select 
+          name="sizes" 
+          [(ngModel)]="address().country" 
+          interface="popover" 
+          [toggleIcon]="'chevron-down-outline'"
+          label="Country" 
+          aria-label="countries" 
+          placeholder="Select country" 
+          label-placement="stacked"
+          >
+              @for(country of countries; track country){
+                  <ion-select-option [value]="country">{{ country.flag }} {{ country.name }}</ion-select-option>
+              }
+          </ion-select>
       </ion-item>
 
       <ion-item>
@@ -76,6 +83,7 @@
       <app-primary-button
         [buttonText]="'Save'"
         [icon]="'save-outline'"
+        [disabled]="!address().addressLine1 || !address().country"
         (action)="submit()"
       ></app-primary-button>
     </div>

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AccountStatus } from '@pindder/contracts';
-import { HydratedDocument } from 'mongoose';
-import { TailorSnapshot } from '../../tailors/schemas/tailor.schema';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { Tailor } from '../../tailors/schemas/tailor.schema';
 
 export type BrandDocument = HydratedDocument<Brand>;
 
@@ -13,8 +13,8 @@ export class Brand {
   @Prop({ type: String, maxLength: 1800, default: null})
   bio?: string;
 
-  @Prop({ type: TailorSnapshot, required: true })
-  admin!: TailorSnapshot;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
+  admin!: Types.ObjectId;
 
   @Prop({ type: String, unique: true, required: true })
   email!: string;

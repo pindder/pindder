@@ -25,7 +25,9 @@ export class ClientService {
 
   async create(createClientDto: CreateClientDto, referee_id?: string) {
     try{
-      const tailor = await this.tailorModel.findById(referee_id).exec();
+      const tailor = await this.tailorModel
+      .findById(referee_id)
+      .exec();
 
       if(!tailor) {
         throw new NotFoundException(`Designer account not found!`);
@@ -33,7 +35,7 @@ export class ClientService {
 
       const client = new this.clientModel(createClientDto);
       client.fullname = client.firstname + ' ' + client.lastname;
-      client.referee = tailor;
+      client.referee = tailor._id;
 
       await client.save();
       
@@ -87,7 +89,7 @@ export class ClientService {
         ],
         $and: [
           {
-            'referee._id': user_id
+            referee: user_id
           }
         ]
       }).exec();
@@ -124,13 +126,20 @@ export class ClientService {
     }
   }
 
-  async findAll(acct_id: string) {
+  async findAll(acct_id: string, page = 1, limit = 20) {
     try {
-      const clients = await this.clientModel
-      .find({ 'referee._id': acct_id })
-      .sort({ createdAt: -1 })
-      .exec();
+      const skip = (page - 1) * limit; 
 
+      const [clients, totalClients] = await Promise.all([
+        this.clientModel
+        .find({ referee : acct_id })
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .exec(),
+        this.clientModel.countDocuments({ "referee._id": acct_id })
+      ]);
+      
       // 1. Throw directly instead of returning
       if (!clients || clients.length === 0) {
         throw new NotFoundException(`No clients found`);
@@ -139,7 +148,15 @@ export class ClientService {
       const res: IResponse<any> = {
         statusCode: 200,
         msg: 'List of clients',
-        data: clients
+        data: clients,
+        meta: {
+          limit: limit,
+          page: page,
+          total: totalClients,
+          hasNextPage: page * limit <=  totalClients ? true : false,
+          hasPreviousPage: page > 1 ? true : false,
+          totalPages: totalClients / limit
+        }
       }
 
       return res;

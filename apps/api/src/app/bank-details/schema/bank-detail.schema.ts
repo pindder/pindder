@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
-import { HydratedDocument } from "mongoose";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
+import mongoose, { HydratedDocument, Types } from "mongoose";
 
 export type BankDetailDocument = HydratedDocument<BankDetail>;
 
 @Schema()
 export class BankDetail {
-    @Prop({ type: () => TailorSnapshot, required: true })
-    tailor!: TailorSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
+    tailor!: Types.ObjectId;
 
     @Prop({ type: String, required: true })
     bankName!: string;

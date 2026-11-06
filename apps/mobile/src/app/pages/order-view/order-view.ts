@@ -8,7 +8,7 @@ import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLab
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DataTypes, DesignTypes, IDesign, IOrderItem, IOrderStyle, IOrderWithPayment, IPayment, IResponse, OrderStatus, PaymentMethods } from '@pindder/contracts';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { PrimaryButton } from '../../components/primary-button/primary-button';
 import { Measurement } from '../../components/measurement/measurement';
@@ -42,6 +42,7 @@ export class OrderView implements ViewWillEnter, OnInit{
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private appService = inject(AppService);
+  private router = inject(Router);
 
   //order!: IOrderItem | any;
   client_id!: string;
@@ -56,16 +57,9 @@ export class OrderView implements ViewWillEnter, OnInit{
   designTypes = DesignTypes;
   paymentMethod = PaymentMethods;
 
-  customModalOptions = {
-    header: 'Update Status',
-    breakpoints: [0, 0.5],
-    initialBreakpoint: 0.5,
-  };
-
   isSharingSupported = signal<boolean>(false);
 
   ionViewWillEnter(): void {
-    console.log(this.order);
     const client = this.ar.snapshot.paramMap.get('id');
     
     if(client) {
@@ -242,7 +236,7 @@ export class OrderView implements ViewWillEnter, OnInit{
   }
 
   updateOrderStatus() {
-    this.orderService.updateOrderStatus(this.order).subscribe({
+    this.orderService.updateOrderStatus(this.order._id, this.order.status).subscribe({
       next: (response: IResponse<any>) => {
         console.log(response);
       },
@@ -251,4 +245,12 @@ export class OrderView implements ViewWillEnter, OnInit{
       }
     })
   }
-}
+
+  repeatOrder() {
+    this.router.navigate(['app/orders'], {
+      queryParams: {
+        order: this.order._id 
+      }
+    });
+  }
+ }

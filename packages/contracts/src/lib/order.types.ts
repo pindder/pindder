@@ -33,8 +33,7 @@ export interface IOrderItem {
   orderId: string;
   _id: string;
   client?: IClient;
-  tailor?: any;
-  user?: any;
+  tailor?: ITailor;
   styles: IOrderStyle[];
   dueDate: string | Date;
   measurements?: IMeasurement[];
@@ -77,11 +76,11 @@ export interface IOrderWithPayment {
 export interface IOrderStyle {
   _id?: string;
   name: string;
-  description: string;
+  description: string | null;
   images: any[];
   type: string;
   dueDate: string;
-  amount: number;
+  amount: number | null;
   specifications: ISpecification[];
   selections: ISpecification[];
   colors: IColors[];

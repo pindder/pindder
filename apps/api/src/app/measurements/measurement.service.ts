@@ -46,7 +46,7 @@ export class MeasurementService {
         description: dto.description,
         notes: dto.notes, 
         measurements: measurementsMap,
-        owner: client
+        owner: client._id
       });
 
       const res: IResponse<any> = {
@@ -86,7 +86,7 @@ export class MeasurementService {
   async findClientMeasurements(id: string): Promise<IResponse<Measurement[]>> {
     try {
       const records = await this.measurementModel.find({
-        'owner._id': id,
+        owner: id,
       }).sort({ createdAt: -1 });
 
       if (!records) {

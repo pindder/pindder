@@ -1,9 +1,8 @@
 import { IOrderStyle } from "@pindder/contracts";
 
 export class CreateOrderDto {
-    client?: string;
-    user?: string;
-    tailor?: string;
+    client!: string;
+    tailor!: string;
     styles!: IOrderStyle[];
     deliveryDate!: string[];
     deliveryMethod!: string;

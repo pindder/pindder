@@ -96,6 +96,35 @@
                 </ion-select>
             </ion-item>
 
+            @if(design.type === designType.BESPOKE){
+            <ion-item>
+                <ion-input 
+                name="production_period" 
+                type="number"
+                min="0"
+                fill="solid"
+                [(ngModel)]="design.estimatedProductionDays" 
+                label="Production Period (in days)" 
+                aria-label="Production Period" 
+                placeholder="15 days" 
+                label-placement="stacked">
+                </ion-input>
+            </ion-item>}
+
+            <ion-item>
+                <ion-input 
+                name="delivery_period" 
+                type="number"
+                min="0"
+                fill="solid"
+                [(ngModel)]="design.estimatedDeliveryDays" 
+                label="Delivery Period (in days)" 
+                aria-label="Production Period" 
+                placeholder="7 days" 
+                label-placement="stacked">
+                </ion-input>
+            </ion-item>
+
             <ion-item>
                 <ion-input
                 name="amount"
@@ -109,28 +138,28 @@
                 ></ion-input>
             </ion-item>
 
-            <ion-item>
             @if(design.type === designType.BESPOKE){
-            <div class="py-2">
-                <p class="text-xs">
-                    Available Colors
-                </p>
-                <div class="color-grid">
-                    @for(color of availableColors; track color._id){
-                    <div
-                        class="color-swatch"
-                        [style.background-color]="color.hex"
-                        [class.selected]="isColorSelected(color.code)"
-                        (click)="toggleColor(color)"
-                    >
-                        @if(isColorSelected(color.code)){<ion-icon
-                        name="checkmark"
-                        [style.color]="getContrastColor(color.hex)"
-                        ></ion-icon>}
-                    </div>}
+            <ion-item>
+                <div class="py-2">
+                    <p class="text-xs">
+                        Available Colors
+                    </p>
+                    <div class="color-grid">
+                        @for(color of availableColors; track color._id){
+                        <div
+                            class="color-swatch"
+                            [style.background-color]="color.hex"
+                            [class.selected]="isColorSelected(color.code)"
+                            (click)="toggleColor(color)"
+                        >
+                            @if(isColorSelected(color.code)){<ion-icon
+                            name="checkmark"
+                            [style.color]="getContrastColor(color.hex)"
+                            ></ion-icon>}
+                        </div>}
+                    </div>
                 </div>
-            </div>}
-            </ion-item>
+            </ion-item>}
         </ion-list>
 
         @if(design.type === designType.READYMADE){
@@ -140,6 +169,7 @@
             </ion-list-header>
             <ion-item lines="none" button (click)="openSpecificationModal()">
                 <ion-label>Add Specification</ion-label>
+                <ion-note>{{ design.specifications.length }}</ion-note>
             </ion-item>
         </ion-list>}
 

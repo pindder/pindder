@@ -14,12 +14,23 @@ export class ClientService {
     return this.http.post<IResponse<IClient>>(`${environment.apiUrl}/clients`, client);
   }
 
-  fetchClients(): Observable<IResponse<any>> {
-    return this.http.get<IResponse<any>>(`${environment.apiUrl}/clients`);
+  fetchClients(page:number, limit: number): Observable<IResponse<IClient[]>> {
+    // 1. Initialize an empty HttpHeaders object
+    let params = new HttpParams();
+
+    // 2. Conditionally append page and size if they are present
+    if (page !== undefined && page !== null) {
+      params = params.set('page', page.toString());
+    }
+    
+    if (limit !== undefined && limit !== null) {
+      params = params.set('limit', limit.toString());
+    }
+    return this.http.get<IResponse<IClient[]>>(`${environment.apiUrl}/clients`, { params });
   }
 
-  fetchClient(client_id: string): Observable<IResponse<any>> {
-    return this.http.get<IResponse<any>>(`${environment.apiUrl}/clients/${client_id}`).pipe(
+  fetchClient(client_id: string): Observable<IResponse<IClient>> {
+    return this.http.get<IResponse<IClient>>(`${environment.apiUrl}/clients/${client_id}`).pipe(
       switchMap((clientRes: IResponse<any>) => {
         // Safe check if client payload exists
         const clientData = clientRes?.data;

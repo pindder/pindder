@@ -1,12 +1,7 @@
 import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonHeader, IonToolbar, IonContent, IonList, IonItem, IonInput, 
-  ViewWillEnter, IonSelect, IonSelectOption, IonButtons, 
-  IonTitle, IonBackButton, IonSpinner, IonActionSheet, 
-  IonLabel, 
-  ModalController
-} from '@ionic/angular';
+import { IonHeader, IonToolbar, IonContent, IonList, IonItem, IonInput, ViewWillEnter, IonSelect, IonSelectOption, IonButtons, IonTitle, IonBackButton, IonSpinner, IonActionSheet, IonLabel, ModalController, IonNote } from '@ionic/angular';
 import { Gender, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -16,14 +11,15 @@ import { ClientOrders } from '../../components/client-orders/client-orders';
 
 @Component({
   imports: [
-    IonActionSheet, IonSpinner, IonButtons, 
+    IonActionSheet, IonSpinner, IonButtons,
     IonBackButton, IonTitle,
     IonContent, IonHeader, IonToolbar,
     IonList, IonItem, IonInput, FormsModule,
     IonSelect, IonSelectOption,
     IonSpinner,
-    IonLabel, PrimaryButton
-  ],
+    IonLabel, PrimaryButton,
+    IonNote
+],
   templateUrl: './client-view.html',
   styleUrl: './client-view.css',
 })

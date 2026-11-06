@@ -13,7 +13,7 @@ import { TokenService } from '../../services/token.service';
 import { Router } from '@angular/router';
 import { ProfileCard } from '../../components/profile-card/profile-card';
 import { EmptyState } from '../../components/empty-state/empty-state';
-import { INotification } from '@pindder/contracts';
+import { INotification, IProfile } from '@pindder/contracts';
 import { NotificationService } from '../../services/notification.service';
 import { SseService } from '../../services/sse.service';
 import { Subscription } from 'rxjs';
@@ -50,7 +50,7 @@ export class Dashboard implements ViewWillEnter{
   private toastCtrl = inject(ToastController);
   private sseSubscription?: Subscription;
 
-  profile!: any;
+  profile = signal<IProfile>({});
   environmentInjector = inject(EnvironmentInjector);
   presentingElement!: HTMLElement | null;
   userBalance = signal<number>(0);
@@ -140,11 +140,14 @@ export class Dashboard implements ViewWillEnter{
 
   async loadProfile() {
     const profile = await this.tokenService.getProfile();
-    this.profile = profile ? JSON.parse(profile) : null;
-    this.catalog = `https://pindder.com/catalogs/${this.profile.username}`;
+    if(profile) {
+      this.profile.set(JSON.parse(profile));
+      this.connectNotifications(this.profile()._id!);
+    }
+    
+    this.catalog = `https://pindder.com/catalogs/${this.profile().username}`;
     this.cdr.markForCheck();
     this.fetchNotifications();
-    this.connectNotifications(this.profile._id);
 
 
     try {
@@ -158,7 +161,11 @@ export class Dashboard implements ViewWillEnter{
   }
 
   fetchNotifications() {
-    this.notificationService.getRecentNotifications(this.profile._id).subscribe({
+    if(!this.profile()._id) {
+      return;
+    }
+
+    this.notificationService.getRecentNotifications(this.profile()._id!).subscribe({
       next: (res) => {
         this.notifications = res.data;
         this.cdr.markForCheck();
@@ -208,7 +215,7 @@ export class Dashboard implements ViewWillEnter{
       await Share.share({
         title: 'Check out pindder!',
         text: 'Hey, kindly check out my design catalog on pindder.',
-        url: `https://pindder.com/catalogs/${this.profile.username}`, // The link you want to share
+        url: `https://pindder.com/catalogs/${this.profile().username}`, // The link you want to share
         dialogTitle: 'Share pindder with friends', // Android only title for the popup
       });
     } catch (error) {

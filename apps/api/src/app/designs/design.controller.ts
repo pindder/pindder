@@ -27,8 +27,12 @@ export class DesignController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll(@Req() req: any) {
-    return this.designService.findAll(req.user.sub);
+  async findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Req() req: any
+  ) {
+    return await this.designService.findAll(req.user, page, limit);
   }
 
   @Get('catalogs/:id')

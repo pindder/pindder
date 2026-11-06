@@ -1,7 +1,5 @@
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
-
 export class CreateReferralDto {
-    referee!: TailorSnapshot;
+    referee!: string;
     referrer!: string;
     refereeSubscription?: string;
 }

@@ -33,7 +33,7 @@
                 <span class="text-sm text-secondary">{{ order.totalItems }} Items</span>
                 <span class="text-sm text-secondary">
                     <ion-icon slot="icon-only" name="calendar-outline"></ion-icon> 
-                    Due: {{ order.createdAt | date }}
+                    Due: {{ order.dueDate | date }}
                 </span>
             </div>
         </div>
@@ -50,7 +50,7 @@
         <div class="flex justify-between">
             <ion-label (click)="editDesign()">
                 <h2>{{ design.name.substring(0, 7) }} {{ design.name.length > 7 ? '...' : '' }}</h2>
-                <p>{{ design.amount.toLocaleString() }}</p>
+                <p>{{ design.amount !== null ? design.amount.toLocaleString() : 0 }}</p>
             </ion-label>
             <ion-buttons>
                 <ion-button (click)="editDesign()">

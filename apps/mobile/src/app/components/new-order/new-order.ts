@@ -153,8 +153,8 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
       // });
 
       this.order.styles.push({
-        amount: this.design.amount,
-        description: this.design.description,
+        amount: this.design.amount ?? null,
+        description: this.design.description ?? null,
         dueDate: '',
         images: this.design.images,
         type: this.design.type,
@@ -170,6 +170,7 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
         quantity: 0
       });
     }
+    console.log(this.order);
 
     if(this.order.styles.length > 0) {
       this.order.styles.forEach((style: IOrderStyle) => {
@@ -376,11 +377,19 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
   }
 
   incrementQuantityBespoke() {
+    if(this.selectedStyle.amount === null) {
+      return;
+    }
+
     this.selectedStyle.quantity++;
     this.order.totalAmount += this.selectedStyle.amount;
   }
 
   decrementQuantityBespoke() {
+    if(this.selectedStyle.amount === null) {
+      return;
+    }
+
     if(this.selectedStyle.quantity > 0) {
       this.selectedStyle.quantity--;
       this.order.totalAmount -= this.selectedStyle.amount;
@@ -485,6 +494,11 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
     for(const item of this.order.styles) {
       item.totalAmount = 0;
       item.totalItems = 0;
+
+      if(item.amount === null) {
+        return;
+      }
+
       if(item.type === DesignTypes.BESPOKE) {
         console.log(item);
         if(item.quantity < 1) {
@@ -563,6 +577,12 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
   }
 
   submit() {
+    if(this.order._id) {
+      delete this.order._id;
+      this.order.status = OrderStatus.PENDING;
+      this.order.paid = false;
+    }
+
     this.order.totalAmount = this.completeOrder.totalAmount;
     this.order.totalItems = this.completeOrder.totalItems;
     this.orderService.createOrder(this.order).subscribe({

@@ -59,7 +59,7 @@ export class OrderService {
     return this.http.get<IResponse<IOrderItem[]>>(`${environment.apiUrl}/orders/search`, { params });
   }
 
-  updateOrderStatus(order: IOrderItem): Observable<IResponse<any>> {
-    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/orders/${order._id}`, { status: order.status });
+  updateOrderStatus(order_id: string, order_status: string): Observable<IResponse<any>> {
+    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/orders/${order_id}`, { status: order_status });
   }
 }

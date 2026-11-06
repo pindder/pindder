@@ -38,7 +38,7 @@ export class SharedService {
 
     async hasValidToken(acct: any) {
         try {
-            const acct_token = await this.tokenModel.findOne({ 'account.email': acct.email }).exec();
+            const acct_token = await this.tokenModel.findOne({ account: acct }).exec();
             
             if(!acct_token) {
                 return { hasToken: false };
@@ -78,7 +78,7 @@ export class SharedService {
 
     async updateToken(acctType: string, acct: any, tokenType: string, newToken?: string) {
         try {
-            const token = await this.tokenModel.findOneAndUpdate({ 'account.email': acct.email }, {
+            const token = await this.tokenModel.findOneAndUpdate({ account: acct }, {
                 type: tokenType,
                 accountType: acctType,
                 account: acct,

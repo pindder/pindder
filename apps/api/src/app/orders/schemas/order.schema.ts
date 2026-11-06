@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, Types } from "mongoose";
 //import { Measurement } from "../../measurements/schemas/measurement.schema";
 import { DeliveryMethods, OrderStatus, PaymentMethods } from "@pindder/contracts";
-import { ClientSnapshot } from "../../clients/schemas/client.schema";
-import { UserSnapshot } from "../../users/schemas/user.schema";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
+import { Client } from "../../clients/schemas/client.schema";
+import { User } from "../../users/schemas/user.schema";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
 import { OrderStyleSnapshot } from "../../designs/schemas/design.schema";
+import { Address } from "../../addresses/schema/address.schema";
 
 export type OrderDocument = HydratedDocument<Order>;
 
@@ -14,14 +15,11 @@ export class Order {
     @Prop({ type: String, required: true, unique: true, index: true })
     orderId!: string;
 
-    @Prop({ type: () => ClientSnapshot, default: null })
-    client?: ClientSnapshot | null;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Client || User })
+    client!: Types.ObjectId;
 
-    @Prop({ type: () => UserSnapshot, default: null })
-    user?: UserSnapshot | null;
-
-    @Prop({ type: () => TailorSnapshot, required: true })
-    tailor!: TailorSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
+    tailor!: Types.ObjectId;
 
     @Prop({ type: () => [OrderStyleSnapshot], required: true })
     styles!: OrderStyleSnapshot[];
@@ -53,8 +51,8 @@ export class Order {
     @Prop({ type: String })
     note?: string
 
-    @Prop({ type: String })
-    address?: string
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Address })
+    address!: Address | null
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

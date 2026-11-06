@@ -2,11 +2,11 @@ export interface IDesign {
     _id?: string;
     name: string;
     category: string;
-    amount: number;
-    description: string;
+    amount: number | null;
+    description: string | null;
     type: string;
-    estimatedProductionPeriod?: number; 
-    estimatedTimeArrival?: number; 
+    estimatedProductionDays?: number | null; 
+    estimatedDeliveryDays?: number | null; 
     specifications: ISpecification[];
     selections?: ISpecification[];
     colors: any;

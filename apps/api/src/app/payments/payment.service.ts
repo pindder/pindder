@@ -58,7 +58,11 @@ export class PaymentService {
 
     try {
       // 1. Check if Order exists
-      const orderDoc = await this.orderModel.findById(createPaymentDto.orderId);
+      const orderDoc = await this.orderModel
+        .findById(createPaymentDto.orderId)
+        .populate('client')
+        .populate('tailor')
+        .exec();
 
       // 2. If order is not found return 
       if(!orderDoc) {
@@ -72,7 +76,7 @@ export class PaymentService {
       //const tailor = order.tailor;
 
       // 5. Extract client information from order and assign to variable declared above
-      const client = order.client || order?.user;
+      const client = order.client;
       
       // 6. Check that client information exists
       if (!client) {
@@ -355,15 +359,15 @@ export class PaymentService {
 
       // 4. If everything succeeded, commit the transaction
       await session.commitTransaction();
+
+      // 5. Trigger sse to update balance in app
+      this.streamerService.streamUserBalance(paymentInfo);
+      
       return { 
         success: true, 
         newBalance: updatedUser.currentBalance,
         ledgerId: ledgerEntry[0]._id 
       };
-
-      // 5. Trigger sse to update balance in app
-      this.streamerService.streamUserBalance(paymentInfo);
-
     } catch (error: any) {
       // 5. If any error occurs, abort and roll back all changes
       await session.abortTransaction();

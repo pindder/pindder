@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
@@ -28,8 +28,19 @@ export class DesignService {
     return this.http.post<IResponse<IDesign>>(`${environment.apiUrl}/designs`, design);
   }
 
-  fetchDesigns(): Observable<IResponse<any>> {
-    return this.http.get<IResponse<any>>(`${environment.apiUrl}/designs`);
+  fetchDesigns(page:number, limit: number): Observable<IResponse<any>> {
+    // 1. Initialize an empty HttpHeaders object
+    let params = new HttpParams();
+
+    // 2. Conditionally append page and size if they are present
+    if (page !== undefined && page !== null) {
+      params = params.set('page', page.toString());
+    }
+    
+    if (limit !== undefined && limit !== null) {
+      params = params.set('limit', limit.toString());
+    }
+    return this.http.get<IResponse<any>>(`${environment.apiUrl}/designs`, { params });
   }
 
   fetchDesign(design_id: string): Observable<any> {

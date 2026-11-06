@@ -83,6 +83,9 @@
                 <ion-label>
                     View Measurement
                 </ion-label>
+                <ion-note>
+                    {{ client.measurements?.length }}
+                </ion-note>
             </ion-item>
         </ion-list>
         <ion-list [inset]="true">
@@ -90,6 +93,9 @@
                 <ion-label>
                     View Orders
                 </ion-label>
+                <ion-note>
+                    {{ client.orders?.length }}
+                </ion-note>
             </ion-item>
         </ion-list>
 

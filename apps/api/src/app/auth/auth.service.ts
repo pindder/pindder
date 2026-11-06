@@ -15,6 +15,7 @@ import { generateCode } from '../shared/helpers';
 import { SubscriptionService } from '../subscriptions/subscription.service';
 import { Admin } from '../admins/schemas/admin.schema';
 import { ReferralsService } from '../referrals/referrals.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +30,8 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly sharedService: SharedService,
     private readonly subscriptionService: SubscriptionService,
-    private readonly referralService: ReferralsService
+    private readonly referralService: ReferralsService,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   async adminLogin(loginDto: LoginDto) {
@@ -70,6 +72,8 @@ export class AuthService {
         throw new HttpException('Failed to generate access token!', HttpStatus.EXPECTATION_FAILED);
       }
 
+      this.eventEmitter.emit('adminLoggedIn', {...adminData, token: auth_token});
+
       const res: IResponse<any> = {
         statusCode: 200,
         msg: 'Admin Logged in successfully!',
@@ -93,19 +97,25 @@ export class AuthService {
         throw new UnauthorizedException('Incorrect email or password');
       }
 
-      const hasToken = await this.sharedService.hasValidToken(tailor);
+      const hasToken = await this.sharedService.hasValidToken(tailor._id);
 
       if (hasToken) {
-        token = await this.sharedService.updateToken(AccountTypes.TAILOR, tailor, TokenTypes.CODE);
+        token = await this.sharedService.updateToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE);
       } else {
         token = await this.sharedService.createToken(
           AccountTypes.TAILOR, 
-          tailor, 
+          tailor._id, 
           TokenTypes.CODE
         );
       }
-      
-      await this.emailService.sendOneTimeLoginCode(tailor, token.token);
+
+      this.eventEmitter.emit(
+        'loginCodeRequested', 
+        {
+          user: {...tailor}, 
+          token: token.token
+        }
+      );
 
       return { status: 200, message: 'Login code has been sent to your email!' };
       
@@ -140,16 +150,24 @@ export class AuthService {
       await tailor.save();
 
       // await this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
-      const token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor, TokenTypes.CODE);
+      const token = await this.sharedService.createToken(AccountTypes.TAILOR, tailor._id, TokenTypes.CODE);
 
-      await this.emailService.sendOneTimeLoginCode(tailor, token.token);
+      this.eventEmitter.emit(
+        'loginCodeRequested', 
+        {
+          user: {...tailor}, 
+          token: token.token
+        }
+      );
 
-      console.log(tailorRegistrationDto);
-      // if tailor was referred capture referral info
-      if(tailorRegistrationDto.referralCode) {
-        await this.subscriptionService.assignSubscription({ user_id: tailor._id });
-        await this.referralService.create({ referee: tailor, referrer: tailorRegistrationDto.referralCode });
-      }
+      this.eventEmitter.emit(
+        'accountCreated', 
+        { 
+          id: tailor._id,
+          user: {...tailor},
+          referralCode: tailorRegistrationDto.referralCode ?? ''
+        }
+      );
 
       const res: IResponse<Tailor> = {
         statusCode: 200,
@@ -174,15 +192,21 @@ export class AuthService {
         throw new NotFoundException('User not found');
       }
 
-      const hasToken = await this.sharedService.hasValidToken(user);
+      const hasToken = await this.sharedService.hasValidToken(user._id);
 
       if(hasToken) {
-        token = await this.sharedService.updateToken(user.accountType, user, TokenTypes.CODE);
+        token = await this.sharedService.updateToken(user.accountType, user._id, TokenTypes.CODE);
       } else {
-        token = await this.sharedService.createToken(AccountTypes.TAILOR, user, TokenTypes.CODE,);
+        token = await this.sharedService.createToken(AccountTypes.TAILOR, user._id, TokenTypes.CODE,);
       }
       
-      this.emailService.sendOneTimeLoginCode(user, token.token);
+      this.eventEmitter.emit(
+        'loginCodeRequested', 
+        {
+          user: {...user}, 
+          token: token.token
+        }
+      );
 
       return { status: 200, message: `Login code has been sent to your email!` };
     } catch(error: any) {
@@ -195,10 +219,23 @@ export class AuthService {
     const user = new this.userModel({...createUserDto, referralCode: generateCode(8, true)});
     await user.save();
 
-    this.emailService.sendWelcomeEmail(user.email, user.username);
-    const token = await this.sharedService.createToken(AccountTypes.TAILOR, user, TokenTypes.CODE);
+    const token = await this.sharedService.createToken(AccountTypes.TAILOR, user._id, TokenTypes.CODE);
 
-    this.emailService.sendOneTimeLoginCode(user, token.token);
+    this.eventEmitter.emit(
+      'loginCodeRequested', 
+      {
+        user: {...user}, 
+        token: token.token
+      }
+    );
+
+    this.eventEmitter.emit(
+      'accountCreated', 
+      { 
+        id: user._id,
+        user: {...user}
+      }
+    );
 
     return { status: 200, data: user, message: `Account created successfully!` };
 
@@ -218,10 +255,10 @@ export class AuthService {
 
       // check for the associated acct on the token against all acctTypes
       if(token.accountType === AccountTypes.TAILOR) {
-        acct = await this.tailorModel.findOne({ email: token.account.email });
+        acct = await this.tailorModel.findById(token.account).select('username email accountType').exec();
       } 
       else if(token.accountType === AccountTypes.USER) {
-        acct = await this.userModel.findOne({ email: token.account.email });
+        acct = await this.userModel.findById(token.account).select('username email accountType').exec();
       }
 
       // throw an error if the acct associated with the token could not be found
@@ -239,12 +276,11 @@ export class AuthService {
       // update acct status to ACTIVE From PENDING
       if(acct && acct.status == AccountStatus.PENDING) {
         acct.status = AccountStatus.ACTIVE;
-        await acct.save();
-
-        if(acct.accountType === AccountTypes.TAILOR) {
-          await this.paystackService.createCustomer(acct);
-          await this.emailService.sendWelcomeEmail(acct.email, acct.username);
+        if(!acct.verified) {
+          acct.verified = true
+          setTimeout(() => this.eventEmitter.emit('accountVerificationSuccess', { user: {...acct }}), 5000);
         }
+        await acct.save();
       }
 
       return result;
@@ -280,11 +316,80 @@ export class AuthService {
 
       const token = await this.sharedService.updateToken(acct.accountType, acct, TokenTypes.CODE);
 
-      await this.emailService.sendOneTimeLoginCode(acct, token.token);
-
+      this.eventEmitter.emit(
+        'loginCodeRequested', 
+        {
+          user: {...acct}, 
+          token: token.token
+        }
+      );
       return true;
     } catch(error: any) {
       throw new InternalServerErrorException(`${error}`);
     }
+  }
+
+  @OnEvent('userLoggedIn')
+  async onSuccessfulLogin(payload: {
+    user: Tailor | User,
+  }) {
+    return;
+  }
+
+  @OnEvent('loginCodeRequested')
+  async onLoginCodeRequest(payload: {
+    acct: User | Tailor,
+    token: string
+  }) {
+    try {
+      await this.emailService.sendOneTimeLoginCode(payload.acct, payload.token);
+      this.logger.log('EVENT_LOG:', {
+        type: 'OTP_REQUEST',
+        initiator: payload.acct.email
+      });
+      return;
+    } catch(error: unknown) {
+      this.logger.error('EVENT_LOG:', error);
+    }
+  }
+
+  @OnEvent('accountCreated')
+  async handleSubscriptionAssoc(payload: {
+    id: string,
+    referralCode?: string,
+    user: Tailor | User,
+  }) {
+    try {
+      if(payload.referralCode) {
+        await this.referralService.create({ referee: payload.id, referrer: payload.referralCode });
+      }
+      await this.subscriptionService.assignSubscription({ user_id: payload.id });
+      this.logger.log('EVENT_LOG:', {
+        type: 'NEW_SIGN_UP',
+        account: payload.user
+      });
+      return;
+    } catch(error: unknown) {
+      this.logger.error('EVENT_LOG:', error);
+      return;
+    }
+  }
+
+  @OnEvent('accountVerificationSuccess')
+  async handleWelcomeMail(payload: {
+    user: Tailor | User
+  }) {
+    try {
+      await this.emailService.sendWelcomeEmail(payload.user.email, payload.user.username);
+      await this.paystackService.createCustomer(payload.user);
+      this.logger.log('EVENT_LOG:', {
+        type: 'ACCOUNT_VERIFICATION',
+        initiator: payload.user.email
+      });
+      return;
+    } catch(error: unknown) {
+      this.logger.log('EVENT_LOG:', error);
+    }
+    
   }
 }

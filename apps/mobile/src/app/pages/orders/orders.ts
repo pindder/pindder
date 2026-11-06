@@ -9,7 +9,7 @@ import { EmptyState } from "../../components/empty-state/empty-state";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataTypes, IClient, IDesign, IOrderItem, IResponse, OrderStatus } from '@pindder/contracts';
+import { DataTypes, IClient, IDesign, IOrderItem, IOrderWithPayment, IResponse, OrderStatus } from '@pindder/contracts';
 import { NewOrder } from '../../components/new-order/new-order';
 import { ClientService } from '../../services/client.service';
 import { DesignService } from '../../services/design.service';
@@ -90,6 +90,7 @@ export class Orders implements ViewWillEnter, OnInit{
     const client_id = this.ar.snapshot.queryParamMap.get('client');
     const design_id = this.ar.snapshot.queryParamMap.get('style');
     const status = this.ar.snapshot.queryParamMap.get('status');
+    const order = this.ar.snapshot.queryParamMap.get('order');
 
     if(client_id) {
       this.client_id.set(client_id);
@@ -100,6 +101,8 @@ export class Orders implements ViewWillEnter, OnInit{
     } else if(status) {
       this.activeSegment = status.toLocaleLowerCase();
       this.fetchOrders(status.toLocaleUpperCase());
+    } else if(order) {
+      this.fetchOrder(order);
     } else {
       this.fetchOrders();
     }
@@ -207,8 +210,22 @@ export class Orders implements ViewWillEnter, OnInit{
     // });
   }
 
+  fetchOrder(order_id: string) {
+    this.orderService.fetchOrder(order_id).subscribe({
+      next: (response: IResponse<IOrderWithPayment>) => {
+        if(response.data?.order) {
+          this.client = response.data.order.client!
+          this.openNewOrderModal(response.data.order);
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
+  }
+
   viewOrder(order_id: string) {
-    console.log(order_id);
+    // console.log(order_id);
     this.router.navigate(['/app/orders/' + order_id ]);
   }
 
@@ -237,12 +254,13 @@ export class Orders implements ViewWillEnter, OnInit{
     })
   }
 
-  async openNewOrderModal() {
+  async openNewOrderModal(order?: any) {
     const modal = await this.modalCtrl.create({
       component: NewOrder,
       componentProps: {
         client: this.client,
-        design: this.design
+        design: this.design,
+        order: order
       }
     });
 
