@@ -61,4 +61,10 @@
       ></app-empty-state>
     }
   }
+
+  @if(hasMoreData){<ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content
+    loadingSpinner="bubbles"
+    loadingText="processing..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>}
 </ion-content>

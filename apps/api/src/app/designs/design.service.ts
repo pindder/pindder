@@ -27,22 +27,20 @@ export class DesignService {
       const newDesign = new this.designModel(createDesignDto);
 
       if(user.acctType === AccountTypes.TAILOR) {
-        const tailor = await this.tailorModel.findById(user.sub).lean();
-        
-        if(tailor) {
-          newDesign.owner = await tailor;
-        }
-        else {
+        const tailor = await this.tailorModel.findById(user.sub);
+        if(!tailor) {
           throw new UnauthorizedException();
         }
+
+        newDesign.owner = tailor._id;
+
       } else if(user.acctType === AccountTypes.USER) {
-        const customer = await this.userModel.findById(user.sub).lean();
-        
-        if(customer) {
-          newDesign.owner = customer;
-        } else {
+        const customer = await this.userModel.findById(user.sub);
+        if(!customer) {
           throw new UnauthorizedException();
         }
+
+        newDesign.owner = customer._id;
       }
 
       await newDesign.save();
@@ -72,18 +70,36 @@ export class DesignService {
     }
   }
 
-  async findAll(acct_id: string) {
+  async findAll(user: any, page = 1, limit = 20) {
     try {
-      const designs = await this.designModel.find({ 'owner._id': acct_id }).sort({ createdAt: -1 });
+      const skip = (page - 1) * limit; 
 
-      const res: IResponse<any> = {
+      const [designs, totalDesigns] = await Promise.all([
+        this.designModel
+          .find({ owner : user.sub })
+          .skip(skip)
+          .limit(limit)
+          .sort({ createdAt: -1 }),
+        this.designModel.countDocuments({ $or: [ {owner: user.sub }]})
+      ]);
+
+      const res: IResponse<any[]> = {
         statusCode: 200,
         msg: 'List of styles',
-        data: designs
+        data: designs,
+        meta: {
+          limit: limit,
+          page: page,
+          total: totalDesigns,
+          hasNextPage: page * limit <=  totalDesigns ? true : false,
+          hasPreviousPage: page > 1 ? true : false,
+          totalPages: totalDesigns > limit ? totalDesigns / limit : page
+        }
       }
 
       return res;
     } catch(error: any) {
+      this.logger.error(error);
       throw new InternalServerErrorException(`${error}`);
     }
   }
@@ -96,7 +112,7 @@ export class DesignService {
         throw new NotFoundException(`No designer found with username: ${id}`);
       }
 
-      const catalogs = await this.designModel.find({ 'owner._id': tailor._id, catalogDisplay: true }).sort({ createdAt: -1 });
+      const catalogs = await this.designModel.find({ owner: tailor._id, catalogDisplay: true }).sort({ createdAt: -1 });
 
       if(!catalogs || catalogs.length === 0) {
         throw new NotFoundException(`No catalog found for this designer`);
@@ -126,7 +142,7 @@ export class DesignService {
         ],
         $and: [
           {
-            'owner._id': user_id
+            owner : user_id
           }
         ]
       }).exec();

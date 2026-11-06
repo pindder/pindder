@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
-import { UserSnapshot } from "../../users/schemas/user.schema";
-import { HydratedDocument } from "mongoose";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
+import { User } from "../../users/schemas/user.schema";
+import mongoose, { HydratedDocument, Types } from "mongoose";
 import { AccountTypes, TokenStatus, TokenTypes } from "@pindder/contracts";
-import { AdminSnapshot } from "../../admins/schemas/admin.schema";
+import { Admin } from "../../admins/schemas/admin.schema";
 
 export type TokenDocument = HydratedDocument<Token>;
 
@@ -21,8 +21,8 @@ export class Token {
     @Prop({ type: String, enum: AccountTypes, required: true })
     accountType!: string;
 
-    @Prop({ type: () => UserSnapshot || TailorSnapshot || AdminSnapshot })
-    account!: UserSnapshot | TailorSnapshot | AdminSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User || Tailor || Admin })
+    account!: Types.ObjectId;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);

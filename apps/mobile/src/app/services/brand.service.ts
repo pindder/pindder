@@ -33,4 +33,8 @@ export class BrandService {
   getAddresses(tailor_id: string): Observable<IResponse<IAddress[]>> {
     return this.http.get<IResponse<IAddress[]>>(`${environment.apiUrl}/address/${tailor_id}`);
   }
+
+  deleteAddress(address_id: string): Observable<IResponse<unknown>> {
+    return this.http.delete<IResponse<unknown>>(`${environment.apiUrl}/address/${address_id}`);
+  }
 }

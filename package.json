@@ -116,11 +116,13 @@
     "ionicons": "^8.1.0",
     "ioredis": "^6.0.0",
     "mongoose": "^9.9.5",
+    "nest-winston": "^2.0.0",
     "photoswipe": "^5.4.4",
     "reflect-metadata": "^0.2.0",
     "remixicon": "^4.9.1",
     "resend": "^6.28.0",
     "rxjs": "~7.8.0",
-    "uuid": "^14.0.2"
+    "uuid": "^14.0.2",
+    "winston": "^3.19.0"
   }
 }

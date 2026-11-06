@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -53,23 +53,29 @@ export class OrderService {
       //console.log(createOrderDto);
 
       if(user.acctType === AccountTypes.TAILOR) {
-        const tailor = await this.tailorModel.findById(user.sub).lean();
-        const client = await this.clientModel.findById(createOrderDto.client).lean();
+        const [tailor, client] = await Promise.all([
+          this.tailorModel.findById(user.sub).lean(),
+          this.clientModel.findById(createOrderDto.client).lean()
+        ]);
 
         if(!tailor || !client) {
           return;
         }
 
-        newOrder.tailor = tailor;
-        newOrder.client = client;
+        newOrder.tailor = tailor._id;
+        newOrder.client = client._id;
       } else if(user.acctType === AccountTypes.USER){
-        const user = await this.userModel.findById(createOrderDto.user).lean();
+        const [tailor, client] = await Promise.all([
+          this.tailorModel.findById(createOrderDto.tailor).lean(),
+          this.userModel.findById(user.sub).lean()
+        ]);
 
-        if(!user) {
+        if(!tailor || !client) {
           return;
         }
 
-        newOrder.user = user;
+        newOrder.tailor = tailor._id;
+        newOrder.client = client._id;
       }
 
       const styles: any[] = [];
@@ -90,8 +96,8 @@ export class OrderService {
       }
 
       await this.notificationService.create({
-        initiator: user.acctType === AccountTypes.TAILOR ? newOrder.tailor : newOrder.user,
-        dependent: user.acctType === AccountTypes.TAILOR ? newOrder.client : newOrder.tailor, 
+        initiator: user.acctType === AccountTypes.TAILOR ? newOrder.tailor._id : newOrder.client._id,
+        dependent: user.acctType === AccountTypes.TAILOR ? newOrder.client._id : newOrder.tailor._id, 
         type: DataTypes.ORDER,
         action: NotificationActions.ORDER_CREATED,
         title: 'New Order',
@@ -172,9 +178,8 @@ export class OrderService {
       if(user.acctType !== AccountTypes.ADMIN) {
         // 1. Build base filter matching user involvement
         filter.$or = [
-          { 'tailor._id': user.sub },
-          { 'client.id': user.sub },
-          { 'user_id': user.sub },
+          { tailor: user.sub },
+          { client: user.sub },
         ];
       }
 
@@ -213,11 +218,8 @@ export class OrderService {
           { orderId: searchRegex },
           { status: searchRegex },
           { deliveryMethod: searchRegex },
-          { 'client._id': searchRegex },
-          { 'client.firstname': searchRegex },
-          { 'client.lastname': searchRegex },
-          { 'client.fullname': searchRegex },
-          { 'tailor._id': searchRegex },
+          { client: searchRegex },
+          { tailor: searchRegex },
         ]
       };
 
@@ -226,7 +228,6 @@ export class OrderService {
       .populate('client')
       .populate('tailor')
       .exec();
-      console.log(orders);
 
       const res: IResponse<any> = {
         statusCode: 200,
@@ -260,8 +261,27 @@ export class OrderService {
     }
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(id: string, updateOrderDto: UpdateOrderDto) {
+    try {
+      const order = await this.orderModel.findByIdAndUpdate(id, updateOrderDto, {
+        returnDocument: 'after', upsert: true
+      });
+
+      if(!order) {
+        throw new NotFoundException(`Order was not found!`);
+      }
+
+      const res: IResponse<Order> = {
+        statusCode: 200,
+        msg: 'Order updated successfully.',
+        data: order
+      };
+
+      return res;
+    } catch(error: unknown) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async cancelOrder(id: string) {

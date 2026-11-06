@@ -92,12 +92,12 @@
                         </ion-avatar>
                         <ion-label>
                             <h2>{{ style.name }}</h2>
-                            @if(style.type === designTypes.BESPOKE){
+                            @if(style.type === designTypes.BESPOKE && style.amount !== null){
                                 <p>{{ style.quantity < 1 ? style.amount.toLocaleString() : (style.amount * style.quantity).toLocaleString() }}</p>
                             } @else if(style.type === designTypes.READYMADE && style.selections.length > 0){
                                 <p>{{ style.totalAmount.toLocaleString() }}</p>
                             } @else {
-                                <p>{{ style.amount.toLocaleString() }}</p>
+                                <p>{{ style.amount !== null ? style.amount.toLocaleString() : 0 }}</p>
                             }
                             @for(size of style.specifications; track size){
                                 @if(size.quantity > 0){
@@ -252,7 +252,7 @@
                         </ion-avatar>
                         <ion-label>
                             <h2>{{ selectedStyle.name }}</h2> 
-                            <p>unit price: {{ selectedStyle.amount.toLocaleString() }}</p>
+                            <p>unit price: {{ selectedStyle.amount !== null ? selectedStyle.amount.toLocaleString() : 0 }}</p>
                         </ion-label>
                     </ion-item>
 

@@ -30,6 +30,7 @@ export interface IProfile {
   tel?: string;
   username?: string;
   status?: string;
+  currentBalance?: number;
   referralCode?: string;
   subscription?: any;
   profileImg?: string;

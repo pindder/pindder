@@ -5,7 +5,7 @@ export class CreateClientDto {
     username!: string;
     email!: string;
     phoneNo!: string;
-    referee?: string;
+    referee!: string;
     password?: string;
     gender!: string;
     measurements?: any[]

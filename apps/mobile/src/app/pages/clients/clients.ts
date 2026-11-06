@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { IonTitle, IonHeader, IonToolbar, IonButtons, IonBackButton, IonList, IonContent,
-  IonSearchbar, ModalController
+  IonSearchbar, ModalController, IonInfiniteScroll,
+  IonInfiniteScrollContent,
+  InfiniteScrollCustomEvent
 } from "@ionic/angular";
 import { DataTypes, IClient, IResponse } from '@pindder/contracts';
 import { ClientService } from '../../services/client.service';
@@ -29,7 +31,9 @@ import { EmptyState } from '../../components/empty-state/empty-state';
     IonList,
     AsyncPipe,
     PrimaryButton,
-    EmptyState
+    EmptyState,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent
   ],
   templateUrl: './clients.html',
   styleUrl: './clients.css',
@@ -45,6 +49,9 @@ export class Clients implements ViewWillEnter, OnInit{
   dataTypes = DataTypes;
   clients$!: Observable<IClient[]>;
   isLoading = false;
+  page = 1;
+  limit = 20;
+  hasMoreData = false;
 
   ionViewWillEnter() {
     this.fetchClients();
@@ -72,7 +79,7 @@ export class Clients implements ViewWillEnter, OnInit{
         this.cdr.markForCheck(); // Trigger change detection for loading state updates
       },
       // Triggered when search bar is CLEARED (query is empty)
-      () => this.clientService.fetchClients().pipe(
+      () => this.clientService.fetchClients(this.page, this.limit).pipe(
         map((res: IResponse<IClient[]>) => res.data || [])
       )
     )
@@ -85,9 +92,14 @@ export class Clients implements ViewWillEnter, OnInit{
   fetchClients() {
     this.clients$ = of([]);
 
-    this.clients$ = this.clientService.fetchClients()
+    this.clients$ = this.clientService.fetchClients(this.page, this.limit)
     .pipe(
-      map((res: IResponse<any>) => res.data || []),
+      map((res: IResponse<any>) => {
+        if(res.meta?.hasNextPage) {
+          this.hasMoreData = true;
+        }
+        return res.data || []
+      }),
       catchError((error: HttpErrorResponse) => {
         console.error('Fetch Orders Error:', error);
         return of([]); // Return empty array on error to keep stream alive
@@ -133,5 +145,14 @@ export class Clients implements ViewWillEnter, OnInit{
   onSearchInput(event: any) {
     const value = event.target.value || '';
     this.searchSubject.next(value);
+  }
+
+  onIonInfinite(event: InfiniteScrollCustomEvent) {
+    this.page += 1;
+
+    this.fetchClients();
+    setTimeout(() => {
+      event.target.complete();
+    }, 500);
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, 
@@ -9,18 +9,8 @@ import { IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList,
 } from '@ionic/angular';
 import { ProfileCard } from "../../components/profile-card/profile-card";
 import { TokenService } from '../../services/token.service';
-import { IProfile } from '@pindder/contracts';
+import { countries, IProfile } from '@pindder/contracts';
 import { SseService } from '../../services/sse.service';
-
-const initialProfile: IProfile = {
-  firstname: '',
-  lastname: '',
-  email: '',
-  address: '',
-  countryCode: '',
-  tel: '',
-  username: ''
-};
 
 @Component({
   selector: 'app-settings',
@@ -53,7 +43,17 @@ export class Settings implements ViewWillEnter{
   private cdr = inject(ChangeDetectorRef);
   private alertCtrl = inject(AlertController);
 
-  profile: IProfile = { ...initialProfile };
+  profile = signal<IProfile>({
+    firstname: '',
+    lastname: '',
+    username: '',
+    currentBalance: 0,
+    countryCode: countries[38].code,
+    tel: '',
+    profileImg: '',
+    referralCode: '',
+    email: '',
+  });
 
   ionViewWillEnter(): void {
     this.loadProfile();
@@ -61,8 +61,9 @@ export class Settings implements ViewWillEnter{
 
   async loadProfile() {
     const profileStr = await this.tokenService.getProfile();
-    // Fall back to initialProfile instead of null to prevent template errors
-    this.profile = profileStr ? JSON.parse(profileStr) : { ...initialProfile };
+    if(profileStr) {
+      this.profile.set(JSON.parse(profileStr));
+    }
     this.cdr.markForCheck();
   }
 

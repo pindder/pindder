@@ -39,8 +39,8 @@ export class NotificationService {
       // 1. Filter notifications where the user is either client or tailor
       filter(
         (notification) =>
-          notification.initiator?._id === userId ||
-          notification.dependent?._id === userId
+          notification.initiator._id.toString() === userId ||
+          notification.dependent?._id.toString() === userId
       ),
       // 2. Map to standard MessageEvent structure for SSE
       map((notification) => ({
@@ -106,11 +106,12 @@ export class NotificationService {
     try {
       const notifications = await this.notificationModel.find({
         $or: [
-          { 'client._id': acctId },
-          { 'customer._id': acctId },
-          { 'tailor._id': acctId }
+          { initiator: acctId },
+          { dependent: acctId }
         ]
-      }).sort({ createdAt: -1 });
+      })
+      .limit(20)
+      .sort({ createdAt: -1 });
 
       if(!notifications) {
         return 
@@ -118,6 +119,7 @@ export class NotificationService {
 
       return notifications;
     } catch(error: any) {
+      this.logger.error(error);
       return error;
     }
   }
@@ -126,16 +128,15 @@ export class NotificationService {
     try {
       const notifications = await this.notificationModel.find({
         $or: [
-          { 'client._id': acctId },
-          { 'customer._id': acctId },
-          { 'tailor._id': acctId }
+          { initiator: acctId },
+          { dependent: acctId }
         ],
         $and: [
           { status: NotificationStatus.UNREAD },
         ]
       })
-      .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(20)
+      .sort({ createdAt: -1 });
 
       if(!notifications) {
         return 

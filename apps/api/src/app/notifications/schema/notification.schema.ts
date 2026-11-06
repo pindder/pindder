@@ -1,9 +1,9 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, Types } from "mongoose";
 import { randomUUID } from "crypto";
-import { ClientSnapshot } from "../../clients/schemas/client.schema";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
-import { UserSnapshot } from "../../users/schemas/user.schema";
+import { Client } from "../../clients/schemas/client.schema";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
+import { User } from "../../users/schemas/user.schema";
 import { DataTypes, NotificationActions, NotificationStatus } from "@pindder/contracts";
 
 export type NotificationDocument = HydratedDocument<Notification>;
@@ -22,11 +22,11 @@ export class Notification {
     @Prop({ type: mongoose.Schema.Types.Mixed })
     data: any;
 
-    @Prop({ type: () => ClientSnapshot || TailorSnapshot || UserSnapshot, required: true })
-    initiator!: ClientSnapshot | TailorSnapshot | UserSnapshot
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Client || Tailor || User })
+    initiator!: Types.ObjectId;
 
-    @Prop({ type: () => ClientSnapshot || TailorSnapshot || UserSnapshot, default: null })
-    dependent?: ClientSnapshot | TailorSnapshot | UserSnapshot
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Client || Tailor || User })
+    dependent?: Types.ObjectId | null;
 
     @Prop({ type: String, required: true })
     title!: string;

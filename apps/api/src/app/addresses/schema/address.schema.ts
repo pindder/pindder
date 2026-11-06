@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument, Types } from "mongoose";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
 import { Brand } from "../../brands/schemas/brand.schema";
 
 export type AddressDocument = HydratedDocument<Address>;
 
 @Schema({ timestamps: true })
 export class Address {
-    @Prop({ type: () => TailorSnapshot })
-    tailor?: TailorSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
+    tailor?: Tailor;
 
     @Prop({  type: mongoose.Schema.Types.ObjectId, ref: () => Brand })
     brand!: Types.ObjectId;

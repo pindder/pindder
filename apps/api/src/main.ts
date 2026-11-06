@@ -6,9 +6,43 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import * as fs from 'fs'; // 1. Import Node's fs module
+
+// 2. Ensure the logs directory exists before initializing Winston
+const logDir = 'logs';
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true });
+}
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { rawBody: true });
+  const app = await NestFactory.create(AppModule, { 
+    rawBody: true,
+    logger: WinstonModule.createLogger({
+      transports: [
+        // 1. Keep console logging active for local development
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.ms(),
+            winston.format.json(),
+          ),
+        }),
+        // 2. Write all error logs to error.log
+        new winston.transports.File({ 
+          filename: 'logs/error.log', 
+          level: 'error',
+          format: winston.format.combine(winston.format.timestamp(), winston.format.json())
+        }),
+        // 3. Write all logs (info, warn, error) to combined.log
+        new winston.transports.File({ 
+          filename: 'logs/combined.log',
+          format: winston.format.combine(winston.format.timestamp(), winston.format.json())
+        }),
+      ],
+    }),
+  });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({

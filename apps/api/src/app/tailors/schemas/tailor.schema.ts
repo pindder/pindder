@@ -1,42 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { AccountStatus, AccountTypes } from "@pindder/contracts";
-import { randomUUID } from "crypto";
+// import { randomUUID } from "crypto";
 import { HydratedDocument, Model } from "mongoose";
 
 export type TailorDocument = HydratedDocument<Tailor>;
-
-@Schema()
-export class TailorSnapshot {
-    @Prop({ type: String })
-    _id!: string;
-
-    @Prop({ type: String })
-    fullname?: string;
-
-    @Prop({ type: String })
-    firstname?: string;
-
-    @Prop({ type: String })
-    lastname?: string;
-
-    @Prop({ type: String })
-    username!: string;
-
-    @Prop({ type: String })
-    email!: string;
-
-    @Prop({ type: String })
-    countryCode!: string;
-
-    @Prop({ type: String })
-    tel?: string;
-
-    @Prop({ type: String })
-    accountType!: string;
-
-    @Prop({ type: String })
-    profileImg?: string;
-}
 
 @Schema({ 
   timestamps: true,
@@ -44,9 +11,6 @@ export class TailorSnapshot {
   toObject: { virtuals: true }
 })
 export class Tailor {
-    @Prop({ type: String, default: () => randomUUID() })
-    _id!: string;
-
     @Prop({ type: String, maxLength: 1000 })
     description?: string;
 
@@ -62,7 +26,7 @@ export class Tailor {
     @Prop({ type: String, required: true })
     username!: string;
 
-    @Prop({ type: String, required: true, unique: true, index: true })
+    @Prop({ type: String, required: true })
     email!: string;
 
     @Prop({ type: String, required: true })
@@ -86,11 +50,24 @@ export class Tailor {
     @Prop({ type: String, required: true, enum: AccountStatus, default: AccountStatus.PENDING })
     status!: string;
 
+    @Prop({ type: Boolean, default: false, required: true })
+    verified!: boolean;
+
     @Prop({ type: Number, required: true, default: 0 })
     currentBalance!: number;
+
+    @Prop({ type: Date, default: null })
+    deletedAt!: Date | null;
 }
 
 export const TailorSchema = SchemaFactory.createForClass(Tailor);
+
+TailorSchema.index(
+  { email: 1},
+  { unique: true, 
+    partialFilterExpression: { deletedAt: null }
+  }
+);
 
 // 1. Virtual definition for subscription assigned to this tailor
 TailorSchema.virtual('subscription', {

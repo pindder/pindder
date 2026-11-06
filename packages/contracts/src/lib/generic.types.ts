@@ -1,10 +1,18 @@
 export interface IResponse<T> {
-    statusCode: number;
-    msg: string;
-    data?: T;
-    total?: number;
-    page?: number;
-    size?: number;
+  statusCode: number;
+  msg: string;
+  data?: T;
+  total?: number;
+  meta?: IMeta
+}
+
+export interface IMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export interface GalleryItem {

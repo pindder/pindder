@@ -129,13 +129,16 @@ export class BankDetail implements ViewWillEnter{
   }
 
   deleteBank(bankDetail: IBankDetail) {
-    this.appService.deletePayoutDetail(bankDetail._id!).subscribe({
+    if(!bankDetail._id) {
+      return;
+    }
+
+    this.appService.deletePayoutDetail(bankDetail._id).subscribe({
       next: (response: IResponse<IBankDetail>) => {
         this.presentToast(response.msg, 'primary', 'top');
         this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
-        console.log(error);
         this.presentToast(error.error.message, 'primary', 'top');
       }
     });
@@ -146,6 +149,11 @@ export class BankDetail implements ViewWillEnter{
       this.appService.updatePayoutDetail(this.bankDetail).subscribe({
         next: (response: IResponse<IBankDetail>) => {
           this.presentToast(response.msg, 'primary', 'top');
+          
+          this.bankDetails$ = this.bankDetails$.pipe(
+            map((bankDetails: IBankDetail[]) => bankDetails.filter(bd => bd._id !== bd._id))
+          );
+          
           this.dismissModal();
           this.cdr.markForCheck();
         },

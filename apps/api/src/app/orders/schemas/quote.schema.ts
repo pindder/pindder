@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
-import { UserSnapshot } from "../../users/schemas/user.schema";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
+import { User } from "../../users/schemas/user.schema";
 import { Order } from "./order.schema";
 
 export type QuoteDocument = HydratedDocument<Quote>;
@@ -14,11 +14,11 @@ export class Quote {
     @Prop({ type: Number, required: true, default: 1 })
     amount!: number;
 
-    @Prop({ type: () => TailorSnapshot, required: true })
-    tailor!: TailorSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
+    tailor!: Tailor;
 
-    @Prop({ type: () => UserSnapshot, required: true })
-    customer!: UserSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User })
+    customer!: User;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Order })
     order!: string;

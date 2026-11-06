@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, Types } from "mongoose";
 import { DesignTypes } from "@pindder/contracts";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
-import { UserSnapshot } from "../../users/schemas/user.schema";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
+import { User } from "../../users/schemas/user.schema";
 import { ColorSnapshot } from "../../colors/schema/color.schema";
 
 export type DesignDocument = HydratedDocument<Design>;
@@ -51,13 +51,13 @@ export class OrderStyleSnapshot {
     @Prop({ type: String, required: true })
     name!: string;
 
-    @Prop({ type: String, maxLength: 1000 })
+    @Prop({ type: String })
     description?: string;
 
-    @Prop({ type: [String], required: true })
+    @Prop({ type: [String] })
     images!: [string];
 
-    @Prop({ type: String, required: true, enum: DesignTypes })
+    @Prop({ type: String, enum: DesignTypes })
     type!: string;
 
     @Prop({ type: () => [Specification] })
@@ -73,10 +73,10 @@ export class OrderStyleSnapshot {
     amount!: number;
 
     @Prop({ type: Number })
-    estimatedProductionPerod?: number; 
+    estimatedProductionDays?: number; 
 
     @Prop({ type: Number })
-    estimatedTimeArrival?: number; 
+    estimatedDeliveryDays?: number; 
 
     @Prop({ type: Number })
     quantity!: number;
@@ -102,14 +102,14 @@ export class OrderStyleSnapshot {
 
 @Schema({ timestamps: true })
 export class Design {
-    @Prop({ type: () => TailorSnapshot || UserSnapshot })
-    owner!: TailorSnapshot | UserSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor || User })
+    owner!: Types.ObjectId;
 
     @Prop({ type: String, required: true })
     name!: string;
 
-    @Prop({ type: String, maxLength: 1000 })
-    description?: string;
+    @Prop({ type: String, maxLength: 1000, default: null })
+    description?: string | null;
 
     @Prop({ type: [String], required: true })
     images!: [string];
@@ -123,17 +123,14 @@ export class Design {
     @Prop({ type: () => [ColorSnapshot] })
     colors?: [ColorSnapshot];
 
-    @Prop({ type: Number })
-    estimatedProductionPeriod?: number; 
+    @Prop({ type: Number, default: null })
+    estimatedProductionDays?: number | null; 
 
-    @Prop({ type: Number })
-    estimatedTimeArrival?: number; 
+    @Prop({ type: Number, default: null })
+    estimatedDeliveryDays?: number | null; 
 
     @Prop({ type: Number })
     units!: number; 
-
-    @Prop({ type: String, enum: [] })
-    visibility!: string; 
 
     @Prop({ type: Number })
     amount?: number;
@@ -143,12 +140,6 @@ export class Design {
 
     @Prop({ type: Number })
     percentageDiscount?: number;
-
-    @Prop({ type: Number })
-    productionDurationInDays?: number;
-
-    @Prop({ type: Number })
-    maxDaysToDeliver?: number;
 
     @Prop({ type: Boolean, default: false, required: true })
     catalogDisplay!: boolean;

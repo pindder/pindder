@@ -142,6 +142,7 @@
       <app-primary-button
         [buttonText]="'Save'"
         [icon]="'save-outline'"
+        [disabled]="!brand().name || !brand().country || !brand().tel || !brand().countryCode"
         (action)="submit()"
       ></app-primary-button>
     </div>

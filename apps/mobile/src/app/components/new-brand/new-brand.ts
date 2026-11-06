@@ -87,7 +87,11 @@ export class NewBrand implements OnInit{
   }
 
   getBrand(profile: IProfile) {
-    this.brandService.getBrand(profile._id!).subscribe({
+    if(!profile._id) {
+      return;
+    }
+
+    this.brandService.getBrand(profile._id).subscribe({
       next: (response: IResponse<IBrand>) => {
         if(response.data) {
           this.brand.set(response.data);
@@ -102,7 +106,11 @@ export class NewBrand implements OnInit{
   }
 
   getAddresses(brand: IBrand) {
-    this.brandService.getAddresses(brand._id!).subscribe({
+    if(!brand._id) {
+      return;
+    }
+
+    this.brandService.getAddresses(brand._id).subscribe({
       next: (response: IResponse<IAddress[]>) => {
         if(response.data) {
           this.addresses = response.data;
@@ -115,7 +123,7 @@ export class NewBrand implements OnInit{
     })
   }
 
-  updateCountryCode(event: any) {
+  updateCountryCode(event: unknown) {
     const country = this.countries.find(c => c.name == event); 
     this.brand.update(b => b ? {...b, countryCode: country?.code} : b);
   }
@@ -127,10 +135,12 @@ export class NewBrand implements OnInit{
   createBrand() {
     this.brandService.createBrand(this.brand()).subscribe({
       next: (response: IResponse<IBrand>) => {
-        console.log(response.data);
+        this.presentToast(response.msg, 'primary', 'top');
+        this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
-        console.log(error);
+        this.presentToast(error.error.msg, 'danger', 'top');
+        this.cdr.markForCheck();
       }
     });
   }
@@ -138,10 +148,12 @@ export class NewBrand implements OnInit{
   updateBrand() {
     this.brandService.updateBrand(this.brand()).subscribe({
       next: (response: IResponse<IBrand>) => {
-        console.log(response.data);
+        this.presentToast(response.msg, 'primary', 'top');
+        this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
-        console.log(error);
+        this.presentToast(error.error.msg, 'danger', 'top');
+        this.cdr.markForCheck();
       }
     });
   }
@@ -154,7 +166,7 @@ export class NewBrand implements OnInit{
     }
   }
 
-  editAddress(address: IAddress) {
+  editAddress() {
     this.openNewAddressModal()
   }
 
@@ -197,6 +209,21 @@ export class NewBrand implements OnInit{
   }
 
   deleteAddress(address: IAddress) {
-    return;
+    if(!address._id) {
+      return;
+    }
+
+    this.brandService.deleteAddress(address._id).subscribe({
+      next: (response: IResponse<unknown>) => {
+        if(response.data) {
+          this.presentToast(response.msg, 'primary', 'top');
+          this.cdr.markForCheck();
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.presentToast(error.error.message, 'danger', 'top');
+        this.cdr.markForCheck();
+      }
+    })
   }
 }

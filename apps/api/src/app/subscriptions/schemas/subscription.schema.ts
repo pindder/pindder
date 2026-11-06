@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
-import { TailorSnapshot } from "../../tailors/schemas/tailor.schema";
+import mongoose, { HydratedDocument } from "mongoose";
+import { Tailor } from "../../tailors/schemas/tailor.schema";
 import { SubscriptionProviders, SubscriptionStatus } from "@pindder/contracts";
 import { PlanSnapshot } from "../../plans/schema/plan.schema";
 
@@ -12,8 +12,8 @@ export type SubscriptionDocument = HydratedDocument<Subscription>;
     toObject: { virtuals: true }
 })
 export class Subscription {
-    @Prop({ type: () => TailorSnapshot, required: true })
-    tailor!: TailorSnapshot;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
+    tailor!: Tailor;
 
     @Prop({ type: () => PlanSnapshot, required: true })
     plan!: PlanSnapshot;
