@@ -105,6 +105,20 @@
         "cwd": "apps/mobile"
       }
     },
+    "cap-sync-android": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap sync android",
+        "cwd": "apps/mobile"
+      }
+    },
+    "cap-sync-ios": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap sync ios",
+        "cwd": "apps/mobile"
+      }
+    },
     "cap-open-android": {
       "executor": "nx:run-commands",
       "options": {

@@ -88,7 +88,7 @@ export class ViewOrder implements OnInit{
   }
 
   reassignTailorModal() {
-    const currentTailor = this.order()?.tailor.fullname;
+    const currentTailor = this.order()?.tailor?.fullname;
     const newTailorName = currentTailor === 'Emmanuel Vance' ? 'Aisha Bello' : 'Emmanuel Vance';
     
     // Safely update the single order signal immutably

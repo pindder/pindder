@@ -81,7 +81,7 @@ export class Order implements OnInit{
       result = result.filter(o => 
         o.orderId.toLowerCase().includes(query) ||
         o.client?.firstname.toLowerCase().includes(query) ||
-        o.tailor.fullname.toLowerCase().includes(query)
+        o.tailor?.fullname.toLowerCase().includes(query)
       );
     }
 

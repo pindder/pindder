@@ -154,13 +154,13 @@
                 <!-- Tailor Profile -->
                 <td class="py-3.5 px-4">
                 <div class="flex items-center space-x-2">
-                    @if(!order.tailor.profilePic){
+                    @if(!order.tailor?.profileImg){
                     <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-500/20 shrink-0">
-                        {{ order.tailor.firstname[0] }}
+                        {{ order.tailor?.firstname[0] }}
                     </div>}@else{
                         <img [src]="order.tailor.avatar" [alt]="order.tailor.fullname" class="w-6 h-6 rounded-full object-cover">
                     }
-                    <span class="font-medium text-slate-700">{{ order.tailor.fullname }}</span>
+                    <span class="font-medium text-slate-700">{{ order.tailor?.fullname }}</span>
                 </div>
                 </td>
 
