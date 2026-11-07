@@ -103,7 +103,11 @@
             </div>
 
             <div class="text-right sm:text-right">
-                <span class="text-sm font-black text-slate-900">\${{ (item.amount * item.quantity) | number:'1.2-2' }}</span>
+                @if(item.amount !== null){
+                    <span class="text-sm font-black text-slate-900">
+                        ${{ (item.amount * item.quantity) | number:'1.2-2' }}
+                    </span>
+                }
                 <div class="text-[10px] text-slate-400">\${{ item.amount }} each</div>
             </div>
             </div>
@@ -253,25 +257,25 @@
     </div>
 
     <div class="flex items-center space-x-3">
-        @if(!order()?.tailor.profilePic){
+        @if(!order()?.tailor?.profileImg){
         <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-500/20 shrink-0">
-            {{ order()?.tailor.firstname[0] }}
+            {{ order()?.tailor?.firstname[0] }}
         </div>}@else{
-            <img [src]="order()?.tailor.avatar" [alt]="order()?.tailor.fullname" class="w-12 h-12 rounded-full object-cover">
+            <img [src]="order()?.tailor?.avatar" [alt]="order()?.tailor?.fullname" class="w-12 h-12 rounded-full object-cover">
         }
         <div>
-        <h4 class="font-bold text-slate-900 text-sm">{{ order()?.tailor.fullname }}</h4>
-        <div class="text-xs text-slate-500">{{ order()?.tailor.location }}</div>
+        <h4 class="font-bold text-slate-900 text-sm">{{ order()?.tailor?.fullname }}</h4>
+        <div class="text-xs text-slate-500">{{ order()?.tailor?.location }}</div>
         <div class="flex items-center space-x-1 mt-1 text-xs">
-            <span class="text-amber-500 font-bold">&starf; {{ order()?.tailor.email }}</span>
-            <span class="text-slate-400">&bull; {{ order()?.tailor.countryCode + '' + order()?.tailor.tel }}</span>
+            <span class="text-amber-500 font-bold">&starf; {{ order()?.tailor?.email }}</span>
+            <span class="text-slate-400">&bull; {{ order()?.tailor?.countryCode + '' + order()?.tailor?.tel }}</span>
         </div>
         </div>
     </div>
 
     <div class="bg-amber-50/70 border border-amber-200/80 p-2.5 rounded-lg text-xs text-amber-900 flex justify-between items-center">
         <span>Current Tailor Workload:</span>
-        <span class="font-black px-2 py-0.5 bg-amber-100 rounded text-amber-800">{{ order()?.tailor.studioName }} Active Orders</span>
+        <span class="font-black px-2 py-0.5 bg-amber-100 rounded text-amber-800">{{ order()?.tailor?.studioName }} Active Orders</span>
     </div>
     </div>
 
