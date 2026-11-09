@@ -3,3 +3,16 @@ ion-avatar {
   height: 48px;
   flex-shrink: 0;
 }
+
+.notification-btn {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -10px;
+  right: -5px;
+  font-size: 10px;
+  padding: 3px 5px;
+  border-radius: 50%;
+}

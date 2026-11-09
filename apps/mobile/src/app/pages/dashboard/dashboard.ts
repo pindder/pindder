@@ -13,10 +13,9 @@ import { TokenService } from '../../services/token.service';
 import { Router } from '@angular/router';
 import { ProfileCard } from '../../components/profile-card/profile-card';
 import { EmptyState } from '../../components/empty-state/empty-state';
-import { INotification, IProfile } from '@pindder/contracts';
+import { INotification, IProfile, IResponse } from '@pindder/contracts';
 import { NotificationService } from '../../services/notification.service';
 import { SseService } from '../../services/sse.service';
-import { Subscription } from 'rxjs';
 import { EarningsCard } from '../../components/earnings-card/earnings-card';
 import { Share } from '@capacitor/share';
 import { Payout } from '../../components/payout/payout';
@@ -48,7 +47,6 @@ export class Dashboard implements ViewWillEnter{
   private tokenService = inject(TokenService);
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
-  private sseSubscription?: Subscription;
 
   profile = signal<IProfile>({});
   environmentInjector = inject(EnvironmentInjector);
@@ -142,7 +140,7 @@ export class Dashboard implements ViewWillEnter{
     const profile = await this.tokenService.getProfile();
     if(profile) {
       this.profile.set(JSON.parse(profile));
-      this.connectNotifications(this.profile()._id!);
+      this.sseService.connectToNotificationStream(this.profile()._id!)
     }
     
     this.catalog = `https://pindder.com/catalogs/${this.profile().username}`;
@@ -165,19 +163,23 @@ export class Dashboard implements ViewWillEnter{
       return;
     }
 
-    this.notificationService.getRecentNotifications(this.profile()._id!).subscribe({
-      next: (res) => {
-        this.notifications = res.data;
+    this.notificationService.getNotifications(this.profile()._id!).subscribe({
+      next: (res: IResponse<INotification[]>) => {
+        if(res.data) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 7);
+
+          // Convert yesterday to a timestamp number for safe comparison
+          // Checking for recent notifications within the last week and are not read
+          const yesterdayTimestamp = yesterday.getTime();
+          this.notifications = res.data.filter(notification => notification.read === false && new Date(notification.createdAt).getTime() >= yesterdayTimestamp)
+          if(res.meta?.totalNotificationsUnread)
+            this.notificationService.totalUnreadNotifications.set(res.meta?.totalNotificationsUnread)
+          console.log(this.notifications);
+        }
         this.cdr.markForCheck();
       }
     });
-  }
-
-  private connectNotifications(userId: string) {
-    // Prevent duplicate connections if already connected
-    if (this.sseSubscription) return;
-
-    this.sseService.connectToNotificationStream(userId)
   }
 
   openNotifications() {

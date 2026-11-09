@@ -6,6 +6,7 @@ import { IonButtons, IonContent, IonHeader,
 import { TokenService } from '../../services/token.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationTile } from '../../components/notification-tile/notification-tile';
+import { IProfile } from '@pindder/contracts';
 
 @Component({
   imports: [
@@ -22,7 +23,7 @@ export class Notification implements ViewWillEnter{
   private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
 
-  profile!: any;
+  profile!: IProfile;
   notifications = this.notificationService.notifications;
 
   ionViewWillEnter(): void {
@@ -34,15 +35,22 @@ export class Notification implements ViewWillEnter{
     this.profile = profile ? JSON.parse(profile) : null;
     // Only fetch if we haven't loaded them yet in this session!
     if (!this.notificationService.hasLoaded()) {
-      this.fetchNotifications();
-    }
+      this.fetchNotifications();                                                                  
+    }                                                                                                                                                                                               
   }
 
   fetchNotifications() {
+    if(!this.profile._id) {
+      return;                                                                                                                   
+    }
+
     this.notificationService.getNotifications(this.profile._id).subscribe({
       next: (res) => {
         // this.notifications = res.data;
-        this.notificationService.setInitialNotifications(res.data);
+        if(res.data) {
+          this.notificationService.setInitialNotifications(res.data);
+        }
+        
         this.cdr.markForCheck();
       }
     });

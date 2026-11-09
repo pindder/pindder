@@ -57,13 +57,7 @@ export class NotificationController {
     if(result instanceof InternalServerErrorException) {
       throw new InternalServerErrorException(`$result`);
     } else {
-      const res: IResponse<any> = {
-        statusCode: 200,
-        msg: 'Notifications List.',
-        data: result
-      };
-
-      return res;
+      return result;
     }
   }
 

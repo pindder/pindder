@@ -73,7 +73,7 @@
             <ion-label>Styles</ion-label>
         </ion-list-header>
 
-        @if(order.styles.length === 0){
+        @if(order.styles && order.styles.length === 0){
         <div class="">
             <app-empty-state 
             [icon]="'color-palette-outline'" 

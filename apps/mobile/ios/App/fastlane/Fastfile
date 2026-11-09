@@ -12,9 +12,14 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # 2. Automatically manage signing or fetch certificates via Match
-    # (Ensure Xcode project is set to automatically manage signing for CI runners)
-    
+    # 2. Automatically apply team settings and project configurations for CI
+    # Replace "YOUR_TEAM_ID" with your 10-character Apple Developer Team ID (e.g. "ABC123XYZ")
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      team_id: ENV["ASC_TEAM_ID"],
+      path: "App.xcodeproj"
+    )
+
     # 3. Build the iOS App (.ipa)
     build_app(
       workspace: "App.xcworkspace",

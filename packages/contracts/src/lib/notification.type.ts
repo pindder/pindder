@@ -10,4 +10,7 @@ export interface INotification {
     icon: string;
     message: string;
     status: string;
+    read: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
