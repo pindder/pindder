@@ -89,6 +89,13 @@ jobs:
       - name: Sync Capacitor iOS
         run: npx nx run mobile:cap-sync-ios
 
+      - name: Increment iOS Build Number
+        run: |
+          PLIST_PATH="apps/mobile/ios/App/App/Info.plist"
+          echo "Updating CFBundleVersion to ${{ github.run_number }} in $PLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion '${{ github.run_number }}'" "$PLIST_PATH"
+        shell: bash
+
       - name: Install CocoaPods
         run: |
           cd apps/mobile/ios/App
