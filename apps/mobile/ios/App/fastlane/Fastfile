@@ -51,7 +51,7 @@ platform :ios do
 
     # 6. Automatically generate/download distribution certificate on the runner
     get_certificates(
-      app_identifier: "com.pindder.app"
+      type: "appstore"
     )
 
     # 7. Automatically download the App Store provisioning profile via API Key
