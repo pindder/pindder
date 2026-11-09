@@ -18,11 +18,11 @@ platform :ios do
       workspace_root = File.dirname(workspace_root)
     end
     
-    # package_json_path = File.join(workspace_root, 'package.json')
-    # package_data = JSON.parse(File.read(package_json_path))
-    # package_version = package_data["version"]
+    package_json_path = File.join(workspace_root, 'package.json')
+    package_data = JSON.parse(File.read(package_json_path))
+    package_version = package_data["version"]
     
-    # UI.message("Syncing iOS marketing version: #{package_version}")
+    UI.message("Syncing iOS marketing version: #{package_version}")
 
     # 3. Apply marketing version (relative path since we are in apps/mobile/ios/App)
     increment_version_number(
