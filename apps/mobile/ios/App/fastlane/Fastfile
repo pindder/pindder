@@ -49,13 +49,18 @@ platform :ios do
       path: "App.xcodeproj"
     )
 
-    # 6. Automatically download the App Store provisioning profile via API Key
+    # 6. Automatically generate/download distribution certificate on the runner
+    get_certificates(
+      app_identifier: "com.pindder.app"
+    )
+
+    # 7. Automatically download the App Store provisioning profile via API Key
     get_provisioning_profile(
       app_identifier: "com.pindder.app",
       adhoc: false
     )
 
-    # 7. Build the iOS App (.ipa)
+    # 8. Build the iOS App (.ipa)
     build_app(
       workspace: "App.xcworkspace",
       scheme: "App",
@@ -64,7 +69,7 @@ platform :ios do
       export_xcargs: "-allowProvisioningUpdates"
     )
 
-    # 8. Upload to TestFlight
+    # 9. Upload to TestFlight
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )
