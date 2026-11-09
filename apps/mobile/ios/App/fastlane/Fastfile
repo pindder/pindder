@@ -42,23 +42,15 @@ platform :ios do
       xcodeproj: "App.xcodeproj"
     )
 
-    # 5. Apply automatic signing team ID
-    update_code_signing_settings(
-      use_automatic_signing: true,
-      team_id: ENV["ASC_TEAM_ID"],
-      path: "App.xcodeproj"
-    )
-
-    # 6. Automatically generate/download distribution certificate on the runner
-    get_certificates
-
-    # 7. Automatically download the App Store provisioning profile via API Key
-    get_provisioning_profile(
+    # 5. Use Fastlane Match for secure, automated CI code signing
+    match(
+      type: "appstore",
       app_identifier: "com.pindder.app",
-      adhoc: false
+      readonly: true, # Set to false only when first generating/uploading certs from your local machine
+      git_url: "https://github.com/pindder/pindder.git"
     )
 
-    # 8. Build the iOS App (.ipa)
+    # 6. Build the iOS App (.ipa)
     build_app(
       workspace: "App.xcworkspace",
       scheme: "App",
