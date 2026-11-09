@@ -50,9 +50,7 @@ platform :ios do
     )
 
     # 6. Automatically generate/download distribution certificate on the runner
-    get_certificates(
-      type: "appstore"
-    )
+    get_certificates
 
     # 7. Automatically download the App Store provisioning profile via API Key
     get_provisioning_profile(
