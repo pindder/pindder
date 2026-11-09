@@ -37,6 +37,9 @@ export class Notification {
     @Prop({ type: String, required: true, enum: NotificationStatus, default: NotificationStatus.UNREAD })
     status!: string;
 
+    @Prop({ type: Boolean, required: true, default: false })
+    read!: boolean;
+
     @Prop({ type: String })
     icon?: string;
 }

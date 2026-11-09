@@ -96,7 +96,7 @@ export class Settings implements ViewWillEnter{
   logout() {
     this.tokenService.clearToken();
     // START THE REAL-TIME STREAM IMMEDIATELY
-    this.sseService.disconnect();
+    this.sseService.disconnectAllEventSources();
     this.router.navigate(["auth"]);
   }
 }

@@ -3,16 +3,19 @@ export interface IResponse<T> {
   msg: string;
   data?: T;
   total?: number;
-  meta?: IMeta
+  meta?: IMeta;
 }
 
 export interface IMeta {
   total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+  page?: number;
+  limit?: number;
+  totalPages?: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+  totalNotifications?: number;
+  totalNotificationsUnread?: number;
+  totalNotificationsRead?: number;
 }
 
 export interface GalleryItem {

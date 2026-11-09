@@ -37,7 +37,8 @@ import { PrimaryButton } from '../../components/primary-button/primary-button';
     IonButtons,
     IonBackButton,
     IonLabel,
-    EmptyState, NewOrder,
+    EmptyState, 
+    NewOrder,
     ListCard,
     IonList,
     IonActionSheet,
@@ -260,7 +261,7 @@ export class Orders implements ViewWillEnter, OnInit{
       componentProps: {
         client: this.client,
         design: this.design,
-        order: order
+        existingOrder: order
       }
     });
 

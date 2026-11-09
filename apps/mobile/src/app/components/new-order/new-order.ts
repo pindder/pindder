@@ -63,6 +63,7 @@ import { OrderView } from '../../pages/order-view/order-view';
 export class NewOrder implements ViewWillEnter, OnDestroy{
   @Input() client?: IClient;
   @Input() design?: IDesign;
+  @Input() existingOrder!: IOrder;
   @ViewChild('modal') modalSheet!: IonModal;
 
   private cdr = inject(ChangeDetectorRef);
@@ -170,6 +171,12 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
         quantity: 0
       });
     }
+    
+    if(this.existingOrder) {
+      console.log(this.existingOrder);
+      this.order = this.existingOrder;
+    }
+    console.log(this.client);
     console.log(this.order);
 
     if(this.order.styles.length > 0) {
@@ -347,6 +354,27 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
 
   dismissModal() {
     this.modalCtrl.dismiss(null, 'cancel');
+    // this.ngOnDestroy();
+
+    let paramKey!: string;
+    
+    if(this.client) {
+      paramKey = 'client'
+    } else if(this.design) {
+      paramKey = 'style'
+    } else {
+      paramKey = 'order'
+    }
+
+    this.selectedClient = null;
+
+    this.router.navigate([], {
+      relativeTo: this.ar,
+      queryParams: {
+        [paramKey]: null // Setting to null or undefined removes it from the URL
+      },
+      queryParamsHandling: 'merge' // Merges with current params so other params remain
+    });
   }
 
   removeSelectedClient() {
@@ -442,12 +470,15 @@ export class NewOrder implements ViewWillEnter, OnDestroy{
   }
 
   ngOnDestroy(): void {
+    console.log('new-order component destroyed')
     let paramKey!: string;
     
     if(this.client) {
       paramKey = 'client'
-    } else {
+    } else if(this.design) {
       paramKey = 'style'
+    } else {
+      paramKey = 'order'
     }
 
     this.selectedClient = null;
