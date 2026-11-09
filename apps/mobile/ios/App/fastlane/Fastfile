@@ -1,3 +1,5 @@
+require 'json'
+
 platform :ios do
   desc "Push a new beta build to Apple TestFlight"
   lane :beta do
@@ -10,10 +12,25 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # 2. Dynamically find monorepo root and sync versions (if using package.json)
-    # ... your version logic ...
+    # 2. Find monorepo root for package.json version
+    workspace_root = Dir.pwd
+    until File.exist?(File.join(workspace_root, 'nx.json')) || workspace_root == '/'
+      workspace_root = File.dirname(workspace_root)
+    end
+    
+    # package_json_path = File.join(workspace_root, 'package.json')
+    # package_data = JSON.parse(File.read(package_json_path))
+    # package_version = package_data["version"]
+    
+    # UI.message("Syncing iOS marketing version: #{package_version}")
 
-    # 3. Fetch latest build number and increment
+    # 3. Apply marketing version (relative path since we are in apps/mobile/ios/App)
+    increment_version_number(
+      version_number: package_version,
+      xcodeproj: "App.xcodeproj"
+    )
+
+    # 4. Fetch latest build number and increment
     latest_build = latest_testflight_build_number(
       app_identifier: "com.pindder.app",
       initial_build_number: 1
@@ -22,25 +39,26 @@ platform :ios do
     
     increment_build_number(
       build_number: new_build_number.to_s,
-      xcodeproj: "apps/mobile/ios/App/App.xcodeproj"
+      xcodeproj: "App.xcodeproj"
     )
 
-    # 4. Automatically download or generate the provisioning profile via API Key
-    get_provisioning_profile(
-      app_identifier: "com.pindder.app",
-      adhoc: false # false creates an App Store profile
+    # 5. Apply automatic signing team ID
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      team_id: ENV["ASC_TEAM_ID"],
+      path: "App.xcodeproj"
     )
 
-    # 5. Build the iOS App (.ipa) with provisioning updates allowed
+    # 6. Build the iOS App (.ipa)
     build_app(
-      workspace: "apps/mobile/ios/App/App.xcworkspace",
+      workspace: "App.xcworkspace",
       scheme: "App",
       export_method: "app-store",
       xcargs: "-allowProvisioningUpdates",
       export_xcargs: "-allowProvisioningUpdates"
     )
 
-    # 6. Upload to TestFlight
+    # 7. Upload to TestFlight
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )
