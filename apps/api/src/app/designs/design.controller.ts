@@ -25,6 +25,11 @@ export class DesignController {
     return this.designService.create(createDesignDto, req.user);
   }
 
+  @Post()
+  user(@Body() createDesignDto: CreateDesignDto, @Req() req: any) {
+    return this.designService.create(createDesignDto, req.user);
+  }
+
   @UseGuards(AuthGuard)
   @Get()
   async findAll(

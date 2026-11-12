@@ -9,6 +9,14 @@ export interface ILogin {
   phone?: string; 
 }
 
+export interface IUser {
+  fullname: string;
+  email: string;
+  countryCode: string;
+  tel: string;
+  gender: string;
+}
+
 export interface TailorReg {
   fullname: string;
   email: string;

@@ -1,0 +1,36 @@
+<ion-content [fullscreen]="true">
+    <ion-header collapse="condense">
+        <ion-toolbar>
+            <ion-title size="large">Settings</ion-title>
+        </ion-toolbar>
+    </ion-header>
+    <div class="login-container">
+        <!-- <app-profile-card [profile]="profile()" (action)="openProfileEdit()"></app-profile-card> -->
+
+        <!-- Section Menu List-->
+        @if(settingsItems){
+                @for(section of settingsItems; track section.id){
+                <div class="px-3">
+                    <h3 class="text-sm font-bold uppercase text-gray-500 tracking-wider m-0">
+                    {{ section.name }}
+                    </h3>
+                </div>
+                <ion-list lines="none" [inset]="true">
+                    @for(item of section.subItems; track item.id){
+                        @if(item.route){
+                            <ion-item class="custom-input" [routerLink]="item.route">
+                                <ion-icon [color]="section.color" [name]="item.icon" slot="start" aria-hidden="true"></ion-icon>
+                                <ion-label [color]="section.color" >{{ item.title | titlecase }}</ion-label>
+                            </ion-item>
+                        }@else {
+                            <ion-item class="custom-input" button (click)="item.action === 'logout' ? logout.emit() : deleteAccount.emit()">
+                                <ion-icon color="section.color" [name]="item.icon" slot="start" aria-hidden="true"></ion-icon>
+                                <ion-label color="section.color" >{{ item.title | titlecase }}</ion-label>
+                            </ion-item>
+                        }
+                    }
+                </ion-list>
+            }
+        }
+    </div>
+</ion-content>

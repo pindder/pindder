@@ -1,0 +1,65 @@
+@if(dataType === dataTypes.CLIENT && client){
+    <div class="p-3 flex items-center justify-between border border-left-2">
+        <div (click)="viewClient()" class="flex flex-col gap-1">
+            <span class="text-md font-semibold">{{ client.firstname + " " + client.lastname }}</span>
+            <span class="text-sm text-secondary">{{ client.phoneNo }}</span>
+        </div>
+        <div class="flex gap-3 items-center">
+            <p class="text-secondary text-xs">{{ client.createdAt | date }}</p>
+            <ion-icon (click)="presentDeleteAlert(dataTypes.CLIENT)" name="trash-outline" color="danger"></ion-icon>
+        </div>
+    </div>
+} 
+@else if(dataType === dataTypes.ORDER) {
+    <div (click)="action.emit(order._id)" class="px-3 pb-3 mb-2 flex flex-col border border-left-2">
+        <div class="flex justify-between items-center">
+            <p class="text-md font-bold">{{ order.orderId }}</p>
+            <div>
+                @if(order.status == orderStatuses.CANCELLED){
+                <ion-badge color="danger">{{ order.status }}</ion-badge>
+                }@else if(order.status === orderStatuses.PENDING) {
+                <ion-badge color="warning">{{ order.status }}</ion-badge>
+                }@else if(order.status === orderStatuses.ONGOING) {
+                <ion-badge color="secondary">{{ order.status }}</ion-badge>
+                }@else if(order.status === orderStatuses.OVERDUE) {
+                <ion-badge color="danger">{{ order.status }}</ion-badge>
+                }
+
+            </div>
+        </div>
+        <div class="flex flex-col gap-2">
+            <span class="text-md font-semibold">{{ order.client?.firstname + ' ' + order.client?.lastname }}</span>
+            <div class="flex justify-between">
+                <span class="text-sm text-secondary">{{ order.totalItems }} Items</span>
+                <span class="text-sm text-secondary">
+                    <ion-icon slot="icon-only" name="calendar-outline"></ion-icon> 
+                    Due: {{ order.dueDate | date }}
+                </span>
+            </div>
+        </div>
+        
+    </div>
+}
+@else if(dataType === dataTypes.DESIGN) {
+    <div class="flex flex-col gap-2 p-2">
+        @if(design.images.length > 0){
+            <img alt="style-img" [src]="design.images[0]" (click)="editDesign()"/>
+        }@else {
+            <img alt="style-img" src="https://ionicframework.com/docs/img/demos/card-media.png" (click)="editDesign()"/>
+        }
+        <div class="flex justify-between">
+            <ion-label (click)="editDesign()">
+                <h2>{{ design.name.substring(0, 7) }} {{ design.name.length > 7 ? '...' : '' }}</h2>
+                <p>{{ design.amount !== null ? design.amount.toLocaleString() : 0 }}</p>
+            </ion-label>
+            <ion-buttons>
+                <ion-button (click)="editDesign()">
+                    <ion-icon color="primary" size="medium" slot="icon-only" name="create-outline"></ion-icon>
+                </ion-button>
+                <ion-button (click)="presentDeleteAlert(dataTypes.DESIGN)">
+                    <ion-icon color="danger" size="medium" slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-button>
+            </ion-buttons>
+        </div>
+    </div>
+}

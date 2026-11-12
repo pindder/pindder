@@ -14,6 +14,6 @@ export class PlanService {
     private http = inject(HttpClient);
 
     fetchPlans(): Observable<IResponse<IPlan[]>> {
-        return this.http.get<IResponse<IPlan[]>>(`${environment.base_api_url}/plans/list`);
+        return this.http.get<IResponse<IPlan[]>>(`${environment.apiUrl}/plans/list`);
     }
 }

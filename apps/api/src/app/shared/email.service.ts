@@ -36,13 +36,14 @@ export class EmailService {
         if (error) {
             this.logger.error('Resend error:', error)
             // throw new InternalServerErrorException('Failed to send email');
-            return;
+            return error;
         }
 
         return data;
     }
 
     async sendOneTimeLoginCode(user: User | Tailor, code: string) {
+        console.log(user);
         const { data, error } = await this.resend.emails.send({
         from: this.sender_email,
         to: [user.email],
@@ -57,7 +58,7 @@ export class EmailService {
         if (error) {
             this.logger.error('Resend error:', error)
             //throw new InternalServerErrorException('Failed to send email');
-            return;
+            return error;
         }
 
         return data;

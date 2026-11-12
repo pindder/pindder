@@ -1,0 +1,65 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { environment } from '../../environment/environment.prod';
+import { Observable } from 'rxjs';
+import { IDesign, IResponse } from '@pindder/contracts';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class DesignService {
+  private http = inject(HttpClient)
+
+  private cloudName = environment.cloudName;       // Replace with your Cloudinary Cloud Name
+  private uploadPreset = environment.presetName; // Replace with your Unsigned Preset Name
+
+  uploadImageToCloudinary(blob: Blob): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', blob);
+    formData.append('upload_preset', this.uploadPreset);
+
+    return this.http.post(
+      `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`,
+      formData
+    );
+  }
+
+  createDesign(design: IDesign): Observable<IResponse<IDesign>> {
+    return this.http.post<IResponse<IDesign>>(`${environment.apiUrl}/designs`, design);
+  }
+
+  fetchDesigns(page:number, limit: number): Observable<IResponse<any>> {
+    // 1. Initialize an empty HttpHeaders object
+    let params = new HttpParams();
+
+    // 2. Conditionally append page and size if they are present
+    if (page !== undefined && page !== null) {
+      params = params.set('page', page.toString());
+    }
+    
+    if (limit !== undefined && limit !== null) {
+      params = params.set('limit', limit.toString());
+    }
+    return this.http.get<IResponse<any>>(`${environment.apiUrl}/designs`, { params });
+  }
+
+  fetchDesign(design_id: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/designs/${design_id}`);
+  }
+
+  searchDesign(query: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/designs/search?q=${query}`);
+  }
+
+  updateDesign(design_id: string, design: IDesign): Observable<IResponse<any>> {
+    return this.http.patch<IResponse<any>>(`${environment.apiUrl}/designs/${design_id}`, design);
+  }
+
+  removeDesign(design_id: string): Observable<any> {
+    return this.http.delete<any>(`${environment.apiUrl}/designs/${design_id}`);
+  }
+
+  removeDesignImage(design_id: string, imgUrl: string): Observable<IResponse<any>> {
+    return this.http.post<IResponse<any>>(`${environment.apiUrl}/designs/${design_id}/delete-img`, { imgUrl: imgUrl });
+  }
+}

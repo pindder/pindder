@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create-account.dto';
@@ -30,7 +31,11 @@ export class AccountController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  findOne(@Req() req: any) {
+  findOne(
+    @Query('user_id') user_id?: string,
+    @Query('acctType') acctType?: string,
+    @Req() req?: any
+  ) {
     return this.accountService.findOne(req.user.sub);
   }
 

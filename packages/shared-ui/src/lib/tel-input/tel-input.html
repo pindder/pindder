@@ -1,0 +1,36 @@
+<ion-item lines="none" fill="outline" class="custom-input phone-container-item">
+    @if(icon){<ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon>}
+    <div class="flex flex-col">
+        <ion-text class="text-xs pt-2" [color]="'dark'" slot="start">Phone No</ion-text>
+        <div class="phone-input-wrapper">
+            <!-- Country Code Selector -->
+            <ion-select 
+            [(ngModel)]="countryCode" 
+            (ngModelChange)="updateCountryCode.emit($event)"
+            name="countryCode" 
+            [interfaceOptions]="customModalOptions" 
+            interface="modal" 
+            [toggleIcon]="'chevron-down-outline'"
+            class="country-code-select"
+            aria-label="Country Code">
+                @for(c of countries; track c.name) {
+                    <ion-select-option [value]="c.code">
+                        {{ c.flag }} {{ c.code }}
+                    </ion-select-option>
+                }
+            </ion-select>
+
+            <!-- Phone Digits Input -->
+            <ion-input 
+            label-placement="stacked" 
+            type="tel" 
+            [(ngModel)]="tel" 
+            (ngModelChange)="updateTel.emit($event)"
+            name="tel"
+            placeholder="800 000 0000" 
+            class="phone-digits-input"
+            required>
+            </ion-input>
+        </div>
+    </div>
+</ion-item>

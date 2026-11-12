@@ -37,9 +37,9 @@ export interface IPlan {
   free: boolean;
   plan_id?: number;
   plan_code?: string;
-  metadata?: any;
+  metadata?: unknown;
   totalSubscribers?: number;
-  subscribers?: any[];
+  subscribers?: unknown[];
 }
 
 export interface IBankDetail {
@@ -49,4 +49,26 @@ export interface IBankDetail {
   accountName: string;
   sortCode?: string;
   disabled: boolean;
+}
+
+export interface SettingItem {
+  id: string;
+  icon: string;
+  title: string;
+  route?: string;
+  path?: string;
+  action?: string;
+  callback?: () => void;
+}
+
+export interface SettingsSection {
+  id: string;
+  name: string;
+  subItems: SettingItem[];
+  color?: string;
+}
+
+export interface ITelInput {
+  countryCode: string;
+  tel: string;
 }

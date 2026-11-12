@@ -1,4 +1,6 @@
 export const environment = {
-    // base_api_url: 'http://localhost:4000/api',
-    base_api_url: 'https://pindder-api.onrender.com/api'
+    // apiUrl: 'http://localhost:4000/api',
+    apiUrl: 'https://pindder-api.onrender.com/api',
+    cloudName: 'w28vsff3',
+    presetName: 'pindder'
 }
