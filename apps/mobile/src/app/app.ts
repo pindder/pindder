@@ -4,6 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 import { IonRouterOutlet, IonApp } from "@ionic/angular";
 import { SplashScreen } from '@capacitor/splash-screen';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { Stripe } from '@capacitor-community/stripe';
+import { environment } from '../environments/environment.production';
 
 @Component({
   imports: [IonApp, RouterModule, IonRouterOutlet],
@@ -14,6 +16,12 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 export class App implements OnInit{
   protected title = 'mobile';
   private router = inject(Router);
+
+  constructor() {
+    Stripe.initialize({
+      publishableKey: environment.stripe_pk,
+    });
+  }
 
   async ngOnInit() {
     await SplashScreen.hide();

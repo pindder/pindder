@@ -7,3 +7,5 @@ export * from './lib/items-list/items-list';
 export * from './lib/settings/settings';
 export * from './lib/style-upload/style-upload';
 export * from './lib/tel-input/tel-input';
+export * from './lib/preview/preview';
+export * from './lib/create-order/create-order';

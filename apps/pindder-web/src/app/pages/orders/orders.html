@@ -24,11 +24,11 @@
     (ionChange)="onSearchInput($event)"
     ></ion-searchbar>
 
-    <!-- New Style Button-->
+    <!-- New Order Button-->
     @if(orders.length > 0){
     <div class="px-2">
       <lib-button
-      [buttonText]="'New Style'" 
+      [buttonText]="'New Order'" 
       (action)="openNewOrderModal()" 
       icon="add-outline"
       ></lib-button>
@@ -42,7 +42,9 @@
         <ion-col class="p-0" size-lg="4" size-md="4" size-xs="6">
           <lib-items-list 
           [order]="order" 
-          [dataType]="dataTypes.ORDER">
+          [dataType]="dataTypes.ORDER"
+          (action)="navigate($event)"
+          > 
           </lib-items-list>
         </ion-col>
       }

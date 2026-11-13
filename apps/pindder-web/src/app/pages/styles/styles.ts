@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
 import { DataTypes, IDesign, IResponse } from '@pindder/contracts';
 import { AsyncPipe } from '@angular/common';
-import { AppButton, EmptyState, ListCard } from '@pindder/shared-ui';
+import { AppButton, EmptyState, ItemList } from '@pindder/shared-ui';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NewStyle } from '../new-style/new-style';
 
@@ -18,7 +18,7 @@ import { NewStyle } from '../new-style/new-style';
   selector: 'app-styles',
   imports: [IonInfiniteScroll, IonInfiniteScrollContent, IonCol, IonRow, IonContent, IonBackButton, IonButtons,
     IonToolbar, IonHeader, IonTitle, EmptyState,
-    IonGrid, IonRow, IonSearchbar, AsyncPipe, AppButton, ListCard],
+    IonGrid, IonRow, IonSearchbar, AsyncPipe, AppButton, ItemList],
   templateUrl: './styles.html',
   styleUrl: './styles.css',
 })

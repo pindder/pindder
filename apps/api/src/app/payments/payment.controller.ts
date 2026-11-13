@@ -12,10 +12,14 @@ import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { StripeService } from './stripe.service';
 
 @Controller('payment')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(
+    private readonly paymentService: PaymentService,
+    private readonly stripeService: StripeService
+  ) {}
 
   @UseGuards(AuthGuard)
   @Post('init')
@@ -52,5 +56,11 @@ export class PaymentController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.paymentService.remove(+id);
+  }
+
+  /** STRIPE PAYMENTS CONTROLLERS */
+  @Post('stripe/intent')
+  async getPaymentSheet(@Body() body: { amount: number; currency: string }) {
+    return this.stripeService.createPaymentSheetIntent(body.amount, body.currency);
   }
 }

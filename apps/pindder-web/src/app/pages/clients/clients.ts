@@ -10,7 +10,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
 import { AppService } from '../../services/app.service';
 import { AsyncPipe } from '@angular/common';
-import { ListCard, EmptyState, AppButton } from '@pindder/shared-ui';
+import { EmptyState, AppButton, ItemList } from '@pindder/shared-ui';
 
 @Component({
   selector: 'app-clients',
@@ -27,7 +27,7 @@ import { ListCard, EmptyState, AppButton } from '@pindder/shared-ui';
     AsyncPipe,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    ListCard,
+    ItemList,
     EmptyState,
     AppButton
 ],

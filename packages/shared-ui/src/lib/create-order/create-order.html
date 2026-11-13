@@ -1,0 +1,340 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{ isPreview ? 'Order Preview' : 'New Order' }}</ion-title>
+        @if(isPreview){
+        <ion-buttons slot="start">
+            <ion-button (click)="isPreview = false">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>}
+        <ion-buttons slot="end">
+            <ion-button (click)="dismissModal()">
+                <ion-icon name="close-outline" color="primary" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+@if(isPreview){
+<ion-content color="light" [fullscreen]="true">
+    <lib-preview [order]="completeOrder" [isPreview]="true" (action)="submit()"></lib-preview>
+</ion-content>
+}@else{
+<ion-content color="light" [fullscreen]="true">
+    <!-- Client Information-->
+    <ion-list [inset]="true">
+        <ion-list-header>
+            <ion-label>Client Information</ion-label>
+        </ion-list-header>
+
+        @if(!selectedClient){
+        <div class="">
+            <lib-empty-state 
+            [icon]="'person-add'" 
+            [title]="'No Client Added'" 
+            [desc]="'click the button to add a client to this order.'" 
+            [buttonText]="'Add Client'"
+            (action)="openClientActionSheet()"
+            ></lib-empty-state>
+        </div>
+        }@else if (selectedClient) {
+        <ion-item lines="none">
+            <ion-label>
+            <h2>
+                {{ selectedClient.fullname || (selectedClient.firstname ? selectedClient.firstname + ' ' + selectedClient.lastname : 'Unnamed Client') }}
+            </h2>
+            @if (selectedClient.email) {
+                <p>{{ selectedClient.email }}</p>
+            }
+            @if (selectedClient.phoneNo) {
+                <p>{{ selectedClient.phoneNo }}</p>
+            }
+            </ion-label>
+            
+            <ion-button fill="clear" slot="end" (click)="removeSelectedClient()">
+                <ion-icon name="close-circle-outline" color="danger" size="medium"></ion-icon>
+            </ion-button>
+        </ion-item>
+        }
+    </ion-list>
+
+    <!-- Client Measurement-->
+    @if(selectedClient){
+        <ion-list [inset]="true">
+            <ion-item button (click)="openMeasurementModal()">
+                <ion-label>View Measurement</ion-label>
+            </ion-item>
+        </ion-list>
+    }
+
+    <!-- Selected Styles-->
+    <ion-list [inset]="true">
+        <ion-list-header>
+            <ion-label>Styles</ion-label>
+        </ion-list-header>
+
+        @if(order.styles && order.styles.length === 0){
+        <div class="">
+            <lib-empty-state 
+            [icon]="'color-palette-outline'" 
+            [title]="'No Style Added'" 
+            [desc]="'click the button to add a style to this order.'" 
+            [buttonText]="'Add Style'"
+            (action)="openDesignActionSheet()"
+            ></lib-empty-state>
+        </div>
+        }@else {
+            @for(style of order.styles; track style._id){
+                <ion-item-sliding>
+                    <ion-item [button]="true" (click)="openModalSheet($index, style)">
+                        <ion-avatar aria-hidden="true" slot="start">
+                            <img alt="" src="{{ style.images[0] }}" />
+                        </ion-avatar>
+                        <ion-label>
+                            <h2>{{ style.name }}</h2>
+                            @if(style.type === designTypes.BESPOKE && style.amount !== null){
+                                <p>{{ style.quantity < 1 ? style.amount.toLocaleString() : (style.amount * style.quantity).toLocaleString() }}</p>
+                            } @else if(style.type === designTypes.READYMADE && style.selections.length > 0){
+                                <p>{{ style.totalAmount.toLocaleString() }}</p>
+                            } @else {
+                                <p>{{ style.amount !== null ? style.amount.toLocaleString() : 0 }}</p>
+                            }
+                            @for(size of style.specifications; track size){
+                                @if(size.quantity > 0){
+                                    <span class="text-sm">
+                                    {{ size.size }}
+                                    </span>
+                                }
+                            }
+                        </ion-label>
+                    </ion-item>
+                    <ion-item-options slot="end">
+                        <ion-item-option 
+                        (click)="viewDesignDetails(style)" 
+                        color="primary">
+                            <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+                        </ion-item-option>
+                        <ion-item-option 
+                        color="danger" 
+                        expandable="true" 
+                        (click)="removeSelectedDesign($index)">
+                            <ion-icon slot="icon-only" name="trash"></ion-icon>
+                        </ion-item-option>
+                    </ion-item-options>
+                </ion-item-sliding>
+            }
+        }
+
+        <!-- Add Style Button-->
+        @if(order.styles.length > 0){
+            <div class="p-3">
+                <ion-button 
+                expand="block" 
+                fill="outline"
+                color="primary"
+                (click)="openDesignActionSheet()">
+                    <ion-icon slot="start" name="add-outline"></ion-icon>
+                    Add Style
+                </ion-button>
+            </div>
+        }
+    </ion-list>
+
+    <!-- Additional Info Section-->
+    @if(selectedClient && order.styles.length > 0){
+    <ion-list [inset]="true">
+        <ion-list-header>
+            <ion-label>Additional Details</ion-label>
+        </ion-list-header>
+
+        <form #orderForm="ngForm" (ngSubmit)="submit()" class="p-3">
+            <ion-list lines="true">
+                <ion-item lines="full">
+                    <ion-textarea 
+                    label="Regular textarea" 
+                    placeholder="Type something here"
+                    name="note"
+                    type="text"
+                    [(ngModel)]="order.note" 
+                    label="Note" 
+                    labelPlacement="stacked"
+                    ></ion-textarea>
+                </ion-item>
+
+                <ion-item lines="full">
+                    <ion-select 
+                    name="delivery_method" 
+                    [(ngModel)]="order.deliveryMethod" 
+                    label="Delivery Method" 
+                    aria-label="Delivery Method" 
+                    placeholder="Select delivery method" 
+                    labelPlacement="stacked"
+                    >
+                    @for (dm of deliveryMethods; track dm) {
+                        <ion-select-option [disabled]="dm !== deliveryMethod.PICKUP" [value]="dm">{{ dm }}</ion-select-option>
+                    }
+                    </ion-select> 
+                </ion-item>
+
+                <ion-item lines="full">
+                    <ion-select 
+                    name="payment_method" 
+                    [(ngModel)]="order.paymentMethod" 
+                    label="Payment Method" 
+                    aria-label="Payment Method" 
+                    placeholder="Select payment method" 
+                    labelPlacement="stacked"
+                    >
+                    @for (pm of paymentMethods; track pm) {
+                        <ion-select-option [value]="pm">{{ pm }}</ion-select-option>
+                    }
+                    </ion-select> 
+                </ion-item>
+
+                <ion-item lines="none">
+                    <ion-datetime
+                    name="dueDate"
+                    presentation="date"
+                    [showDefaultTitle]="false"
+                    [(ngModel)]="order.dueDate" 
+                    (ionChange)="onDateChange($event)"
+                    >
+                        <span slot="title">Select due date</span>    
+                    </ion-datetime>
+                </ion-item>
+            </ion-list>
+        </form>
+    </ion-list>
+    }
+
+    @if(order.totalAmount > 0) {
+        <ion-list [inset]="true">
+            <ion-list-header>
+                Cost Breakdown
+            </ion-list-header>
+
+            <ion-item lines="none">
+                <ion-label>
+                    <p>Accumulated Cost</p>
+                </ion-label>
+                <ion-note>{{ order.totalAmount.toLocaleString() }}</ion-note>
+            </ion-item>
+        </ion-list>
+    }
+
+    <!-- Create Order Button-->
+    <div class="p-3">
+        <lib-button
+            [buttonText]="'Preview Order'"
+            [icon]="'eye-outline'"
+            [disabled]="selectedClient === undefined || order.styles.length === 0"
+            (action)="buildOrder.emit()"
+        ></lib-button>
+    </div>
+
+    <!-- Modal sheet for quantity and color selection-->
+    <ion-modal #modal 
+    [initialBreakpoint]="0.75" 
+    [breakpoints]="[0.75]" 
+    (didDismiss)="closeModalSheet()"
+    [expandToScroll]="false"
+    >
+        <ng-template>
+            <ion-content>
+                <ion-list>
+                    <ion-list-header>
+                        Specifications
+                    </ion-list-header>
+
+                    <ion-item lines="none">
+                        <ion-avatar aria-hidden="true" slot="start">
+                            <img alt="" src="{{ selectedStyle.images[0] }}" />
+                        </ion-avatar>
+                        <ion-label>
+                            <h2>{{ selectedStyle.name }}</h2> 
+                            <p>unit price: {{ selectedStyle.amount !== null ? selectedStyle.amount.toLocaleString() : 0 }}</p>
+                        </ion-label>
+                    </ion-item>
+
+                    @if(selectedStyle.type === designTypes.READYMADE){
+                        @for(spec of selectedStyle.specifications; track spec; let specIndex = $index;){
+                        <ion-item-group>
+                            <ion-item-divider>
+                                <ion-label>{{ spec.size }} ({{ spec.amount.toLocaleString() }})</ion-label>
+                            </ion-item-divider>
+                            <ion-item lines="full">
+                                <ion-label>
+                                    <div class="py-1 color-grid">
+                                    @for(color of spec.colors; track color._id){
+                                        <div
+                                            class="color-swatch"
+                                            [style.background-color]="color.hex"
+                                            [class.selected]="isColorSelected(color, spec)"
+                                            (click)="toggleColor(color, spec)"
+                                        >
+                                            @if(isColorSelected(color, spec)){<ion-icon
+                                            name="checkmark"
+                                            [style.color]="getContrastColor(color.hex)"
+                                            ></ion-icon>}
+                                        </div>
+                                    }
+                                    </div>
+                                </ion-label>
+                                <div class="flex gap-3 items-center">
+                                    <ion-button size="small" (click)="decrementQuantity(spec)">-</ion-button>
+                                        <p>{{ selectedStyle.selections[specIndex].quantity }}</p>
+                                    <ion-button size="small" (click)="incrementQuantity(spec)">+</ion-button>
+                                </div>
+                            </ion-item>
+                        </ion-item-group>}
+                    } @else if(selectedStyle.type === designTypes.BESPOKE){
+                        <ion-item>
+                            <ion-label><p>Quantity</p></ion-label>
+                            <div class="flex gap-3 items-center">
+                                <ion-button size="small" (click)="decrementQuantityBespoke()">-</ion-button>
+                                    <p>{{ selectedStyle.quantity }}</p>
+                                <ion-button size="small" (click)="incrementQuantityBespoke()">+</ion-button>
+                            </div>
+                        </ion-item>
+                        <ion-item>
+                            <ion-label><p>Colors</p></ion-label>
+                            <div class="py-2 color-grid">
+                            @for(color of selectedStyle.colors; track color._id; let colorIndex = $index){
+                                <div
+                                    class="color-swatch"
+                                    [style.background-color]="color.hex"
+                                    [class.selected]="isColorSelected(color)"
+                                    (click)="toggleColor(color)"
+                                >
+                                    @if(isColorSelected(color)){<ion-icon
+                                    name="checkmark"
+                                    [style.color]="getContrastColor(color.hex)"
+                                    ></ion-icon>}
+                                </div>
+                            } @empty {
+                                
+                            }
+                            </div>
+                        </ion-item>
+                    }
+                </ion-list>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
+
+    <!-- Client Action Sheet -->
+    <ion-action-sheet
+        [isOpen]="isClientActionSheetOpen()"
+        header="Quick Actions"
+        [buttons]="clientActionSheetButtons"
+        (didDismiss)="isClientActionSheetOpen.set(false)">
+    </ion-action-sheet>
+
+    <!-- Design Action Sheet -->
+    <ion-action-sheet
+        [isOpen]="isDesignActionSheetOpen()"
+        header="Quick Actions"
+        [buttons]="designActionSheetButtons"
+        (didDismiss)="isDesignActionSheetOpen.set(false)">
+    </ion-action-sheet>
+</ion-content>}

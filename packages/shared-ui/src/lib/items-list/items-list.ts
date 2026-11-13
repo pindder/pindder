@@ -11,7 +11,7 @@ import { DataTypes, IDesign, IOrderItem, OrderStatus } from '@pindder/contracts'
   templateUrl: './items-list.html',
   styleUrl: './items-list.css',
 })
-export class ListCard {
+export class ItemList {
   @Output() updateList = new EventEmitter();
   @Output() edit = new EventEmitter();
   @Output() action = new EventEmitter();

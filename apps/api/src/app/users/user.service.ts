@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -19,6 +19,13 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      const exisiting_user = await this.userModel.findOne({ email: createUserDto.email });
+
+      if(exisiting_user) {
+        this.logger.log('CONFLICT:EMAIL_EXISTS', createUserDto);
+        throw new HttpException('The provided email is in use.', HttpStatus.CONFLICT);
+      }
+
       const createdUser = new this.userModel(createUserDto);
       createdUser.firstname = createUserDto.fullname.split(' ')[0];
       createdUser.lastname = createUserDto.fullname.split(' ')[1];

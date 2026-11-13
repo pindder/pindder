@@ -9,16 +9,16 @@ import { Router } from '@angular/router';
 import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
 import { DataTypes, IOrderItem, IResponse } from '@pindder/contracts';
 import { AsyncPipe } from '@angular/common';
-import { AppButton, EmptyState, ListCard } from '@pindder/shared-ui';
+import { AppButton, EmptyState, ItemList } from '@pindder/shared-ui';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrderService } from '../../services/order.service';
-import { Clients } from '../clients/clients';
+import { NewOrder } from '../new-order/new-order';
 
 @Component({
   selector: 'app-orders',
   imports: [IonInfiniteScroll, IonInfiniteScrollContent, IonCol, IonRow, IonContent, IonBackButton, IonButtons,
     IonToolbar, IonHeader, IonTitle, EmptyState,
-    IonGrid, IonRow, IonSearchbar, AsyncPipe, AppButton, ListCard
+    IonGrid, IonRow, IonSearchbar, AsyncPipe, AppButton, ItemList
   ],
   templateUrl: './orders.html',
   styleUrl: './orders.css',
@@ -95,7 +95,7 @@ export class Orders implements ViewWillEnter, OnInit{
 
   async openNewOrderModal() {
     const modal = await this.modalCtrl.create({
-      component:  Clients
+      component:  NewOrder
     });
 
     await modal.present();
@@ -113,5 +113,9 @@ export class Orders implements ViewWillEnter, OnInit{
     setTimeout(() => {
       event.target.complete();
     }, 500);
+  }
+
+  navigate(order_id: string) {
+    this.router.navigate([`app/orders/${order_id}`]);
   }
 }
