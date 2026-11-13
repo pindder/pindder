@@ -11,24 +11,26 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SharedModule } from '../shared/shared.module';
 import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
 import { LedgerModule } from '../ledger/ledger.module';
+import { StripeService } from './stripe.service';
+import { PaystackService } from './paystack.service';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     HttpModule.register({
       timeout: 5000,
-      maxRedirects: 5
+      maxRedirects: 5,
     }),
     MongooseModule.forFeature([
       { name: Payment.name, schema: PaymentSchema },
       { name: Order.name, schema: OrderSchema },
-      { name: Tailor.name, schema: TailorSchema }
+      { name: Tailor.name, schema: TailorSchema },
     ]),
     LedgerModule,
-    SharedModule
+    SharedModule,
   ],
   controllers: [PaymentController, PaymentWebhookController],
-  providers: [PaymentService, JwtService],
-  exports: [MongooseModule, PaymentService]
+  providers: [PaymentService, JwtService, StripeService, PaystackService],
+  exports: [MongooseModule, PaymentService, StripeService, PaystackService],
 })
 export class PaymentModule {}

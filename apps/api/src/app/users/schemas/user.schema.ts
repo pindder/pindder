@@ -32,7 +32,7 @@ export class User {
   @Prop({ type: String, enum: AccountTypes, required: true })
   accountType!: string;
 
-  @Prop({ type: String, enum: AccountStatus, required: true })
+  @Prop({ type: String, enum: AccountStatus, default: AccountStatus.PENDING, required: true })
   status!: string;
 
   @Prop({ type: Boolean, default: false, required: true })

@@ -1,6 +1,11 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="custom-header">
-    <ion-title>Outfit Designs</ion-title>
+    <ion-title class="px-5">Outfit Designs</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="cart" slot="icon-only" size="medium"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -31,9 +36,9 @@
               </ion-card-header>
               <ion-card-content>
                 <p>{{ design.description }}</p>
-                <ion-button fill="clear" class="primary-text-btn ion-no-padding">
-                  View Details
-                  <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+                <ion-button fill="outline" [expand]="'block'" class="primary-text-btn ion-no-padding">
+                  Add to Cart
+                  <ion-icon name="cart-outline" slot="start"></ion-icon>
                 </ion-button>
               </ion-card-content>
             </ion-card>
@@ -43,6 +48,7 @@
     </section>
 
     <!-- Section 2: Upload Form -->
+    @if(!isAuthenticated){
     <section class="upload-section">
       <div class="section-title">
         <h2>Upload Your Own Design</h2>
@@ -51,79 +57,22 @@
 
       <ion-card class="form-card">
         <ion-card-content>
-          <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
-            
-            <!-- Outfit Title -->
-            <ion-item lines="none" class="custom-input-item">
-              <ion-label position="stacked">Design Title</ion-label>
-              <ion-input 
-                type="text" 
-                formControlName="title" 
-                placeholder="e.g. Summer Floral Dress">
-              </ion-input>
-            </ion-item>
-            @if(uploadForm.get('title')?.touched && uploadForm.get('title')?.invalid){
-            <div class="error-msg">
-              Title is required.
-            </div>}
-
-            <!-- Category -->
-            <ion-item lines="none" class="custom-input-item">
-              <ion-label position="stacked">Category</ion-label>
-              <ion-select formControlName="category" placeholder="Select outfit type">
-                <ion-select-option value="Casual">Casual</ion-select-option>
-                <ion-select-option value="Formal">Formal</ion-select-option>
-                <ion-select-option value="Traditional">Traditional</ion-select-option>
-                <ion-select-option value="Streetwear">Streetwear</ion-select-option>
-              </ion-select>
-            </ion-item>
-            @if(uploadForm.get('category')?.touched && uploadForm.get('category')?.invalid){
-            <div class="error-msg">
-              Please select a category.
-            </div>}
-
-            <!-- Description -->
-            <ion-item lines="none" class="custom-input-item">
-              <ion-label position="stacked">Description / Special Instructions</ion-label>
-              <ion-textarea 
-                formControlName="description" 
-                rows="4" 
-                placeholder="Describe fabric details, dimensions, or specific preferences...">
-              </ion-textarea>
-            </ion-item>
-
-            <!-- File Upload Zone -->
-            <div class="file-upload-zone" [class.has-preview]="imagePreview">
-              <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="file-input-hidden" />
-              
-              @if(!imagePreview){<div class="upload-placeholder" (click)="fileInput.click()">
-                <ion-icon name="cloud-upload-outline" class="upload-icon"></ion-icon>
-                <p class="upload-text"><strong>Click to upload</strong> or drag and drop</p>
-                <p class="upload-hint">PNG, JPG, or WEBP (Max 5MB)</p>
-              </div>}
-
-              @if(imagePreview){<div class="preview-container">
-                <img [src]="imagePreview" alt="Upload Preview" />
-                <ion-button fill="solid" color="danger" size="small" class="remove-btn" (click)="removeImage()">
-                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                </ion-button>
-              </div>}
+          <!-- File Upload Zone -->
+          <div class="file-upload-zone">
+            <div class="flex flex-col gap-2 items-center upload-placeholder">
+              <ion-icon name="cloud-upload-outline" class="upload-icon"></ion-icon>
+              <p class="font-semibold text-xl">Can't find what you're looking for?</p>
+              <p class="upload-text">Upload your own style reference and we'll create something custom for you.</p>
+              <lib-button
+              [buttonText]="'Upload Custom Style'"
+              [buttonType]="''"
+              [icon]="'cloud-upload'"
+              (action)="openNewStyleModal()"
+              ></lib-button>
             </div>
-
-            <!-- Submit Button -->
-            <ion-button 
-              type="submit" 
-              expand="block" 
-              class="submit-btn" 
-              [disabled]="uploadForm.invalid">
-              Submit Design
-              <ion-icon name="send-outline" slot="end"></ion-icon>
-            </ion-button>
-
-          </form>
+          </div>
         </ion-card-content>
       </ion-card>
-    </section>
-
+    </section>}
   </div>
 </ion-content>

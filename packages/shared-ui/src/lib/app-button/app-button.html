@@ -1,0 +1,13 @@
+<ion-button 
+[disabled]="disabled" 
+[shape]="shape" 
+[expand]="buttonType" 
+[fill]="fill"
+[color]="color"
+[size]="size"
+(click)="action.emit()">
+    @if(icon){<ion-icon [slot]="iconPosition" [name]="icon"></ion-icon>}
+    @if(buttonText){ 
+        {{ buttonText  }}
+    }
+</ion-button>

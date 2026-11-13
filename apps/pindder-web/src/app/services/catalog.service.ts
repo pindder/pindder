@@ -11,6 +11,6 @@ export class CatalogService {
     private http = inject(HttpClient);
 
     fetchTailorCatalogs(tailor: string): Observable<IResponse<any[]>> {
-        return this.http.get<IResponse<any[]>>(`${environment.base_api_url}/designs/catalogs/${tailor}`);
+        return this.http.get<IResponse<any[]>>(`${environment.apiUrl}/designs/catalogs/${tailor}`);
     }
 }

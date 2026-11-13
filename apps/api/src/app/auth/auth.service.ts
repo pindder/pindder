@@ -112,7 +112,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...tailor}, 
+          user: {...tailor.toObject()}, 
           token: token.token
         }
       );
@@ -126,7 +126,7 @@ export class AuthService {
       }
 
       // 3. Log unknown database/system errors and return a 500
-      console.error('tailorLogin error:', error);
+      this.logger.error('tailorLogin error:', error);
       throw new InternalServerErrorException('An error occurred while logging in');
     }
   }
@@ -146,7 +146,7 @@ export class AuthService {
       tailor.accountType = AccountTypes.TAILOR;
       tailor.tel = tailorRegistrationDto.tel;
       tailor.countryCode = tailorRegistrationDto.countryCode;
-      tailor.referralCode = generateCode(8, true);
+      tailor.referralCode = generateCode(6, true);
       await tailor.save();
 
       // await this.emailService.sendWelcomeEmail(tailor.email, tailor.username);
@@ -203,13 +203,14 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...user}, 
+          user: {...user.toObject()}, 
           token: token.token
         }
       );
 
       return { status: 200, message: `Login code has been sent to your email!` };
     } catch(error: any) {
+      this.logger.error(error);
       throw new InternalServerErrorException();
     }
   }
@@ -338,16 +339,15 @@ export class AuthService {
 
   @OnEvent('loginCodeRequested')
   async onLoginCodeRequest(payload: {
-    acct: User | Tailor,
+    user: User | Tailor,
     token: string
   }) {
     try {
-      await this.emailService.sendOneTimeLoginCode(payload.acct, payload.token);
+      await this.emailService.sendOneTimeLoginCode(payload.user, payload.token);
       this.logger.log('EVENT_LOG:', {
         type: 'OTP_REQUEST',
-        initiator: payload.acct.email
+        initiator: payload.user.email,
       });
-      return;
     } catch(error: unknown) {
       this.logger.error('EVENT_LOG:', error);
     }

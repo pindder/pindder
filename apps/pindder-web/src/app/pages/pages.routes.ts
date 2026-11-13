@@ -3,11 +3,17 @@ import { Dashboard } from './dashboard/dashboard';
 import { Styles } from './styles/styles';
 import { Clients } from './clients/clients';
 import { Orders } from './orders/orders';
+import { Settings } from './settings/settings';
+import { NewStyle } from './new-style/new-style';
+import { ViewOrder } from './view-order/view-order';
 
 export const pagesRoutes: Routes = [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     { path: 'dashboard', component: Dashboard },
     { path: 'orders', component: Orders },
+    { path: 'orders/:id', component: ViewOrder },
     { path: 'clients', component: Clients },
     { path: 'styles', component: Styles },
+    { path: 'styles/new', component: NewStyle },
+    { path: 'settings', component: Settings },
 ];

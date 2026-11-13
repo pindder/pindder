@@ -1,0 +1,33 @@
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AppButton } from '../app-button/app-button';
+import { DataTypes } from '@pindder/contracts';
+import { IonIcon } from "@ionic/angular";
+
+@Component({
+  selector: 'lib-empty-state',
+  imports: [IonIcon, AppButton],
+  templateUrl: './empty-state.html',
+  styleUrl: './empty-state.css',
+})
+export class EmptyState implements OnInit{
+  @Input() imgPath!: string;
+  @Input() icon!: string;
+  @Input() title!: string;
+  @Input() desc!: string;
+  @Input() buttonText!: string;
+  @Input() parentComponent!: string; 
+  @Input() hideButton = false;
+  @Output() action = new EventEmitter();
+
+  dataTypes = DataTypes;
+
+  ngOnInit(): void {
+    if(!this.imgPath && !this.icon) {
+      this.imgPath = '/images/empty_state.png'
+    }
+  }
+
+  clickAction() {
+    this.action.emit();
+  }
+}

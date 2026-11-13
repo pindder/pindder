@@ -1,1 +1,71 @@
-<p>orders works!</p>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="#"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Orders</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Orders</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="container">
+  @if(orders$ | async; as orders) {
+    <!-- Searchbar-->
+    <ion-searchbar 
+    placeholder="Search styles..." 
+    [debounce]="0" 
+    (ionInput)="onSearchInput($event)"
+    (ionChange)="onSearchInput($event)"
+    ></ion-searchbar>
+
+    <!-- New Order Button-->
+    @if(orders.length > 0){
+    <div class="px-2">
+      <lib-button
+      [buttonText]="'New Order'" 
+      (action)="openNewOrderModal()" 
+      icon="add-outline"
+      ></lib-button>
+    </div>
+    }
+    
+    <!-- styles grid-->
+    <ion-grid >
+      <ion-row class="p-0">
+      @for (order of orders; track order._id) {
+        <ion-col class="p-0" size-lg="4" size-md="4" size-xs="6">
+          <lib-items-list 
+          [order]="order" 
+          [dataType]="dataTypes.ORDER"
+          (action)="navigate($event)"
+          > 
+          </lib-items-list>
+        </ion-col>
+      }
+      </ion-row>
+    </ion-grid>
+
+    @if(orders.length === 0) {     
+      <lib-empty-state 
+      [imgPath]="'/images/add-to-cart.png'"
+      [title]="'No Style Added'" 
+      [desc]="'click the button to add a style to this order.'" 
+      [buttonText]="'New Style'"
+      (action)="openNewOrderModal()"
+      ></lib-empty-state>
+    }
+  }
+
+  @if(hasMoreData){<ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content
+    loadingSpinner="bubbles"
+    loadingText="processing..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>}
+  </div>
+</ion-content>

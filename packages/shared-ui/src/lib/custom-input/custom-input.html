@@ -1,0 +1,11 @@
+<ion-item lines="none" fill="outline" class="custom-input">
+    @if(icon){<ion-icon name="call-outline" slot="start" aria-hidden="true"></ion-icon>}
+    <ion-input
+    [name]="inputName"
+    [type]="inputType"
+    [label]="inputLabel"
+    label-placement="floating" 
+    [placeholder]="inputPlaceholder"
+    [(ngModel)]="inputValue"
+    ></ion-input>
+</ion-item>

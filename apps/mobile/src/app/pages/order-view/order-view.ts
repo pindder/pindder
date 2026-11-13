@@ -253,4 +253,4 @@ export class OrderView implements ViewWillEnter, OnInit{
       }
     });
   }
- }
+}
