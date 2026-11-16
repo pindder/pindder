@@ -15,57 +15,10 @@
     </ion-header>
 
     <div class="packages-scroll-container">
-      @for(pkg of packages; track pkg){
-      <ion-card class="sub-card" [class.popular]="pkg.recommended">
-        
-        <!-- Popular Highlight Badge -->
-        @if(pkg.recommended){
-          <div class="popular-badge">Most Popular</div>
-        }
-
-        <ion-card-header>
-          <ion-card-subtitle>{{ pkg.description }}</ion-card-subtitle>
-          <ion-card-title>{{ pkg.name }}</ion-card-title>
-          
-          <!-- <div class="price-container">
-            <span class="currency">₦</span>
-            <span class="amount">{{ pkg.amount | number }}</span>
-            <span class="period">/ {{ pkg.interval }}</span>
-          </div> -->
-        </ion-card-header>
-
-        <ion-card-content>
-          <ul class="features-list">
-            @for(feat of pkg.features; track feat){
-              <li>
-                <ion-icon name="checkmark-circle" color="success"></ion-icon>
-                <span>{{ feat }}</span>
-              </li>
-            }
-          </ul>
-
-          <!-- @if(pkg.free){
-            <ion-button 
-            expand="block" 
-            [fill]="'solid'" 
-            color="light">
-            Active
-            </ion-button>
-          }@else{
-            <ion-button 
-            expand="block" 
-            [fill]="pkg.recommended ? 'solid' : 'outline'" 
-            color="primary"
-            (click)="onSelectPlan(pkg)">
-            {{ 'Choose Plan' }}
-            </ion-button>
-          } -->
-        </ion-card-content>
-      </ion-card>
-      }
       @for(pkg of packages; track pkg._id){
         <lib-pricing-card 
         [plan]="pkg"
+        [isNative]="isNative"
         [isAuthenticated]="isAuthenticated"
         (initializeSubscription)="initSub($event)"
         ></lib-pricing-card>

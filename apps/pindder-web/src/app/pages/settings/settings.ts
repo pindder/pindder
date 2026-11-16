@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AlertController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle } from '@ionic/angular';
+import { AlertController, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent } from '@ionic/angular';
 import { SettingsSection } from '@pindder/contracts';
-import { Settings as LibSettings } from '@pindder/shared-ui';
+import { LibSettings } from '@pindder/shared-ui';
 import { TokenService } from '../../services/token.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
-  imports: [IonTitle, IonBackButton, IonButtons, IonToolbar, IonHeader, LibSettings],
+  imports: [IonContent, IonTitle, IonBackButton, IonButtons, IonToolbar, IonHeader, LibSettings],
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })

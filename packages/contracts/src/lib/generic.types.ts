@@ -57,6 +57,7 @@ export interface SettingItem {
   title: string;
   route?: string;
   path?: string;
+  type?: string;
   action?: string;
   callback?: () => void;
 }

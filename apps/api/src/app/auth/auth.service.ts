@@ -114,7 +114,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...tailor.toObject()}, 
+          user: tailor.toObject(), 
           token: token.token
         }
       );
@@ -157,7 +157,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...tailor}, 
+          user: tailor.toObject(), 
           token: token.token
         }
       );
@@ -165,7 +165,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'accountCreated', 
         { 
-          user: {...tailor},
+          user: tailor.toObject(),
           referralCode: tailorRegistrationDto.referralCode ?? ''
         }
       );
@@ -204,7 +204,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...user.toObject()}, 
+          user: user.toObject(), 
           token: token.token
         }
       );
@@ -226,7 +226,7 @@ export class AuthService {
     this.eventEmitter.emit(
       'loginCodeRequested', 
       {
-        user: {...user}, 
+        user: user.toObject(), 
         token: token.token
       }
     );
@@ -234,7 +234,7 @@ export class AuthService {
     this.eventEmitter.emit(
       'accountCreated', 
       { 
-        user: {...user}
+        user: user.toObject()
       }
     );
 

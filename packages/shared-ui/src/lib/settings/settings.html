@@ -1,10 +1,12 @@
-<ion-content [fullscreen]="true">
+<!-- <ion-content [fullscreen]="true"> -->
+    @if(displayHeader){
     <ion-header collapse="condense">
         <ion-toolbar>
             <ion-title size="large">Settings</ion-title>
         </ion-toolbar>
-    </ion-header>
-    <div class="login-container">
+    </ion-header>}
+
+    <div class="container">
         <!-- <app-profile-card [profile]="profile()" (action)="openProfileEdit()"></app-profile-card> -->
 
         <!-- Section Menu List-->
@@ -22,8 +24,8 @@
                                 <ion-icon [color]="section.color" [name]="item.icon" slot="start" aria-hidden="true"></ion-icon>
                                 <ion-label [color]="section.color" >{{ item.title | titlecase }}</ion-label>
                             </ion-item>
-                        }@else {
-                            <ion-item class="custom-input" button (click)="item.action === 'logout' ? logout.emit() : deleteAccount.emit()">
+                        }@else {    
+                            <ion-item class="custom-input" button (click)="action.emit(item.callback)">
                                 <ion-icon color="section.color" [name]="item.icon" slot="start" aria-hidden="true"></ion-icon>
                                 <ion-label color="section.color" >{{ item.title | titlecase }}</ion-label>
                             </ion-item>
@@ -33,4 +35,4 @@
             }
         }
     </div>
-</ion-content>
+<!-- </ion-content> -->

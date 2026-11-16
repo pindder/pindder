@@ -1,9 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, 
-  IonCardContent, IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle,
-  IonIcon,
-  ViewWillEnter,
-  AlertController
+  ViewWillEnter, AlertController
 } from '@ionic/angular';
 import { SubscriptionService } from '../../services/subscription.service';
 import { DataTypes, IPayment, IPlan, IResponse } from '@pindder/contracts';
@@ -18,9 +15,7 @@ import { PricingCard } from '@pindder/shared-ui';
   selector: 'app-premium',
   imports: [IonHeader, 
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
-    IonContent, PricingCard,
-    IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-    IonCardContent, IonIcon, 
+    IonContent, PricingCard
   ],
   templateUrl: './premium.html',
   styleUrl: './premium.css',
@@ -35,10 +30,12 @@ export class Premium implements ViewWillEnter{
   packages: IPlan[] = [];
   selectedPackage!: IPlan;
   isAuthenticated!: boolean;
+  isNative!: boolean;
 
   async ionViewWillEnter() {
     this.fetchPlans();
     this.isAuthenticated = await this.tokenService.isAuthenticated();
+    this.isNative = Capacitor.isNativePlatform();
   }
 
   async presentPaymentAlert(authorizationUrl: string) {

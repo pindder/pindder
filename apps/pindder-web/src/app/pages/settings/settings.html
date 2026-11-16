@@ -7,8 +7,11 @@
   </ion-toolbar>
 </ion-header>
 
-<lib-settings 
-[settingsItems]="settingsItems" 
-(deleteAccount)="deleteAccount()"
-(logout)="presentLogoutConfirmationAlert()"
-></lib-settings>
+<ion-content>
+  <lib-settings
+  [displayHeader]="true" 
+  [settingsItems]="settingsItems" 
+  (deleteAccount)="deleteAccount()"
+  (logout)="presentLogoutConfirmationAlert()"
+  ></lib-settings>
+</ion-content>

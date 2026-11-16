@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, 
+import { IonHeader, IonIcon, IonItem, IonLabel, IonList, 
     IonTitle, IonToolbar
 } from '@ionic/angular';
 import { SettingsSection } from '@pindder/contracts';
@@ -10,7 +10,6 @@ import { SettingsSection } from '@pindder/contracts';
 @Component({
   selector: 'lib-settings',
   imports: [
-    IonContent,
     IonHeader,
     IonTitle,
     IonToolbar,
@@ -25,8 +24,10 @@ import { SettingsSection } from '@pindder/contracts';
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })
-export class Settings {
+export class LibSettings {
+    @Input() displayHeader = false;
     @Input() settingsItems!: SettingsSection[];
+    @Output() action = new EventEmitter<() => void>();
     @Output() logout = new EventEmitter();
     @Output() deleteAccount = new EventEmitter();
 
