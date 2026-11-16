@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { IOrderItem, IPlan, IResponse } from '@pindder/contracts';
+import { IOrderItem, IPlan, IResponse, PlanIntervals } from '@pindder/contracts';
 import { PlanService } from '../../services/plan.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -33,6 +33,8 @@ export class Plan implements OnInit{
     recommended: false,
     free: false
   });
+
+  planIntervals = Object.keys(PlanIntervals);
 
   ngOnInit(): void {
     this.fetchPlans();
@@ -126,7 +128,8 @@ export class Plan implements OnInit{
     const featureList: any = this.features()?.split(',');
     this.package.update(pkg => pkg ? {...pkg, features: featureList} : null);
 
-    if(this.package() !== null) {
+    console.log(this.package());
+    // if(this.package() !== null) {
       this.planService.createPlan(this.package()!).subscribe({
         next: (response: IResponse<IPlan>) => {
           if(response.data) {
@@ -140,7 +143,7 @@ export class Plan implements OnInit{
           console.log(error);
         }
       })
-    }
+    // }
   }
 
   triggerToast(msg: string) {

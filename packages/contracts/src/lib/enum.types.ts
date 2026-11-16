@@ -130,3 +130,10 @@ export enum DeliveryMethods {
     PICKUP = "PICKUP",
     SHIPPING = "SHIPPING",
 }
+
+export enum PlanIntervals {
+    day = "day",
+    week = "week",
+    month = "month",
+    year = "year"
+}

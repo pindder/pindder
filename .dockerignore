@@ -1,0 +1,15 @@
+# .dockerignore (workspace root)
+node_modules
+dist
+tmp
+.git
+.nx
+.idea
+.vscode
+coverage
+android
+ios
+*.log
+.env
+.env.*
+!.env.example

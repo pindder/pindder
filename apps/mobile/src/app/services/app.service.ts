@@ -110,6 +110,10 @@ export class AppService {
     return { paymentIntent, setupIntent, ephemeralKey, customer };
   }
 
+  async stripeCheckoutSession(transactionType: string, itemId: string) {
+    return await firstValueFrom(this.http.post(`${environment.apiUrl}/payment/stripe/checkout?transaction_type=${transactionType}&item_id=${itemId}`, {}));
+  }
+
   async checkout(email: string, amount: number, planCode?: string) {
     // 1. Get Authorization URL from NestJS backend
     const res: any = await firstValueFrom(

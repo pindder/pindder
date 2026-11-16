@@ -13,6 +13,7 @@ import {
   PaymentSheetEventsEnum,
   Stripe,
 } from '@capacitor-community/stripe';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-view-order',
@@ -118,6 +119,15 @@ export class ViewOrder implements OnInit {
     }
   }
 
+  initPayment() {
+    console.log("This is native platform:::", Capacitor.isNativePlatform());
+    if(Capacitor.isNativePlatform()) {
+      this.createPaymentSheet();
+    } else {
+      this.createCheckoutSession();
+    }
+  }
+
   async createPaymentSheet(withCustomer = true, withBillingDetails = false) {
     if(!this.order) {
       return console.log('No order');
@@ -173,6 +183,16 @@ export class ViewOrder implements OnInit {
       }
 
       await Stripe.createPaymentSheet(base);
+    }
+  }
+
+  async createCheckoutSession() {
+    const res: any = await this.appService.stripeCheckoutSession(DataTypes.ORDER, this.order._id);
+
+    // console.log(res);
+    if (res && res.url) {
+      console.log(res)
+      window.location.href = res.url;
     }
   }
 

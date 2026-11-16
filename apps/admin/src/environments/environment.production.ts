@@ -9,7 +9,7 @@ export const getApiUrl = () => {
 
   if (!isNative) {
     // Running in web browser during local development
-    return serverUri;
+    return localUri;
   }
   
   // Running on a real phone or emulator -> use your cloud backend

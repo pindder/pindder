@@ -6,7 +6,9 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards
+  UseGuards,
+  Query,
+  Req
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -60,7 +62,29 @@ export class PaymentController {
 
   /** STRIPE PAYMENTS CONTROLLERS */
   @Post('stripe/intent')
-  async getPaymentSheet(@Body() body: { amount: number; currency: string }) {
-    return this.stripeService.createPaymentSheetIntent(body.amount, body.currency);
+  async getPaymentIntent(
+    @Query('order_id') order_id: string,
+    @Body() body: { amount: number; currency: string }
+  ) {
+    return this.stripeService.createPaymentIntent(body.amount, body.currency);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('stripe/checkout')
+  async getCheckoutUrl(
+    @Query('item_id') item_id: string,
+    @Query('transaction_type') transaction_type: string,
+    @Req() req: any
+  ) {
+    return this.stripeService.createCheckoutSession(transaction_type, item_id, req.user);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('stripe/subscribe')
+  async createSubscription(
+    @Query('product_id') product_id: string,
+    @Req() req: any
+  ) {
+    return this.stripeService.createSubscription(product_id, req.user);
   }
 }

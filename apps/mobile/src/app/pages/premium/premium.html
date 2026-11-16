@@ -63,5 +63,12 @@
         </ion-card-content>
       </ion-card>
       }
+      @for(pkg of packages; track pkg._id){
+        <lib-pricing-card 
+        [plan]="pkg"
+        [isAuthenticated]="isAuthenticated"
+        (initializeSubscription)="initSub($event)"
+        ></lib-pricing-card>
+      }
     </div>
 </ion-content>

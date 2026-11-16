@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument, Types } from 'mongoose';
+import mongoose, { HydratedDocument, Types, Document } from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 import { Tailor } from '../../tailors/schemas/tailor.schema';
 // import { randomUUID } from 'crypto';
@@ -11,7 +11,7 @@ export type ClientDocument = HydratedDocument<Client>;
     toJSON: { virtuals: true },
     toObject: { virtuals: true } 
 })
-export class Client {
+export class Client extends Document {
     @Prop({ type: String })
     fullname!: string;
 

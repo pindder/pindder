@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AccountStatus } from '@pindder/contracts';
-import mongoose, { HydratedDocument, Types } from 'mongoose';
+import mongoose, { HydratedDocument, Types, Document } from 'mongoose';
 import { Tailor } from '../../tailors/schemas/tailor.schema';
 
 export type BrandDocument = HydratedDocument<Brand>;
 
 @Schema({ timestamps: true })
-export class Brand {
+export class Brand extends Document {
   @Prop({ type: String, required: true, unique: true })
   name!: string;
 

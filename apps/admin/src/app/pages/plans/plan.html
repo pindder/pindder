@@ -193,9 +193,7 @@
             (ngModelChange)="package.update(p => p ? {...p, interval: $event} : null)"
             class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white outline-none cursor-pointer"
             >
-            <option value="monthly">monthly</option>
-            <option value="quarterly">quarterly</option>
-            <option value="yearly">yearly</option>
+            @for(interval of planIntervals; track interval){<option [value]="interval">{{ interval }}</option>}
             </select>
         </div>
 

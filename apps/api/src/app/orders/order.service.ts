@@ -261,6 +261,22 @@ export class OrderService {
     }
   }
 
+  async getOrder(id: string) {
+    try {
+      const order = await this.orderModel
+      .findById(id)
+      .populate('client')
+      .populate('tailor')
+      .lean()
+      .exec();
+
+      return order;
+    } catch(error: any) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   async update(id: string, updateOrderDto: UpdateOrderDto) {
     try {
       const order = await this.orderModel.findByIdAndUpdate(id, updateOrderDto, {

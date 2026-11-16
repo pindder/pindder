@@ -6,15 +6,19 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar,
   AlertController
 } from '@ionic/angular';
 import { SubscriptionService } from '../../services/subscription.service';
-import { IPayment, IPlan, IResponse } from '@pindder/contracts';
+import { DataTypes, IPayment, IPlan, IResponse } from '@pindder/contracts';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
+import { AppService } from '../../services/app.service';
+import { TokenService } from '../../services/token.service';
+import { PricingCard } from '@pindder/shared-ui';
 
 @Component({
   selector: 'app-premium',
   imports: [IonHeader, 
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
-    IonContent,
+    IonContent, PricingCard,
     IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
     IonCardContent, IonIcon, 
   ],
@@ -22,15 +26,19 @@ import { Browser } from '@capacitor/browser';
   styleUrl: './premium.css',
 })
 export class Premium implements ViewWillEnter{
+  private appService = inject(AppService);
+  private tokenService = inject(TokenService);
   private subscriptionService = inject(SubscriptionService);
   private cdr = inject(ChangeDetectorRef);
   private alertController = inject(AlertController);
 
   packages: IPlan[] = [];
   selectedPackage!: IPlan;
+  isAuthenticated!: boolean;
 
-  ionViewWillEnter(): void {
+  async ionViewWillEnter() {
     this.fetchPlans();
+    this.isAuthenticated = await this.tokenService.isAuthenticated();
   }
 
   async presentPaymentAlert(authorizationUrl: string) {
@@ -90,5 +98,24 @@ export class Premium implements ViewWillEnter{
         console.log(error);
       }
     })
+  }
+
+  async initSub(plan_id: string) {
+    console.log("This is native platform:::", Capacitor.isNativePlatform());
+    if(Capacitor.isNativePlatform()) {
+      return;
+    } else {
+      this.createCheckoutSession(plan_id);
+    }
+  }
+
+  async createCheckoutSession(plan_id: string) {
+    const res: any = await this.appService.stripeCheckoutSession(DataTypes.SUBSCRIPTION, plan_id);
+
+    // console.log(res);
+    if (res && res.url) {
+      console.log(res)
+      window.location.href = res.url;
+    }
   }
 }

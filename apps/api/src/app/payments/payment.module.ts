@@ -13,6 +13,9 @@ import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
 import { LedgerModule } from '../ledger/ledger.module';
 import { StripeService } from './stripe.service';
 import { PaystackService } from './paystack.service';
+import { Plan, PlanSchema } from '../plans/schema/plan.schema';
+import { Client, ClientSchema } from '../clients/schemas/client.schema';
+import { User, UserSchema } from '../users/schemas/user.schema';
 
 @Module({
   imports: [
@@ -22,9 +25,12 @@ import { PaystackService } from './paystack.service';
       maxRedirects: 5,
     }),
     MongooseModule.forFeature([
+      { name: Plan.name, schema: PlanSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: Order.name, schema: OrderSchema },
       { name: Tailor.name, schema: TailorSchema },
+      { name: Client.name, schema: ClientSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     LedgerModule,
     SharedModule,

@@ -15,6 +15,9 @@ export class Plan {
     @Prop({ type: String, required: true })
     interval!: string;
 
+    @Prop({ type: Number, required: true, default: 1 })
+    intervalCount!: number;
+
     @Prop({ type: [String], required: true })
     features!: string[];
 
@@ -24,31 +27,7 @@ export class Plan {
     @Prop({ type: String })
     description?: string;
 
-    @Prop({ type: Number })
-    integration!: number;
-    
-    @Prop({ type: String })
-    domain!: string;
-
-    @Prop({ type: String })
-    plan_code!: string;
-
-    @Prop({ type: Boolean, default: true })
-    send_invoices!: boolean;
-    
-    @Prop({ type: Boolean, default: true })
-    send_sms!: boolean;
-    
-    @Prop({ type: Boolean, default: false })
-    hosted_page!: boolean;
-    
-    @Prop({ type: String, default: 'NGN' })
-    currency?: string;
-    
-    @Prop({ type: Number })
-    plan_id!: number;
-
-    @Prop({ type: mongoose.Schema.Types.Mixed })
+    @Prop({ type: mongoose.Schema.Types.Mixed, default: null })
     metadata?: any;
 
     @Prop({ type: Boolean, default: false })
