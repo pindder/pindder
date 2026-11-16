@@ -5,8 +5,8 @@ FROM node:22-slim AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json package-lock.json .npmrc* ./
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 
