@@ -104,6 +104,8 @@ export enum DataTypes {
     WITHDRAWAL = "WITHDRAWAL",
     PAYMENT = "PAYMENT",
     NOTIFICATION = "NOTIFICATION",
+    BRAND = "BRAND",
+    CUSTOM = "CUSTOM"
 }
 
 export enum PaymentTypes {
@@ -129,4 +131,11 @@ export enum DataTypesIcon {
 export enum DeliveryMethods {
     PICKUP = "PICKUP",
     SHIPPING = "SHIPPING",
+}
+
+export enum PlanIntervals {
+    day = "day",
+    week = "week",
+    month = "month",
+    year = "year"
 }

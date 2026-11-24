@@ -1,13 +1,16 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AccountStatus, AccountTypes } from '@pindder/contracts';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Document } from 'mongoose';
 // import { randomUUID } from "crypto";
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
-export class User {
+export class User extends Document {
+  @Prop({ type: String, required: true })
+  fullname!: string;
+
   @Prop({ type: String, required: true })
   firstname!: string;
 
@@ -32,6 +35,9 @@ export class User {
   @Prop({ type: String, enum: AccountTypes, required: true })
   accountType!: string;
 
+  @Prop({ type: String, default: 'ngn' })
+  defaultCurrency?: string | null;
+
   @Prop({ type: String, enum: AccountStatus, default: AccountStatus.PENDING, required: true })
   status!: string;
 
@@ -40,6 +46,9 @@ export class User {
 
   @Prop({ type: String, required: true, unique: true, index: true })
   referralCode?: string;
+
+  @Prop({ type: String, default: null})
+  stripeCustomerId?: string; 
 
   @Prop({ type: Date, default: null })
   deletedAt!: Date | null;

@@ -31,3 +31,6 @@ project(':capacitor-share').projectDir = new File('../../../node_modules/@capaci
 
 include ':capacitor-splash-screen'
 project(':capacitor-splash-screen').projectDir = new File('../../../node_modules/@capacitor/splash-screen/android')
+
+include ':tolutronics-capacitor-paystack'
+project(':tolutronics-capacitor-paystack').projectDir = new File('../../../node_modules/@tolutronics/capacitor-paystack/android')

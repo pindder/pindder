@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class CreateBankDetailDto {
     @IsNotEmpty()
     @IsString()
-    bankName!: string;
+    bank!: string;
 
     @IsNotEmpty()
     @IsString()
@@ -12,8 +12,4 @@ export class CreateBankDetailDto {
     @IsNotEmpty()
     @IsString()
     accountName!: string;
-
-    @IsOptional()
-    @IsString()
-    sortCode?: string;
 }

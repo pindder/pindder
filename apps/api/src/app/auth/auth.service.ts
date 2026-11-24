@@ -16,6 +16,7 @@ import { SubscriptionService } from '../subscriptions/subscription.service';
 import { Admin } from '../admins/schemas/admin.schema';
 import { ReferralsService } from '../referrals/referrals.service';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { StripeService } from '../payments/stripe.service';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     @InjectModel(Admin.name) private readonly adminModel: Model<Admin>,
     private readonly jwtService: JwtService,
     private readonly paystackService: PaystackService,
+    private readonly stripeService: StripeService,
     private readonly emailService: EmailService,
     private readonly sharedService: SharedService,
     private readonly subscriptionService: SubscriptionService,
@@ -112,7 +114,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...tailor.toObject()}, 
+          user: tailor.toObject(), 
           token: token.token
         }
       );
@@ -155,7 +157,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...tailor}, 
+          user: tailor.toObject(), 
           token: token.token
         }
       );
@@ -163,8 +165,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'accountCreated', 
         { 
-          id: tailor._id,
-          user: {...tailor},
+          user: tailor.toObject(),
           referralCode: tailorRegistrationDto.referralCode ?? ''
         }
       );
@@ -203,7 +204,7 @@ export class AuthService {
       this.eventEmitter.emit(
         'loginCodeRequested', 
         {
-          user: {...user.toObject()}, 
+          user: user.toObject(), 
           token: token.token
         }
       );
@@ -225,7 +226,7 @@ export class AuthService {
     this.eventEmitter.emit(
       'loginCodeRequested', 
       {
-        user: {...user}, 
+        user: user.toObject(), 
         token: token.token
       }
     );
@@ -233,8 +234,7 @@ export class AuthService {
     this.eventEmitter.emit(
       'accountCreated', 
       { 
-        id: user._id,
-        user: {...user}
+        user: user.toObject()
       }
     );
 
@@ -355,15 +355,14 @@ export class AuthService {
 
   @OnEvent('accountCreated')
   async handleSubscriptionAssoc(payload: {
-    id: string,
     referralCode?: string,
     user: Tailor | User,
   }) {
     try {
       if(payload.referralCode) {
-        await this.referralService.create({ referee: payload.id, referrer: payload.referralCode });
+        await this.referralService.create({ referee: payload.user._id.toString(), referrer: payload.referralCode });
       }
-      await this.subscriptionService.assignSubscription({ user_id: payload.id });
+      await this.subscriptionService.assignSubscription({ user_id: payload.user._id.toString() });
       this.logger.log('EVENT_LOG:', {
         type: 'NEW_SIGN_UP',
         account: payload.user
@@ -382,6 +381,8 @@ export class AuthService {
     try {
       await this.emailService.sendWelcomeEmail(payload.user.email, payload.user.username);
       await this.paystackService.createCustomer(payload.user);
+      await this.stripeService.createStripeCustomer(payload.user);
+      // await this.stripeService.createConnectedAccount(payload.user as Tailor);
       this.logger.log('EVENT_LOG:', {
         type: 'ACCOUNT_VERIFICATION',
         initiator: payload.user.email

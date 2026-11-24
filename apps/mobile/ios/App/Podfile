@@ -12,6 +12,7 @@ def capacitor_pods
   pod 'Capacitor', :path => '../../../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../../../node_modules/@capacitor/ios'
   pod 'CapacitorCommunityPhotoviewer', :path => '../../../../node_modules/@capacitor-community/photoviewer'
+  pod 'CapacitorCommunityStripe', :path => '../../../../node_modules/@capacitor-community/stripe'
   pod 'CapacitorBrowser', :path => '../../../../node_modules/@capacitor/browser'
   pod 'CapacitorCamera', :path => '../../../../node_modules/@capacitor/camera'
   pod 'CapacitorHttp', :path => '../../../../node_modules/@capacitor/http'
@@ -20,6 +21,7 @@ def capacitor_pods
   pod 'CapacitorPushNotifications', :path => '../../../../node_modules/@capacitor/push-notifications'
   pod 'CapacitorShare', :path => '../../../../node_modules/@capacitor/share'
   pod 'CapacitorSplashScreen', :path => '../../../../node_modules/@capacitor/splash-screen'
+  pod 'TolutronicsCapacitorPaystack', :path => '../../../../node_modules/@tolutronics/capacitor-paystack'
 end
 
 target 'App' do

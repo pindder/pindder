@@ -7,12 +7,13 @@ import { IonTitle, IonHeader, IonToolbar, IonButtons,
 import { AppService } from '../../services/app.service';
 import { Router } from '@angular/router';
 import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
-import { DataTypes, IOrderItem, IResponse } from '@pindder/contracts';
+import { DataTypes, IOrderItem, IProfile, IResponse } from '@pindder/contracts';
 import { AsyncPipe } from '@angular/common';
 import { AppButton, EmptyState, ItemList } from '@pindder/shared-ui';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OrderService } from '../../services/order.service';
 import { NewOrder } from '../new-order/new-order';
+import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-orders',
@@ -30,6 +31,7 @@ export class Orders implements ViewWillEnter, OnInit{
   private cdr = inject(ChangeDetectorRef);
   private modalCtrl = inject(ModalController);
   private searchSubject = new Subject<string>();
+  private tokenService = inject(TokenService);
 
   dataTypes = DataTypes;
   orders$!: Observable<IOrderItem[]>;
@@ -37,12 +39,19 @@ export class Orders implements ViewWillEnter, OnInit{
   page = 1;
   limit = 20;
   hasMoreData = false;
+  account!: IProfile;
 
   ionViewWillEnter(): void {
     this.fetchOrders();
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    const profile = await this.tokenService.getProfile();
+
+    if(profile) {
+      this.account = JSON.parse(profile);
+    }
+
     this.orders$ = this.appService.createSearchStream<IOrderItem>(
       this.searchSubject,
       (query) => this.orderService.searchOrders(query).pipe(
@@ -94,6 +103,7 @@ export class Orders implements ViewWillEnter, OnInit{
   }
 
   async openNewOrderModal() {
+    // console.log(this.account);
     const modal = await this.modalCtrl.create({
       component:  NewOrder
     });

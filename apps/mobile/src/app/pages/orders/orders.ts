@@ -9,7 +9,7 @@ import { EmptyState } from "../../components/empty-state/empty-state";
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataTypes, IClient, IDesign, IOrderItem, IOrderWithPayment, IResponse, OrderStatus } from '@pindder/contracts';
+import { DataTypes, IClient, IDesign, IOrderItem, IOrderWithPayment, IProfile, IResponse, OrderStatus } from '@pindder/contracts';
 import { NewOrder } from '../../components/new-order/new-order';
 import { ClientService } from '../../services/client.service';
 import { DesignService } from '../../services/design.service';
@@ -72,7 +72,7 @@ export class Orders implements ViewWillEnter, OnInit{
   presentingElement!: HTMLElement | null;
   client_id = signal<string>("");
   design_id = signal<string>("");
-  client!: IClient;
+  client!: IClient | IProfile;
   design!: IDesign;
   dataTypes = DataTypes;
   isActionSheetOpen = false;

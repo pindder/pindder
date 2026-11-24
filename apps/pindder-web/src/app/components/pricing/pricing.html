@@ -17,7 +17,11 @@
           
           <!-- Monthly Plan -->
           @for(plan of plans(); track plan._id){
-            <app-pricing-card [plan]="plan"></app-pricing-card>
+            <lib-pricing-card 
+            [plan]="plan"
+            [isAuthenticated]="isAuthenticated"
+            (initializeSubscription)="initSub($event)"
+            ></lib-pricing-card>
           }
         </div>
 

@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
-import { /* DataTypes,*/ GalleryItem, IBankDetail, IColors, IPayment, IResponse } from '@pindder/contracts';
+import { /* DataTypes,*/ GalleryItem, IBankDetail, IBrand, IColors, IPayment, IResponse } from '@pindder/contracts';
 import PhotoSwipe from 'photoswipe';
 import { catchError, debounceTime, distinctUntilChanged, finalize, firstValueFrom, Observable, of, Subject, switchMap } from 'rxjs';
 import { environment } from '../../environment/environment.prod';
@@ -110,6 +110,18 @@ export class AppService {
     return { paymentIntent, setupIntent, ephemeralKey, customer };
   }
 
+  async stripeCheckoutSession(transactionType: string, itemId: string) {
+    return await firstValueFrom(this.http.post(`${environment.apiUrl}/payment/stripe/checkout?transaction_type=${transactionType}&item_id=${itemId}`, {}));
+  }
+
+  async flwCheckout(order_id: string) {
+    return await firstValueFrom(this.http.post(`${environment.apiUrl}/payment/flw/checkout?order_id=${order_id}`, {}))
+  }
+
+  async createStripeSubscription(transactionType: string, planId: string) {
+    return await firstValueFrom(this.http.post(`${environment.apiUrl}/payment/stripe/subscribe?transaction_type=${transactionType}&item_id=${planId}`, {}));
+  }
+
   async checkout(email: string, amount: number, planCode?: string) {
     // 1. Get Authorization URL from NestJS backend
     const res: any = await firstValueFrom(
@@ -169,5 +181,10 @@ export class AppService {
 
   getReferrals(): Observable<IResponse<any>> {
     return this.http.get<IResponse<any>>(`${environment.apiUrl}/referrals`);
+  }
+
+  /** Brands */
+  fetchBrands(): Observable<IResponse<IBrand[]>> {
+    return this.http.get<IResponse<IBrand[]>>(`${environment.apiUrl}/brands`);
   }
 }

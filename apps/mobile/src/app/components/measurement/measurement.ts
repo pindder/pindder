@@ -27,7 +27,7 @@ import { EmptyState } from '../empty-state/empty-state';
     IonTitle, IonToolbar, IonButtons,
     PrimaryButton, IonModal,
     EmptyState
-],
+  ],
   templateUrl: './measurement.html',
   styleUrl: './measurement.css',
 })

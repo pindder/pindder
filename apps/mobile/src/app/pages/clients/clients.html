@@ -26,7 +26,7 @@
   @if(clients$ | async; as clients) {
     <!-- New Client Button-->
     @if(clients.length > 0){
-    <div class="px-2">
+    <div class="px-3">
       <app-primary-button
       [buttonText]="'New Client'" 
       (click)="openNewClientModal()" 

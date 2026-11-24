@@ -110,6 +110,10 @@ export class AppService {
     return { paymentIntent, setupIntent, ephemeralKey, customer };
   }
 
+  async stripeCheckoutSession(transactionType: string, itemId: string) {
+    return await firstValueFrom(this.http.post(`${environment.apiUrl}/payment/stripe/checkout?transaction_type=${transactionType}&item_id=${itemId}`, {}));
+  }
+
   async checkout(email: string, amount: number, planCode?: string) {
     // 1. Get Authorization URL from NestJS backend
     const res: any = await firstValueFrom(
@@ -135,6 +139,14 @@ export class AppService {
       // Web browser: Redirect or open in new tab
       window.location.href = authorization_url;
     }
+  }
+
+  async flwCheckout(order_id: string) {
+    return await firstValueFrom(this.http.post(`${environment.apiUrl}/payment/flw/checkout?order_id=${order_id}`, {}))
+  }
+
+  async manageStripeAccount() {
+    return await firstValueFrom(this.http.get<string>(`${environment.apiUrl}/payment/stripe/account`));
   }
 
   async verifyPaymentOnBackend(reference: string) {
@@ -165,6 +177,14 @@ export class AppService {
 
   fetchPayoutDetails(): Observable<IResponse<IBankDetail[]>> {
     return this.http.get<IResponse<IBankDetail[]>>(`${environment.apiUrl}/banks/search`);
+  }
+
+  fetchPayoutDetail(): Observable<IResponse<IBankDetail[]>> {
+    return this.http.get<IResponse<IBankDetail[]>>(`${environment.apiUrl}/banks/search`);
+  }
+
+  fetchBanks(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/payment/flw/banks`);
   }
 
   getReferrals(): Observable<IResponse<any>> {

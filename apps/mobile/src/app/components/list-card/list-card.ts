@@ -34,7 +34,8 @@ export class ListCard {
   private designService = inject(DesignService);
 
   dataTypes = DataTypes;
-  orderStatuses = OrderStatus;
+  orderStatuses = Object.keys(OrderStatus);
+  orderStatus = OrderStatus
 
   async presentDeleteAlert(dataType: string) {
     const alert = await this.alertCtrl.create({
@@ -115,5 +116,22 @@ export class ListCard {
         this.presentToast(error.message, 'danger', 'top');
       }
     });
+  }
+
+  getOrderColor(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'cancelled':
+        return 'danger';
+      case 'completed':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'overdue':
+        return 'warning';
+      case 'ongoing':
+        return 'secondary';
+      default:
+        return 'medium';
+    }
   }
 }

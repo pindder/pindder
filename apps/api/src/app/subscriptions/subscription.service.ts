@@ -136,7 +136,7 @@ export class SubscriptionService {
         });
 
         res.data = await this.subscribe(
-          {...createSubscriptionDto, idempotencyKey: idempotencyKey, plan_code: plan.plan_code }, 
+          {...createSubscriptionDto, idempotencyKey: idempotencyKey }, 
           acct, plan.amount, 
           newSubscription._id.toString()
         );
@@ -150,22 +150,22 @@ export class SubscriptionService {
         return res;
       }
 
-      if(plan.plan_code !== subscription.plan.plan_code) {
-        subscription.plan = plan;
-        subscription.status = SubscriptionStatus.none;
+      // if(plan.plan_code) {
+      //   subscription.plan = plan;
+      //   subscription.status = SubscriptionStatus.none;
 
-        await subscription.save();
+      //   await subscription.save();
 
-        this.logger.log(`Subscription updated:`, subscription);
+      //   this.logger.log(`Subscription updated:`, subscription);
 
-        res.data = await this.subscribe(
-          {...createSubscriptionDto, idempotencyKey: idempotencyKey, plan_code: plan.plan_code },  
-          acct, plan.amount, 
-          subscription._id.toString()
-        );
+      //   res.data = await this.subscribe(
+      //     {...createSubscriptionDto, idempotencyKey: idempotencyKey },  
+      //     acct, plan.amount, 
+      //     subscription._id.toString()
+      //   );
         
-        return res;
-      }
+      //   return res;
+      // }
 
       await this.paymentModel.updateMany({ 
         $and: [
@@ -177,7 +177,7 @@ export class SubscriptionService {
       }, { $set: { status: PaymentStatus.ABANDONED }});
 
       res.data = await this.subscribe(
-        {...createSubscriptionDto, idempotencyKey: idempotencyKey, plan_code: plan.plan_code },  
+        {...createSubscriptionDto, idempotencyKey: idempotencyKey },  
         acct, plan.amount, 
         subscription._id.toString()
       );

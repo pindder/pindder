@@ -1,34 +1,34 @@
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
-import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+// import { ConfigService } from '@nestjs/config';
+// import { HttpService } from '@nestjs/axios';
+// import { firstValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { IPlanModel, Plan } from './schema/plan.schema';
-import { AccountTypes, IResponse } from '@pindder/contracts';
+import { AccountTypes, IResponse, PlanIntervals } from '@pindder/contracts';
+import { StripeService } from '../payments/stripe.service';
 
 @Injectable()
 export class PlanService {
   private readonly logger = new Logger(PlanService.name);
-  private url = this.configService.get<string>('PAYSTACK_BASE_URL') || 'https://api.paystack.co';
+  // private url = this.configService.get<string>('PAYSTACK_BASE_URL') || 'https://api.paystack.co';
 
-  private headers = {
-    Authorization: `Bearer ${this.configService.get<string>('PAYSTACK_SECRET_KEY')}`,
-    'Content-Type': 'application/json',
-  };
+  // private headers = {
+  //   Authorization: `Bearer ${this.configService.get<string>('PAYSTACK_SECRET_KEY')}`,
+  //   'Content-Type': 'application/json',
+  // };
 
   constructor(
-    private httpService: HttpService,
-    private readonly configService: ConfigService,
-    @InjectModel(Plan.name) private readonly planModel: IPlanModel
+    // private httpService: HttpService,
+    // private readonly configService: ConfigService,
+    @InjectModel(Plan.name) private readonly planModel: IPlanModel,
+    private readonly stripeService: StripeService
   ) {}
 
   async create(createPlanDto: CreatePlanDto, type?: string) {
     try {
-      const { features, recommended, free, ...planDto} = createPlanDto
-
-      let newPlan = new this.planModel();
+      const { features, recommended } = createPlanDto
 
       if(type || createPlanDto.amount < 100) {
         const freePlan = await this.planModel.findOne({ free: true });
@@ -37,10 +37,10 @@ export class PlanService {
           throw new ConflictException(`You can have only one free plan!`);
         }
 
-        newPlan.name = createPlanDto.name;
-        newPlan.interval = createPlanDto.interval;
-        newPlan.plan_id = 1;
-        newPlan.plan_code = 'PLN_8690x10a83v0312';
+        const newPlan = new this.planModel();
+
+        newPlan.name = "Starter";
+        newPlan.interval = PlanIntervals.year;
         newPlan.features = [
           'Maximum of 10 catalog', 
           'Maximum of 3 style images per catalog', 
@@ -52,9 +52,9 @@ export class PlanService {
           'No visibility on pindder marketplace'
         ];
         newPlan.free = true;
-        newPlan.amount = createPlanDto.amount;
-        if(createPlanDto.description) newPlan.description = createPlanDto.description; 
-        if(createPlanDto.recommended) newPlan.recommended = createPlanDto.recommended;
+        newPlan.amount = createPlanDto.amount ?? 0;
+        newPlan.description = createPlanDto.description ?? 'This is our starter package, upgrade for advanced features'; 
+        newPlan.recommended = createPlanDto.recommended ?? false;
 
         await newPlan.save();
       } else {
@@ -62,40 +62,19 @@ export class PlanService {
           throw new BadRequestException(`A plan must have at least two features`);
         }
 
-        const amountInKobo = createPlanDto.amount * 100;
-        if(free) createPlanDto.free = free;
-        
-        const response = await firstValueFrom(
-          this.httpService.post(
-            `${this.url}/plan`, 
-            {...planDto, amount: amountInKobo }, 
-            { headers: this.headers }
-          ),
-        );
-
-        // Returns object containing plan_code (e.g., PLN_8690x10a83v0312)
-        newPlan = await this.planModel.create({
-          ...createPlanDto,
-          ...response.data.data,
-          metadata: response.data.data,
-          plan_id: response.data.data.id,
-          amount: createPlanDto.amount,
-          recommended: recommended ?? false
-        });
-
-        this.logger.log('Plan created successfully on Paystack plans', response.data.data);
+        await this.stripeService.createSubscriptionProduct(createPlanDto, recommended);
       }
 
-      const res: IResponse<Plan> = {
+
+      const res: IResponse<any> = {
         statusCode: 200,
         msg: 'Plan created successfully',
-        data: newPlan
       };
 
       return res;
     } catch (error: any) {
       this.logger.error('Failed to create Paystack plan', error.response?.data);
-      throw error;
+      throw new InternalServerErrorException(error);
     } 
   }
 
@@ -154,8 +133,19 @@ export class PlanService {
     }
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return `This action returns a #${id} plan`;
+  }
+
+  async getPlan(id: string) {
+    try {
+      const plan = await this.planModel.findById(id);
+
+      return plan;
+    } catch(error: any) {
+      this.logger.error(error);
+      return error;
+    }
   }
 
   async update(id: string, updatePlanDto: UpdatePlanDto) {

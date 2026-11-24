@@ -12,7 +12,12 @@ export class AuthService {
   private http = inject(HttpClient);
   private tokenService = inject(TokenService);
 
-  login(loginDto: ILogin): Observable<any> {
+  loginUser(loginDto: ILogin): Observable<any> {
+      from(this.tokenService.setPreferenceValue('email', loginDto.email));
+      return this.http.post<any>(`${environment.apiUrl}/auth/login-user`, loginDto);
+  }
+  
+  loginTailor(loginDto: ILogin): Observable<any> {
       from(this.tokenService.setPreferenceValue('email', loginDto.email));
       return this.http.post<any>(`${environment.apiUrl}/auth/login-tailor`, loginDto);
   }

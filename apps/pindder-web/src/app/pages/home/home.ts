@@ -13,4 +13,4 @@ import { Guide } from '../../components/guide/guide';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {}
+export class Home { }

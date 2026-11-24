@@ -1,0 +1,22 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="#"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Brands</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light">    
+    @if(brands){
+        @for(brand of brands; track brand._id){
+            <ion-list inset="true">
+                <lib-items-list
+                [dataType]="dataTypes.BRAND"
+                [brand]="brand"
+                (action)="viewBrand(brand._id!)"
+                ></lib-items-list>
+            </ion-list>
+        }
+    }
+</ion-content>

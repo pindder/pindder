@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
-import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, 
+import { IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, 
   IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, 
   IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, IonNote, 
   ToastController, IonModal, IonItemGroup, IonItemDivider, AlertController, IonSelect, 
@@ -15,12 +15,13 @@ import { Measurement } from '../../components/measurement/measurement';
 import { AppService } from '../../services/app.service';
 import { FormsModule } from '@angular/forms';
 import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-order-view',
   imports: [
     IonHeader, IonItemOptions, IonLabel, IonAvatar, IonItemSliding,
-    IonIcon, IonItem, IonList, IonButton, IonButtons, IonListHeader,
+    IonIcon, IonItem, IonList, IonButtons, IonListHeader,
     IonTitle, IonToolbar, IonContent, IonItemOption, IonBackButton,
     IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe,
     IonNote, PrimaryButton, IonModal, IonNote,
@@ -58,6 +59,7 @@ export class OrderView implements ViewWillEnter, OnInit{
   paymentMethod = PaymentMethods;
 
   isSharingSupported = signal<boolean>(false);
+  isNative = Capacitor.isNativePlatform();
 
   ionViewWillEnter(): void {
     const client = this.ar.snapshot.paramMap.get('id');
@@ -116,6 +118,15 @@ export class OrderView implements ViewWillEnter, OnInit{
 
   viewDesignDetails(design?: IDesign) {
     return;
+  }
+
+  async flwCheckout() {
+    const res: any = await this.appService.flwCheckout(this.order._id);
+
+    // console.log(res);
+    if (res && res.data.link) {
+      this.sharePaymentLink(res.data.link);
+    }
   }
 
   viewPaymentLink() {

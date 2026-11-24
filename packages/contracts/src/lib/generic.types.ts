@@ -44,11 +44,11 @@ export interface IPlan {
 
 export interface IBankDetail {
   _id?: string;
-  bankName: string;
+  bank: object | string;
   accountNo: string;
   accountName: string;
-  sortCode?: string;
-  disabled: boolean;
+  // sortCode?: string;
+  // disabled: boolean;
 }
 
 export interface SettingItem {
@@ -57,8 +57,10 @@ export interface SettingItem {
   title: string;
   route?: string;
   path?: string;
+  type?: string;
   action?: string;
   callback?: () => void;
+  visibility?: 'ALL' | 'USER' | 'TAILOR'
 }
 
 export interface SettingsSection {
@@ -66,6 +68,7 @@ export interface SettingsSection {
   name: string;
   subItems: SettingItem[];
   color?: string;
+  visibility?: 'ALL' | 'USER' | 'TAILOR'
 }
 
 export interface ITelInput {

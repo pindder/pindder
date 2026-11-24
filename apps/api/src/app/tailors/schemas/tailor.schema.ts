@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { AccountStatus, AccountTypes } from "@pindder/contracts";
 // import { randomUUID } from "crypto";
-import { HydratedDocument, Model } from "mongoose";
+import { HydratedDocument, Model, Document } from "mongoose";
 
 export type TailorDocument = HydratedDocument<Tailor>;
 
@@ -10,7 +10,7 @@ export type TailorDocument = HydratedDocument<Tailor>;
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 })
-export class Tailor {
+export class Tailor extends Document {
     @Prop({ type: String, maxLength: 1000 })
     description?: string;
 
@@ -35,6 +35,9 @@ export class Tailor {
     @Prop({ type: String, required: true })
     tel?: string;
 
+    @Prop({ type: String, default: 'ngn' })
+    defaultCurrency?: string | null;
+
     @Prop({ type: String })
     catalog?: string;
 
@@ -55,6 +58,9 @@ export class Tailor {
 
     @Prop({ type: Number, required: true, default: 0 })
     currentBalance!: number;
+
+    @Prop({ type: String, default: null})
+    stripeCustomerId?: string;
 
     @Prop({ type: Date, default: null })
     deletedAt!: Date | null;

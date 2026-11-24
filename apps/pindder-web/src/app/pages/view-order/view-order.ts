@@ -13,6 +13,8 @@ import {
   PaymentSheetEventsEnum,
   Stripe,
 } from '@capacitor-community/stripe';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-view-order',
@@ -118,6 +120,15 @@ export class ViewOrder implements OnInit {
     }
   }
 
+  initPayment() {
+    console.log("This is native platform:::", Capacitor.isNativePlatform());
+    if(Capacitor.isNativePlatform()) {
+      this.createPaymentSheet();
+    } else {
+      this.flwCheckout();
+    }
+  }
+
   async createPaymentSheet(withCustomer = true, withBillingDetails = false) {
     if(!this.order) {
       return console.log('No order');
@@ -176,6 +187,19 @@ export class ViewOrder implements OnInit {
     }
   }
 
+  async createCheckoutSession() {
+    const res: any = await this.appService.stripeCheckoutSession(DataTypes.ORDER, this.order._id);
+
+    // console.log(res);
+    if (res && res.url) {
+      Browser.open({
+        url: res.data.link,
+        presentationStyle: 'popover',
+        windowName: 'Checkout'
+      });
+    }
+  }
+
   async createPaymentSheetWithSetupIntent() {
     const { setupIntent, ephemeralKey, customer } = await this.appService.stripeCheckout();
 
@@ -206,6 +230,16 @@ export class ViewOrder implements OnInit {
       
       console.error('Payment sheet failed:', error);
       throw error;
+    }
+  }
+
+  async flwCheckout() {
+    const res: any = await this.appService.flwCheckout(this.order._id);
+
+    // console.log(res);
+    if (res && res.data.link) {
+      console.log(res)
+      window.location.href = res.data.link;
     }
   }
 

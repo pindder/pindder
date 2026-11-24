@@ -27,7 +27,13 @@
         </ul>
     </div>
 
-    <a routerLink="/auth/register?acctType=tailor" class="w-full py-3.5 rounded-xl brand-button font-bold text-center block text-sm shadow-md">
-        Get Started Free
+    @if(isAuthenticated){
+    <a (click)="initSub(plan._id!)" class="w-full py-3.5 rounded-xl brand-button font-bold text-center block text-sm shadow-md">
+        Get Started
     </a>
+    }
+    @else{
+    <a routerLink="/auth/register?acctType=tailor" class="w-full py-3.5 rounded-xl brand-button font-bold text-center block text-sm shadow-md">
+        Get Started
+    </a>}
 </div>

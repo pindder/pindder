@@ -3,6 +3,7 @@ import { IonInput, IonItem, IonContent, IonIcon, IonButton, IonSpinner, ToastCon
 import { FormsModule } from '@angular/forms';
 import { ILogin } from '@pindder/contracts';
 import { CommonModule } from '@angular/common';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'lib-login',
@@ -13,11 +14,14 @@ import { CommonModule } from '@angular/common';
 export class Login implements OnInit {
   @Input() loginData!: ILogin;
   @Input() isLoading!: boolean;
+  @Input() acctType!: string; 
+  
   @Output() login = new EventEmitter<ILogin>();
   @Output() goToRegister = new EventEmitter<void>();
 
   private toastController = inject(ToastController);
 
+  isNative = Capacitor.isNativePlatform();
   // showPassword = false; 
   
   ngOnInit(): void {

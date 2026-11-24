@@ -13,6 +13,15 @@ import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
 import { LedgerModule } from '../ledger/ledger.module';
 import { StripeService } from './stripe.service';
 import { PaystackService } from './paystack.service';
+import { Plan, PlanSchema } from '../plans/schema/plan.schema';
+import { Client, ClientSchema } from '../clients/schemas/client.schema';
+import { User, UserSchema } from '../users/schemas/user.schema';
+import { StripeAccount, StripeAccountSchema } from './schemas/stripe-account';
+import { Brand, BrandSchema } from '../brands/schemas/brand.schema';
+import { Transaction, TransactionSchema } from './schemas/transaction';
+import { FlutterwaveService } from './flutterwave.service';
+import { Bank, BankSchema } from './schemas/bank';
+import { BankDetail, BankDetailSchema } from '../bank-details/schema/bank-detail.schema';
 
 @Module({
   imports: [
@@ -22,15 +31,29 @@ import { PaystackService } from './paystack.service';
       maxRedirects: 5,
     }),
     MongooseModule.forFeature([
+      { name: Plan.name, schema: PlanSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: Order.name, schema: OrderSchema },
       { name: Tailor.name, schema: TailorSchema },
+      { name: Client.name, schema: ClientSchema },
+      { name: User.name, schema: UserSchema },
+      { name: Brand.name, schema: BrandSchema },
+      { name: Bank.name, schema: BankSchema },
+      { name: BankDetail.name, schema: BankDetailSchema },
+      { name: StripeAccount.name, schema: StripeAccountSchema },
+      { name: Transaction.name, schema: TransactionSchema },
     ]),
     LedgerModule,
     SharedModule,
   ],
   controllers: [PaymentController, PaymentWebhookController],
-  providers: [PaymentService, JwtService, StripeService, PaystackService],
-  exports: [MongooseModule, PaymentService, StripeService, PaystackService],
+  providers: [
+    PaymentService,
+    JwtService,
+    StripeService,
+    PaystackService,
+    FlutterwaveService,
+  ],
+  exports: [MongooseModule, PaymentService, StripeService, PaystackService, FlutterwaveService],
 })
 export class PaymentModule {}

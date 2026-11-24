@@ -2,12 +2,12 @@ import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonIcon, AlertController, ToastController, IonLabel, 
-  IonButtons, IonButton, IonBadge } from '@ionic/angular';
-import { DataTypes, IDesign, IOrderItem, OrderStatus } from '@pindder/contracts';
+  IonButtons, IonButton, IonBadge, IonItemSliding, IonItem, IonItemOptions, IonItemOption, IonAvatar } from '@ionic/angular';
+import { DataTypes, IBrand, IDesign, IOrderItem, OrderStatus } from '@pindder/contracts';
 
 @Component({
   selector: 'lib-items-list',
-  imports: [IonLabel, DatePipe, IonIcon, IonButtons, IonButton, IonBadge],
+  imports: [IonAvatar, IonItemOption, IonItemOptions, IonItem, IonItemSliding, IonLabel, DatePipe, IonIcon, IonButtons, IonButton, IonBadge],
   templateUrl: './items-list.html',
   styleUrl: './items-list.css',
 })
@@ -23,6 +23,7 @@ export class ItemList {
   @Input() client!: any;
   @Input() design!: IDesign;
   @Input() order!: IOrderItem;
+  @Input() brand!: IBrand;
 
   /** Controllers */
   private router = inject(Router);

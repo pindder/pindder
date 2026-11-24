@@ -27,6 +27,7 @@ export class UserService {
       }
 
       const createdUser = new this.userModel(createUserDto);
+      createdUser.fullname = createUserDto.fullname;
       createdUser.firstname = createUserDto.fullname.split(' ')[0];
       createdUser.lastname = createUserDto.fullname.split(' ')[1];
       createdUser.referralCode = generateCode(6, true);
@@ -34,7 +35,7 @@ export class UserService {
       createdUser.username = createUserDto.email.split('@')[0];
       await createdUser.save();      
 
-      this.eventEmitter.emit('accountCreated', { id: createdUser._id, user: createdUser.toObject() });
+      this.eventEmitter.emit('accountCreated', { user: createdUser });
       this.eventEmitter.emit('accountVerificationSuccess', { user: createdUser.toObject() });
 
       const res: IResponse<User> = {

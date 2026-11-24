@@ -63,3 +63,23 @@
         </div>
     </div>
 }
+@else if(dataType === dataTypes.BRAND) {
+<ion-item-sliding>
+    <ion-item class="flex my-2 items-center gap-2" button detail (click)="action.emit()" lines="full">
+        <ion-avatar>
+            <img alt="style-img" [src]="brand.logo"/>
+        </ion-avatar>
+        <ion-label class="ml-2">
+          <h2 class="text-primary">{{ brand.name }}</h2>
+          <p>{{ brand.country }}</p>
+        </ion-label>
+    </ion-item>
+
+    @if(brand.website){
+    <ion-item-options side="end">
+        <ion-item-option>
+            <ion-icon color="light" size="medium" name="globe-outline" slot="end"></ion-icon>
+        </ion-item-option>
+    </ion-item-options>}
+</ion-item-sliding>
+}

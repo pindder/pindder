@@ -1,4 +1,4 @@
-<ion-item class="pt-4" lines="none">
+<ion-item class="py-3" lines="none">
   <ion-avatar aria-hidden="true" slot="start">
     @if(profile.profileImg){
       <img (click)="launchProfile()" [sizes]="" [src]="profile.profileImg" alt="Portrait of Connor Smith" />
@@ -6,7 +6,7 @@
       <img (click)="launchProfile()" [sizes]="" src="https://i.pravatar.cc/300?u=b" alt="Portrait of Connor Smith" />
     }
   </ion-avatar>
-  <ion-label (click)="launchProfile()">
+  <ion-label class="ml-2" (click)="launchProfile()">
     <h2>{{ profile.firstname + ' ' + profile.lastname }} @if(profile.subscription){<ion-badge slot="start">{{ profile.subscription.plan.name }}</ion-badge>}</h2>
     <p>{{ profile.email }}</p>
   </ion-label>

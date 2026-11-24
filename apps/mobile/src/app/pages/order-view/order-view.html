@@ -42,15 +42,20 @@
     </ion-list>}
     
     <!-- Client Information-->
+    <div class="px-3">
+        <p class="text-sm font-semibold text-gray-500 m-0">
+            Client Information
+        </p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Client Information</ion-label>
             <ion-buttons slot="primary">
                 <ion-button>
                     <ion-icon slot="icon-only" ios="ellipsis-horizontal" md="ellipsis-vertical"></ion-icon>
                 </ion-button>
             </ion-buttons>
-        </ion-list-header>
+        </ion-list-header> -->
         
         <ion-item lines="none">
             <ion-label>
@@ -75,18 +80,23 @@
     </ion-list>
 
     <!-- Styles-->
+    <div class="px-3">
+        <p class="text-sm font-semibold text-gray-500 m-0">
+            Styles
+        </p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Styles</ion-label>
-        </ion-list-header>
+        </ion-list-header> -->
 
         @for(style of order.styles; track style._id){
             <ion-item-sliding>
-                <ion-item [button]="true" (click)="viewStyleDetail(style)">
+                <ion-item class="flex items-center" [button]="true" (click)="viewStyleDetail(style)">
                     <ion-avatar aria-hidden="true" slot="start">
                         <img alt="" src="{{ style.images[0] }}" />
                     </ion-avatar>
-                    <ion-label>
+                    <ion-label class="ml-2">
                         <h2>{{ style.name }}</h2>
                         <p>price: {{ style.totalAmount.toLocaleString() }}</p>
                         <p>quantity: {{ style.totalItems }}</p>    
@@ -197,10 +207,15 @@
     </ion-modal>
 
     <!-- Additional Details-->
-    <ion-list [inset]="true">
-        <ion-list-header>
+    <div class="px-3">
+        <p class="text-sm font-semibold text-gray-500 m-0">
+            Additional Details
+        </p>
+    </div>
+    <ion-list class="rounded-xl" inset="true">
+        <!-- <ion-list-header>
             <ion-label>Additional Details</ion-label>
-        </ion-list-header>
+        </ion-list-header> -->
 
         @if(order.note){
         <ion-item>
@@ -243,16 +258,15 @@
     </ion-list>
 
     <!-- Order Invoice-->
+    <div class="px-3">
+        <p class="text-sm font-semibold text-gray-500 m-0">
+            Invoice
+        </p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Invoice</ion-label>
-            <!-- <ion-buttons>
-                <ion-button shape="round" fill="outline" color="primary">
-                    copy link
-                    <ion-icon name="add-outline" slot="icon-only"></ion-icon>
-                </ion-button>
-            </ion-buttons> -->
-        </ion-list-header>
+        </ion-list-header> -->
 
         @if(!isPreview){
         <ion-item button>
@@ -287,7 +301,7 @@
 
         @if(!isPreview && this.order.status !== orderStatuses.CANCELLED){
         <ion-item-sliding>
-            <ion-item button (click)="viewPaymentLink()">
+            <ion-item button (click)="flwCheckout()">
                 <ion-icon slot="start" name="link-outline"></ion-icon>
                 <ion-label>
                     <h2 class="font-bold text-lg">Payment Link</h2>

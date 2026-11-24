@@ -7,8 +7,12 @@
   </ion-toolbar>
 </ion-header>
 
-<lib-settings 
-[settingsItems]="settingsItems" 
-(deleteAccount)="deleteAccount()"
-(logout)="presentLogoutConfirmationAlert()"
-></lib-settings>
+<ion-content>
+  @if(account && account.accountType){
+  <lib-settings
+  [displayHeader]="true"
+  [settingsItems]="settingsItems" 
+  [accountType]="account.accountType"
+  (action)="dispatchAction($event)"
+  ></lib-settings>}
+</ion-content>
