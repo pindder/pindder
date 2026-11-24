@@ -18,7 +18,7 @@
   @if(orders$ | async; as orders) {
     <!-- Searchbar-->
     <ion-searchbar 
-    placeholder="Search styles..." 
+    placeholder="Search orders..." 
     [debounce]="0" 
     (ionInput)="onSearchInput($event)"
     (ionChange)="onSearchInput($event)"
@@ -54,9 +54,9 @@
     @if(orders.length === 0) {     
       <lib-empty-state 
       [imgPath]="'/images/add-to-cart.png'"
-      [title]="'No Style Added'" 
-      [desc]="'click the button to add a style to this order.'" 
-      [buttonText]="'New Style'"
+      [title]="'No Order Found'" 
+      [desc]="'click the button to create an order.'" 
+      [buttonText]="'New Order'"
       (action)="openNewOrderModal()"
       ></lib-empty-state>
     }

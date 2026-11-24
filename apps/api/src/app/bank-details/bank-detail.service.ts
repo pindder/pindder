@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateBankDetailDto } from './dto/create-bank-detail.dto';
 import { UpdateBankDetailDto } from './dto/update-bank-detail.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +6,8 @@ import { BankDetail } from './schema/bank-detail.schema';
 import { Model } from 'mongoose';
 import { IResponse } from '@pindder/contracts';
 import { Tailor } from '../tailors/schemas/tailor.schema';
+import { Bank } from '../payments/schemas/bank';
+import { FlutterwaveService } from '../payments/flutterwave.service';
 
 @Injectable()
 export class BankDetailService {
@@ -13,11 +15,17 @@ export class BankDetailService {
 
   constructor(
     @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
-    @InjectModel(BankDetail.name) private readonly bankModel: Model<BankDetail>
+    @InjectModel(BankDetail.name) private readonly bankModel: Model<BankDetail>,
+    @InjectModel(Bank.name) private readonly banksModel: Model<Bank>,
+    private readonly flwService: FlutterwaveService
   ) {}
 
   async create(createBankDetailDto: CreateBankDetailDto, user: any) {
     try {
+      if(!createBankDetailDto.accountName && !createBankDetailDto.accountNo) {
+        throw new BadRequestException('All fields are required!');
+      }
+
       const tailor = await this.tailorModel.findById(user.sub).lean();
 
       if(!tailor) {
@@ -27,7 +35,23 @@ export class BankDetailService {
       const newBank = new this.bankModel(createBankDetailDto);
 
       newBank.tailor = tailor._id;
-      await newBank.save()
+
+      const bank = await this.banksModel.findOne({ code: createBankDetailDto.bank });
+
+      if(!bank) {
+        throw new NotFoundException(`Bank not found!`);
+      }
+
+      newBank.bank = bank._id;
+
+      const subaccount = await this.flwService.createSubAccount(tailor, newBank, bank);
+      
+      if (!subaccount?.data) {
+        throw new Error('Flutterwave subaccount response missing data payload');
+      }
+
+      newBank.meta = subaccount.data;
+      await newBank.save();
 
       const res: IResponse<any> = {
         statusCode: 200,

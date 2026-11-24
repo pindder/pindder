@@ -1,4 +1,11 @@
+@if(account && isTailor){
 <lib-create-order
 [order]="order"
-></lib-create-order>
+></lib-create-order>}
+@else if(account && !isTailor){
+<lib-create-order
+[order]="order"
+[client]="account"
+></lib-create-order> 
+}
 

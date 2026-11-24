@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, inject, Input, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonModal, ModalController, ToastController, ViewWillEnter } from '@ionic/angular';
-import { DeliveryMethods, DesignTypes, IClient, IDesign, IOrder, IOrderItem, IOrderStyle, IResponse, ISpecification, OrderStatus } from '@pindder/contracts';
+import { AccountTypes, DeliveryMethods, DesignTypes, IClient, IDesign, IOrder, IOrderItem, IOrderStyle, IProfile, IResponse, ISpecification, OrderStatus } from '@pindder/contracts';
 import { CreateOrder } from '@pindder/shared-ui';
 import { OrderService } from '../../services/order.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-new-order',
@@ -12,8 +13,8 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './new-order.html',
   styleUrl: './new-order.css',
 })
-export class NewOrder implements ViewWillEnter{
-  @Input() client?: IClient;
+export class NewOrder implements ViewWillEnter, OnInit{
+  @Input() client?: IClient | IProfile;
   @Input() design?: IDesign;
   @Input() existingOrder!: IOrder;
   @ViewChild('modal') modalSheet!: IonModal;
@@ -23,11 +24,14 @@ export class NewOrder implements ViewWillEnter{
   private modalCtrl = inject(ModalController);
   private router = inject(Router);
   private orderService = inject(OrderService);
+  private tokenService = inject(TokenService);
   
   presentingElement!: HTMLElement | null;
-  selectedClient!: IClient | null;
+  selectedClient!: IClient | IProfile | null;
   selectedStyleIndex!: number;
   selectedStyle!: IOrderStyle;
+  isTailor!: boolean;
+  account!: IProfile;
 
   order: IOrder = {
     totalAmount: 0,
@@ -47,55 +51,67 @@ export class NewOrder implements ViewWillEnter{
   isPreview = false;
 
   ionViewWillEnter(): void {
-  // console.log(this.client);
-  // console.log(this.design);
-  if(this.client) {
-    this.selectedClient = this.client;
-  } else if(this.design) {
-    // let selections: any[] = [];
+    // console.log(this.client);
+    // console.log(this.design);
+    if(this.client && this.client._id) {
+      this.selectedClient = this.client;
+      this.order.client = this.client._id;
+    } else if(this.design) {
+      // let selections: any[] = [];
 
-    // this.design.specifications.forEach((spec: ISpecification) => {
-    //   selections.push({...spec, colors: [], quantity: 0 });
-    // });
+      // this.design.specifications.forEach((spec: ISpecification) => {
+      //   selections.push({...spec, colors: [], quantity: 0 });
+      // });
 
-    this.order.styles.push({
-      amount: this.design.amount ?? null,
-      description: this.design.description ?? null,
-      dueDate: '',
-      images: this.design.images,
-      type: this.design.type,
-      name:  this.design.name,
-      specifications: this.design.specifications,
-      selections: [],
-      colors: this.design.colors ?? [],
-      selectedColors: [],
-      catalogDisplay: false,
-      //design: data,
-      totalAmount: 0,
-      totalItems: 0,
-      quantity: 0
-    });
-  }
-  
-  if(this.existingOrder) {
-    console.log(this.existingOrder);
-    this.order = this.existingOrder;
-  }
-  console.log(this.client);
-  console.log(this.order);
-
-  if(this.order.styles.length > 0) {
-    this.order.styles.forEach((style: IOrderStyle) => {
-      style.selections.forEach((selection: ISpecification) => {
-        if(selection.quantity > 0) {
-          this.order.totalAmount = this.order.totalAmount + selection.amount;
-        } else {
-          this.order.totalAmount = 0;
-        }
+      this.order.styles.push({
+        amount: this.design.amount ?? null,
+        description: this.design.description ?? null,
+        dueDate: '',
+        images: this.design.images,
+        type: this.design.type,
+        name:  this.design.name,
+        specifications: this.design.specifications,
+        selections: [],
+        colors: this.design.colors ?? [],
+        selectedColors: [],
+        catalogDisplay: false,
+        //design: data,
+        totalAmount: 0,
+        totalItems: 0,
+        quantity: 0
       });
-    });
+    }
+    
+    if(this.existingOrder) {
+      // console.log(this.existingOrder);
+      this.order = this.existingOrder;
+    }
+    // console.log(this.client);
+    console.log(this.order);
+
+    if(this.order.styles.length > 0) {
+      this.order.styles.forEach((style: IOrderStyle) => {
+        style.selections.forEach((selection: ISpecification) => {
+          if(selection.quantity > 0) {
+            this.order.totalAmount = this.order.totalAmount + selection.amount;
+          } else {
+            this.order.totalAmount = 0;
+          }
+        });
+      });
+    }
+    this.cdr.markForCheck();
   }
-  this.cdr.markForCheck();
+
+  async ngOnInit() {
+    const profile = await this.tokenService.getProfile();
+    if(profile) {
+      this.account = JSON.parse(profile);
+      this.isTailor = this.account.accountType === AccountTypes.TAILOR;
+       
+    }
+
+    this.cdr.markForCheck();
   }
 
   async presentToast(

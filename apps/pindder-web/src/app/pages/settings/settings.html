@@ -8,10 +8,11 @@
 </ion-header>
 
 <ion-content>
+  @if(account && account.accountType){
   <lib-settings
-  [displayHeader]="true" 
+  [displayHeader]="true"
   [settingsItems]="settingsItems" 
-  (deleteAccount)="deleteAccount()"
-  (logout)="presentLogoutConfirmationAlert()"
-  ></lib-settings>
+  [accountType]="account.accountType"
+  (action)="dispatchAction($event)"
+  ></lib-settings>}
 </ion-content>

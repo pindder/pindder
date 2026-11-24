@@ -22,10 +22,13 @@
 }@else{
 <ion-content color="light" [fullscreen]="true">
     <!-- Client Information-->
+     <div class="p-3">
+        <p class="text-sm font-bold uppercase text-gray-500 m-0">Client Information</p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Client Information</ion-label>
-        </ion-list-header>
+        </ion-list-header> -->
 
         @if(!selectedClient){
         <div class="">
@@ -48,12 +51,15 @@
             }
             @if (selectedClient.phoneNo) {
                 <p>{{ selectedClient.phoneNo }}</p>
+            } @else {
+                <p>{{ selectedClient.countryCode + " " + selectedClient.tel }}</p>
             }
             </ion-label>
             
+            @if(selectedClient.accountType !== ''){
             <ion-button fill="clear" slot="end" (click)="removeSelectedClient()">
                 <ion-icon name="close-circle-outline" color="danger" size="medium"></ion-icon>
-            </ion-button>
+            </ion-button>}
         </ion-item>
         }
     </ion-list>
@@ -68,10 +74,13 @@
     }
 
     <!-- Selected Styles-->
+      <div class="p-3">
+        <p class="text-sm font-bold uppercase text-gray-500 m-0">Styles</p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Styles</ion-label>
-        </ion-list-header>
+        </ion-list-header> -->
 
         @if(order.styles && order.styles.length === 0){
         <div class="">
@@ -142,10 +151,13 @@
 
     <!-- Additional Info Section-->
     @if(selectedClient && order.styles.length > 0){
+     <div class="p-3">
+        <p class="text-sm font-bold uppercase text-gray-500 m-0">Additional Details</p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Additional Details</ion-label>
-        </ion-list-header>
+        </ion-list-header> -->
 
         <form #orderForm="ngForm" (ngSubmit)="submit()" class="p-3">
             <ion-list lines="true">
@@ -208,10 +220,13 @@
     }
 
     @if(order.totalAmount > 0) {
+         <div class="p-3">
+            <p class="text-sm font-bold uppercase text-gray-500 m-0">Cost Breakdown</p>
+        </div>
         <ion-list [inset]="true">
-            <ion-list-header>
+            <!-- <ion-list-header>
                 Cost Breakdown
-            </ion-list-header>
+            </ion-list-header> -->
 
             <ion-item lines="none">
                 <ion-label>

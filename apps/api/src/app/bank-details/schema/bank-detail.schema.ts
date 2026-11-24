@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Tailor } from "../../tailors/schemas/tailor.schema";
 import mongoose, { HydratedDocument, Types } from "mongoose";
+import { Bank } from "../../payments/schemas/bank";
 
 export type BankDetailDocument = HydratedDocument<BankDetail>;
 
@@ -9,8 +10,8 @@ export class BankDetail {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Tailor })
     tailor!: Types.ObjectId;
 
-    @Prop({ type: String, required: true })
-    bankName!: string;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => Bank })
+    bank!: Types.ObjectId;
     
     @Prop({ type: String, required: true })
     accountNo!: string;
@@ -18,14 +19,8 @@ export class BankDetail {
     @Prop({ type: String, required: true })
     accountName!: string;
 
-    @Prop({ type: String })
-    sortCode?: string;
-
-    @Prop({ type: String })
-    withdrawalPin?: string;
-
-    @Prop({ type: Boolean, default: true })
-    disabled!: boolean;
+    @Prop({ type: Object, required: true })
+    meta!: Record<string, any>;
 }
 
 export const BankDetailSchema = SchemaFactory.createForClass(BankDetail);

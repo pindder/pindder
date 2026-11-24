@@ -382,6 +382,7 @@ export class AuthService {
       await this.emailService.sendWelcomeEmail(payload.user.email, payload.user.username);
       await this.paystackService.createCustomer(payload.user);
       await this.stripeService.createStripeCustomer(payload.user);
+      // await this.stripeService.createConnectedAccount(payload.user as Tailor);
       this.logger.log('EVENT_LOG:', {
         type: 'ACCOUNT_VERIFICATION',
         initiator: payload.user.email

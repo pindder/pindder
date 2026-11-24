@@ -141,6 +141,14 @@ export class AppService {
     }
   }
 
+  async flwCheckout(order_id: string) {
+    return await firstValueFrom(this.http.post(`${environment.apiUrl}/payment/flw/checkout?order_id=${order_id}`, {}))
+  }
+
+  async manageStripeAccount() {
+    return await firstValueFrom(this.http.get<string>(`${environment.apiUrl}/payment/stripe/account`));
+  }
+
   async verifyPaymentOnBackend(reference: string) {
     return await firstValueFrom(
       this.http.get(`${environment.apiUrl}/paystack/verify/${reference}`),
@@ -169,6 +177,14 @@ export class AppService {
 
   fetchPayoutDetails(): Observable<IResponse<IBankDetail[]>> {
     return this.http.get<IResponse<IBankDetail[]>>(`${environment.apiUrl}/banks/search`);
+  }
+
+  fetchPayoutDetail(): Observable<IResponse<IBankDetail[]>> {
+    return this.http.get<IResponse<IBankDetail[]>>(`${environment.apiUrl}/banks/search`);
+  }
+
+  fetchBanks(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/payment/flw/banks`);
   }
 
   getReferrals(): Observable<IResponse<any>> {

@@ -55,11 +55,9 @@ export class BankDetail implements ViewWillEnter{
   isLoading = true;
   bankDetails$!: Observable<IBankDetail[]>;
   bankDetail: IBankDetail = {
-    bankName: '',
+    bank: '',
     accountName: '',
-    accountNo: '',
-    sortCode: '',
-    disabled: false
+    accountNo: ''
   };
 
   dataTypes = DataTypes;
@@ -70,11 +68,9 @@ export class BankDetail implements ViewWillEnter{
 
   initBankDetails() {
     this.bankDetail = {
-      bankName: '',
+      bank: '',
       accountName: '',
       accountNo: '',
-      sortCode: '',
-      disabled: false
     };
   }
 
@@ -178,7 +174,7 @@ export class BankDetail implements ViewWillEnter{
   async presentDeleteAlert(bankDetail: IBankDetail) {
     const alert = await this.alertCtrl.create({
       header: `Delete Account Detail`,
-      message: `Are you sure you want to delete ${bankDetail.bankName}?`,
+      message: `Are you sure you want to delete ${bankDetail.bank}?`,
       buttons: [
         {
           text: 'Cancel',

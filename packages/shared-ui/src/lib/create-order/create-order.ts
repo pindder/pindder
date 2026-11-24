@@ -1,11 +1,11 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnDestroy, Output, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonContent, IonItem, IonList, ViewWillEnter, IonLabel, 
   ToastController, IonHeader, IonToolbar, IonTitle, IonButtons, IonIcon, 
   IonListHeader, ModalController, IonDatetime, IonActionSheet, IonItemOption, 
   IonAvatar, IonItemOptions, IonItemSliding, IonTextarea, IonNote, IonModal, 
   IonSelect, IonSelectOption, IonItemGroup, IonItemDivider } from "@ionic/angular";
-import { DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderItem, IOrderStyle, ISpecification, PaymentMethods } from '@pindder/contracts';  
+import { DeliveryMethods, DesignTypes, IClient, IColors, IDesign, IOrder, IOrderItem, IOrderStyle, IProfile, ISpecification, PaymentMethods } from '@pindder/contracts';  
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmptyState } from '../empty-state/empty-state';
 import { AppButton } from '../app-button/app-button';
@@ -48,10 +48,10 @@ import { Preview } from '../preview/preview';
   templateUrl: './create-order.html',
   styleUrl: './create-order.css',
 })
-export class CreateOrder implements ViewWillEnter, OnDestroy{
+export class CreateOrder implements ViewWillEnter, OnInit, OnDestroy{
     @Input() order!: IOrder;
-    @Input() client?: IClient;
-    @Input() design?: IDesign;
+    @Input() client!: IClient | IProfile;
+    @Input() design!: IDesign;
     @Input() existingOrder!: IOrder;
 
     @Output() buildOrder = new EventEmitter<IOrder>();
@@ -71,7 +71,7 @@ export class CreateOrder implements ViewWillEnter, OnDestroy{
     private ar = inject(ActivatedRoute);
     
     presentingElement!: HTMLElement | null;
-    selectedClient!: IClient | null;
+    selectedClient!: IProfile | null;
     selectedStyleIndex!: number;
     selectedStyle!: IOrderStyle;
 
@@ -128,10 +128,10 @@ export class CreateOrder implements ViewWillEnter, OnDestroy{
     isPreview = false;
 
     ionViewWillEnter(): void {
-        // console.log(this.client);
+        console.log(this.client);
         // console.log(this.design);
         if(this.client) {
-        this.selectedClient = this.client;
+            this.selectedClient = this.client;
         } else if(this.design) {
         // let selections: any[] = [];
 
@@ -177,6 +177,12 @@ export class CreateOrder implements ViewWillEnter, OnDestroy{
         });
         }
         this.cdr.markForCheck();
+    }
+
+    ngOnInit(): void {
+        if(this.client) {
+            this.selectedClient = this.client;
+        } 
     }
 
     async openNewClientModal() {

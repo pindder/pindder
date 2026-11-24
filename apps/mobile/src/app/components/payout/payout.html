@@ -26,7 +26,7 @@
         aria-label="Country Code">
             @for(bank of bankDetails(); track bank._id) {
                 <ion-select-option [value]="bank._id">
-                    {{ bank.bankName }}
+                    {{ bank.bank }}
                 </ion-select-option>
             }
         </ion-select>

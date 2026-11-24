@@ -1,29 +1,30 @@
-import { ChangeDetectorRef, Component, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonInput, IonItem, IonList, IonSelect, 
-  IonSelectOption, IonTextarea, IonListHeader,
-  IonButtons,
-  IonButton,
-  IonIcon,
-  ModalController,
-  ToastController,
-  AlertController, 
-} from "@ionic/angular";
+  IonSelectOption, IonTextarea, IonIcon, ModalController,
+  ToastController, AlertController, IonModal, IonButton, IonTitle, IonToolbar, IonButtons, IonHeader, IonToggle } from "@ionic/angular";
 import { PrimaryButton } from '../primary-button/primary-button';
-import { countries, IAddress, IBrand, IProfile, IResponse } from '@pindder/contracts';
+import { countries, IAddress, IBankDetail, IBrand, IProfile, IResponse } from '@pindder/contracts';
 import { BrandService } from '../../services/brand.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IonText } from "@ionic/angular";
 import { IonLabel } from "@ionic/angular";
 import { TokenService } from '../../services/token.service';
 import { NewAddress } from '../new-address/new-address';
-import { IonItemSliding, IonNote, IonItemOptions, IonItemOption } from "@ionic/angular";
+import { IonItemSliding, IonItemOptions, IonItemOption } from "@ionic/angular";
 import { EmptyState } from '../empty-state/empty-state';
+import { AppService } from '../../services/app.service';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-new-brand',
-  imports: [IonItemOption, IonItemOptions, IonNote, IonItemSliding, IonLabel, IonText,
-    IonButtons, IonButton, IonIcon,
+  imports: [IonToggle, IonHeader, IonButtons, IonToolbar, IonTitle, IonButton, 
+    IonModal, 
+    IonItemOption, 
+    IonItemOptions, 
+    IonItemSliding, 
+    IonLabel, IonText,
+    IonIcon,
     IonList,
     IonItem,
     IonInput,
@@ -32,14 +33,18 @@ import { EmptyState } from '../empty-state/empty-state';
     FormsModule,
     IonSelectOption,
     PrimaryButton,
-    IonTextarea, IonListHeader, EmptyState],
+    IonTextarea, EmptyState],
   templateUrl: './new-brand.html',
   styleUrl: './new-brand.css',
 })
 export class NewBrand implements OnInit{
+  @ViewChild('modal') modal!: IonModal;
+  @ViewChild('newAccountModal') newAccountModal!: IonModal;
+  
   private brandService = inject(BrandService);
   private cdr = inject(ChangeDetectorRef);
   private tokenService = inject(TokenService);
+  private appService = inject(AppService);
   private modalController = inject(ModalController);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
@@ -54,8 +59,15 @@ export class NewBrand implements OnInit{
     website: '',
     tel: '',  
   });
+  bankDetail: IBankDetail = {
+    bank: '',
+    accountName: '',
+    accountNo: '',
+  };
   addresses: IAddress[] = [];
   countries = countries;
+  bvn!: string;
+  bank_list: any[] = [];
 
   customModalOptions = {
     header: 'Select Country Code',
@@ -86,6 +98,14 @@ export class NewBrand implements OnInit{
     await modal.present();
   }
 
+  async openNewAccountModal(account?: IBankDetail) {
+    if(account) {
+      this.bankDetail = account;
+    }
+
+    this.newAccountModal.present();
+  }
+
   getBrand(profile: IProfile) {
     if(!profile._id) {
       return;
@@ -96,8 +116,32 @@ export class NewBrand implements OnInit{
         if(response.data) {
           this.brand.set(response.data);
           this.getAddresses(this.brand());
+          this.fetchBanks();
           this.cdr.markForCheck();
         }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      }
+    })
+  }
+
+  fetchBankDetails() {
+    this.appService.fetchPayoutDetail().subscribe({
+      next: (response: IResponse<IBankDetail[]>) => {
+        if(response.data) this.bankDetail = response.data[0];
+      },
+      error: (error: HttpErrorResponse) => {
+        this.presentToast(`${error.error.msg}`, 'danger', 'bottom');
+      }
+    });
+  }
+
+  fetchBanks() {
+    this.appService.fetchBanks().subscribe({
+      next: (response: any) => {
+        this.bank_list = response;
+        this.fetchBankDetails();
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);
@@ -121,6 +165,22 @@ export class NewBrand implements OnInit{
         console.log(error);
       }
     })
+  }
+
+  async manageAccount() {
+    const url = await this.appService.manageStripeAccount()
+
+    if(url) {
+      Browser.open({
+        url: url,
+        presentationStyle: 'fullscreen',
+        toolbarColor: 'primary',
+      });
+    }
+  }
+
+  openAddressesModal() {
+    this.modal.present();
   }
 
   updateCountryCode(event: unknown) {
@@ -225,5 +285,32 @@ export class NewBrand implements OnInit{
         this.cdr.markForCheck();
       }
     })
+  }
+
+  submitBankDetail() {
+    if(this.bankDetail._id) {
+      this.appService.updatePayoutDetail(this.bankDetail).subscribe({
+        next: (response: IResponse<IBankDetail>) => {
+          this.presentToast(response.msg, 'primary', 'top');
+          
+          this.dismissModal();
+          this.cdr.markForCheck();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.presentToast(error.error.message, 'primary', 'top');
+        }
+      });
+    } else {
+      this.appService.createNewPayoutDetail(this.bankDetail).subscribe({
+        next: (response: IResponse<IBankDetail>) => {
+          this.presentToast(response.msg, 'primary', 'top');
+          this.dismissModal();
+          this.cdr.markForCheck();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.presentToast(error.error.message, 'primary', 'top');
+        }
+      });
+    }
   }
 }

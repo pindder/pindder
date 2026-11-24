@@ -15,12 +15,14 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { StripeService } from './stripe.service';
+import { FlutterwaveService } from './flutterwave.service';
 
 @Controller('payment')
 export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,
-    private readonly stripeService: StripeService
+    private readonly stripeService: StripeService,
+    private readonly flwService: FlutterwaveService
   ) {}
 
   @UseGuards(AuthGuard)
@@ -60,7 +62,29 @@ export class PaymentController {
     return this.paymentService.remove(+id);
   }
 
+  /** FLUTTERWAVE PAYMENTS CONTROLLERS */
+  @UseGuards(AuthGuard)
+  @Get('flw/banks')
+  async fetchBanks() {
+    return this.flwService.fetchBanks();
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('flw/checkout')
+  async getCheckoutUrlFlw(
+    @Query('order_id') order_id: string,
+    @Req() req: any
+  ) {
+    return this.flwService.checkout(order_id, req.user);
+  }
+
   /** STRIPE PAYMENTS CONTROLLERS */
+  @UseGuards(AuthGuard)
+  @Get('stripe/account')
+  async getAccount(@Req() req: any) {
+    return this.stripeService.retrieveStripeAccount(req.user);
+  }
+
   @Post('stripe/intent')
   async getPaymentIntent(
     @Query('order_id') order_id: string,

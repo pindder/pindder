@@ -1,4 +1,5 @@
 import { ITailor } from "./admin.interfaces";
+import { IProfile } from "./auth.types";
 import { IClient, IMeasurement } from "./client.types";
 import { IColors, ISpecification } from "./design.types";
 import { PaymentStatus } from "./enum.types";
@@ -32,7 +33,7 @@ export interface IOrder {
 export interface IOrderItem {
   orderId: string;
   _id: string;
-  client?: IClient;
+  client?: IClient | IProfile;
   tailor?: ITailor;
   styles: IOrderStyle[];
   dueDate: string | Date;

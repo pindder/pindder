@@ -1,5 +1,5 @@
 @if(dataType === dataTypes.CLIENT && client){
-    <div class="p-3 flex items-center justify-between border border-left-2">
+    <div class="my-2 p-3 flex items-center justify-between border border-left-2">
         <div (click)="viewClient()" class="flex flex-col gap-1">
             <span class="text-md font-semibold">{{ client.firstname + " " + client.lastname }}</span>
             <span class="text-sm text-secondary">{{ client.phoneNo }}</span>
@@ -11,20 +11,17 @@
     </div>
 } 
 @else if(dataType === dataTypes.ORDER) {
-    <div (click)="action.emit(order._id)" class="px-3 pb-3 mb-2 flex flex-col border border-left-2">
+    <div (click)="action.emit(order._id)" class="p-3 my-2 flex flex-col border border-left-2">
         <div class="flex justify-between items-center">
             <p class="text-md font-bold">{{ order.orderId }}</p>
-            <div>
-                @if(order.status == orderStatuses.CANCELLED){
-                <ion-badge color="danger">{{ order.status }}</ion-badge>
-                }@else if(order.status === orderStatuses.PENDING) {
-                <ion-badge color="warning">{{ order.status }}</ion-badge>
-                }@else if(order.status === orderStatuses.ONGOING) {
-                <ion-badge color="secondary">{{ order.status }}</ion-badge>
-                }@else if(order.status === orderStatuses.OVERDUE) {
-                <ion-badge color="danger">{{ order.status }}</ion-badge>
+            <div class="">
+                @for(status of orderStatuses; track status){
+                    @if(status === order.status){
+                        <ion-badge class="p-1"
+                            [color]="getOrderColor(order.status)"
+                        >{{ order.status }}</ion-badge>    
+                    }
                 }
-
             </div>
         </div>
         <div class="flex flex-col gap-2">
@@ -41,7 +38,7 @@
     </div>
 }
 @else if(dataType === dataTypes.DESIGN) {
-    <div class="flex flex-col gap-2 p-2">
+    <div class="flex flex-col gap-2 p-3">
         @if(design.images.length > 0){
             <img alt="style-img" [src]="design.images[0]" (click)="editDesign()"/>
         }@else {

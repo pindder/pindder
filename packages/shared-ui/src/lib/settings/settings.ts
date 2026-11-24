@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { IonHeader, IonIcon, IonItem, IonLabel, IonList, 
     IonTitle, IonToolbar
 } from '@ionic/angular';
@@ -24,16 +24,13 @@ import { SettingsSection } from '@pindder/contracts';
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })
-export class LibSettings {
+export class LibSettings implements OnInit{
     @Input() displayHeader = false;
     @Input() settingsItems!: SettingsSection[];
+    @Input() accountType!: string;
     @Output() action = new EventEmitter<() => void>();
-    @Output() logout = new EventEmitter();
-    @Output() deleteAccount = new EventEmitter();
 
-    private router = inject(Router);
-
-    openProfileEdit() {
-        this.router.navigate(['app/profile/edit']);
+    ngOnInit(): void {
+        return;
     }
 }

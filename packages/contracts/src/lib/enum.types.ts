@@ -104,6 +104,8 @@ export enum DataTypes {
     WITHDRAWAL = "WITHDRAWAL",
     PAYMENT = "PAYMENT",
     NOTIFICATION = "NOTIFICATION",
+    BRAND = "BRAND",
+    CUSTOM = "CUSTOM"
 }
 
 export enum PaymentTypes {

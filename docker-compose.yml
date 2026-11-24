@@ -47,6 +47,10 @@ services:
       dockerfile: apps/api/Dockerfile
     container_name: pindder-api
     restart: unless-stopped
+    volumes:
+      - ./apps/api:/app/apps/api       # Mount your API source code live
+      - /app/node_modules              # Protects container's node_modules from host overwrite
+      - /app/dist
     depends_on:
       mongo:
         condition: service_healthy
@@ -54,18 +58,27 @@ services:
         condition: service_healthy
     ports:
       - "4000:4000"
+    env_file:
+      - ./apps/api/.env
     environment:
       NODE_ENV: production
       PORT: 4000
       MONGO_URI: mongodb://mongo:27017/pindder?replicaSet=rs0&directConnection=true
       REDIS_URL: redis://redis
       REDIS_PORT: 6379
-      JWT_SECRET: ${JWT_SECRET:-supersecretkey}
+      # JWT_SECRET: ${JWT_SECRET:-supersecretkey}
       # Pass through any other required env variables from host/.env
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-      EMAIL_USER: ${EMAIL_USER:-}
-      EMAIL_PASSWORD: ${EMAIL_PASSWORD:-}
+      # STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      # STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      # EMAIL_USER: ${EMAIL_USER:-}
+      # EMAIL_PASSWORD: ${EMAIL_PASSWORD:-}
+      # #cloudinary
+      # CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      # CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      # CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      # #resend
+      # RESEND_API_KEY: ${RESEND_API_KEY:-}
+      # SENDER_EMAIL: ${SENDER_EMAIL:-}
 
   # -------------------------------------------------------------
   # Web Application

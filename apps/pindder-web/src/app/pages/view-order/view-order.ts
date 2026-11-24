@@ -14,6 +14,7 @@ import {
   Stripe,
 } from '@capacitor-community/stripe';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-view-order',
@@ -124,7 +125,7 @@ export class ViewOrder implements OnInit {
     if(Capacitor.isNativePlatform()) {
       this.createPaymentSheet();
     } else {
-      this.createCheckoutSession();
+      this.flwCheckout();
     }
   }
 
@@ -191,8 +192,11 @@ export class ViewOrder implements OnInit {
 
     // console.log(res);
     if (res && res.url) {
-      console.log(res)
-      window.location.href = res.url;
+      Browser.open({
+        url: res.data.link,
+        presentationStyle: 'popover',
+        windowName: 'Checkout'
+      });
     }
   }
 
@@ -226,6 +230,16 @@ export class ViewOrder implements OnInit {
       
       console.error('Payment sheet failed:', error);
       throw error;
+    }
+  }
+
+  async flwCheckout() {
+    const res: any = await this.appService.flwCheckout(this.order._id);
+
+    // console.log(res);
+    if (res && res.data.link) {
+      console.log(res)
+      window.location.href = res.data.link;
     }
   }
 

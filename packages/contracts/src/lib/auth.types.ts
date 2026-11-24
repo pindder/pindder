@@ -1,3 +1,6 @@
+import { IMeasurement } from "./client.types";
+import { IOrderItem } from "./order.types";
+
 export interface IVerification {
   code: string
 }
@@ -42,7 +45,13 @@ export interface IProfile {
   referralCode?: string;
   subscription?: any;
   profileImg?: string;
-  roles?: string[]
+  roles?: string[];
+  gender?: string;
+  accountType?: string;
+  referee?: string;
+  createdAt?: string;
+  measurements?: IMeasurement[];
+  orders?: IOrderItem[];
 }
 
 export const countries = [

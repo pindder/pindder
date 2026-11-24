@@ -13,6 +13,7 @@ import { CloudinaryService } from './cloudinary-service.service';
 import { StreamerService } from './streamer.service';
 import { StreamsController } from './streams.controller';
 import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
+import { StripeAccount, StripeAccountSchema } from '../payments/schemas/stripe-account';
 
 @Module({
   imports: [
@@ -20,7 +21,11 @@ import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
       timeout: 5000,
       maxRedirects: 5,
     }),
-    MongooseModule.forFeature([{ name: Payment.name, schema: PaymentSchema }, { name: Tailor.name, schema: TailorSchema }]),
+    MongooseModule.forFeature([
+      { name: Payment.name, schema: PaymentSchema }, 
+      { name: Tailor.name, schema: TailorSchema },
+      { name: StripeAccount.name, schema: StripeAccountSchema },
+    ]),
     PlanModule,
     TokenModule,
   ],

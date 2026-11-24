@@ -9,7 +9,7 @@ export const getApiUrl = () => {
 
   if (!isNative) {
     // Running in web browser during local development
-    return localUri;
+    return serverUri;
   }
   
   // Running on a real phone or emulator -> use your cloud backend
@@ -21,5 +21,6 @@ export const environment = {
   apiUrl: getApiUrl(),
   cloudName: 'w28vsff3',
   presetName: 'pindder',
-  stripe_pk: 'pk_test_51SDPx7JpXUibtX37NsVSpg4ZEiHjRyku980u6vBEVdHiZhb1ZHyTvRT1KenCKL8vzUIjUzFV2d9knp0TOVW2jOvj000YHK3c94'
+  // stripe_pk: 'pk_test_51SDPx7JpXUibtX37NsVSpg4ZEiHjRyku980u6vBEVdHiZhb1ZHyTvRT1KenCKL8vzUIjUzFV2d9knp0TOVW2jOvj000YHK3c94'
+  stripe_pk: 'pk_test_51Ud8dAR4iqY69AL3HF4ipjE1zGyKoB3IphNIdPB818gOU3MnIaPwIqK1bIgkNq6OIpsd7OxSWli84UKWhX8QF8QO00qiaRuNPz'
 };

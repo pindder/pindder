@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { Order } from '../orders/schemas/order.schema';
@@ -10,6 +10,9 @@ import { Tailor } from '../tailors/schemas/tailor.schema';
 import { CreatePlanDto } from '../plans/dto/create-plan.dto';
 import { Plan } from '../plans/schema/plan.schema';
 import { AccountTypes, DataTypes } from '@pindder/contracts';
+import { StripeAccount } from './schemas/stripe-account';
+import { EmailService } from '../shared/email.service';
+import { Brand } from '../brands/schemas/brand.schema';
 
 @Injectable()
 export class StripeService {
@@ -22,7 +25,10 @@ export class StripeService {
         @InjectModel(Tailor.name) private readonly tailorModel: Model<Tailor>,
         @InjectModel(Order.name) private readonly orderModel: Model<Order>,
         @InjectModel(Client.name) private readonly clientModel: Model<Client>,
+        @InjectModel(Brand.name) private readonly brandModel: Model<Brand>,
+        @InjectModel(StripeAccount.name) private readonly stripeAccountModel: Model<StripeAccount>,
         private configService: ConfigService,
+        private emailService: EmailService
     ) {
         const secretKey = this.configService.getOrThrow<string>('STRIPE_SECRET_KEY');
 
@@ -285,6 +291,163 @@ export class StripeService {
         } catch (error: any) {
             this.logger.error('Failed to create Stripe customer:', error);
             return { error };
+        }
+    }
+
+    async createConnectedAccount(user: Tailor, brand: Brand): Promise<any> {
+        try {
+            // create stripe connect express account 
+            const account = await this.stripe.v2.core.accounts.create({
+                contact_email: user.email,
+                display_name: user.fullname,
+                contact_phone: user.countryCode + user.tel,
+                dashboard: 'express',
+                configuration: {
+                    recipient: {
+                        capabilities: {
+                            stripe_balance: {
+                                stripe_transfers: {
+                                    requested: true
+                                },
+                            },
+                            bank_accounts: {
+                                swift: {
+                                    requested: true
+                                }
+                            }
+                        }
+                    }
+                },
+                defaults: {
+                    responsibilities: {
+                        fees_collector: 'application',
+                        losses_collector: 'application'
+                    }
+                },
+                identity: {
+                    entity_type: 'individual',
+                    business_details: {
+                        registered_name: brand.name,
+                    },
+                    country: 'ng'
+                },
+                include: [
+                    'defaults',
+                    'identity',
+                    'configuration.recipient'
+                ]
+            });
+
+            // generate onboarding link for tailors to register their payout accounts on stripe
+            const account_link = await this.stripe.v2.core.accountLinks.create({
+                account: account.id,
+                use_case: {
+                    type: 'account_onboarding',
+                    account_onboarding: {
+                        refresh_url: `https://pindder-web.onrender.com/`,
+                        return_url: `https://pindder-web.onrender.com/`
+                    }
+                }
+            });
+
+            // generate login link for tailors to access their stripe express dashboard to view transactions
+            const login_link = await this.stripe.accounts.createLoginLink(account.id);
+
+            // save stripe connect express account details to DB
+            const stripeAccount = await this.stripeAccountModel.create({
+                accountId: account.id,
+                accountType: account.dashboard,
+                owner: user._id,
+                metadata: {
+                    ...account.configuration
+                },
+                onboardingLink: account_link.url,
+                loginLink: login_link.url
+            });
+
+            await this.emailService.sendStripeOnboardingMail(user, stripeAccount);
+
+            this.logger.log('STRIPE_ACCOUNT_CREATED::', stripeAccount);
+            return stripeAccount;
+        } catch(error: any) {
+            this.logger.error(error);
+            return error;
+        }
+    }
+
+    async retrieveStripeAccount(user: any) {
+        try {
+            const [tailor, brand] = await Promise.all([
+                this.tailorModel.findById(user.sub),
+                this.brandModel.findOne({ admin: user.sub })
+            ]);
+
+            if(!tailor || !brand) {
+                throw new NotFoundException('Please setup your brand on pindder to activate your payment account!');
+            }
+
+            let stripeAcct = await this.stripeAccountModel.findOne({ owner: tailor._id });
+
+            if(!stripeAcct) {
+                stripeAcct = await this.createConnectedAccount(tailor, brand);
+                
+                if(!stripeAcct) {
+                    throw new HttpException(`${stripeAcct}`, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                
+                return stripeAcct.onboardingLink; 
+            }
+        } catch(error: any) {
+            this.logger.error(error);
+            return error;
+        }
+    }
+
+    async registerWebhookEndpoint(targetUrl: string): Promise<any> {
+        try {
+            const endpoint = await this.stripe.webhookEndpoints.create({
+                url: targetUrl,
+                enabled_events: [
+                    'payment_intent.succeeded',
+                    'checkout.session.completed',
+                    'customer.subscription.created',
+                    'customer.subscription.updated',
+                    'customer.subscription.deleted',
+                    'invoice.payment_succeeded',
+                    'invoice.payment_failed',
+                    'account.updated',
+                    'capability.updated',
+                    'account.application.deauthorized',
+                    'account.application.authorized',
+                    'balance.available',
+                    'charge.captured',
+                    'charge.expired',
+                    'charge.pending',
+                    'charge.succeeded',
+                    'charge.refunded',
+                    'price.created',
+                    'price.deleted',
+                    'price.updated',
+                    'product.created',
+                    'product.deleted',
+                    'product.updated',
+                    'customer.created',
+                    'customer.created',
+                    'customer.subscription.paused',
+                    'customer.subscription.resumed',
+                    'customer.subscription.pending_update_applied',
+                    'customer.subscription.pending_update_expired'
+                ],
+                // api_version: '2025-02-28.acacia', // Optional: pin a specific API version
+            });
+
+            this.logger.log(`✅ Successfully created webhook endpoint ID: ${endpoint.id}`);
+            this.logger.log(`🔑 Webhook Secret (Save this as STRIPE_WEBHOOK_SECRET): ${endpoint.secret}`);
+            
+            return endpoint;
+        } catch (error: any) {
+            this.logger.error(`❌ Failed to create webhook endpoint: ${error.message}`);
+            throw error;
         }
     }
 }

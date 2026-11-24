@@ -10,6 +10,11 @@ import { Order, OrderSchema } from '../orders/schemas/order.schema';
 import { Tailor, TailorSchema } from '../tailors/schemas/tailor.schema';
 import { Client, ClientSchema } from '../clients/schemas/client.schema';
 import { User, UserSchema } from '../users/schemas/user.schema';
+import { EmailService } from '../shared/email.service';
+import { StripeAccount, StripeAccountSchema } from '../payments/schemas/stripe-account';
+import { Brand, BrandSchema } from '../brands/schemas/brand.schema';
+import { Transaction, TransactionSchema } from '../payments/schemas/transaction';
+import { BankDetail, BankDetailSchema } from '../bank-details/schema/bank-detail.schema';
 
 @Module({
   imports: [
@@ -24,10 +29,14 @@ import { User, UserSchema } from '../users/schemas/user.schema';
       { name: Plan.name, schema: PlanSchema },
       { name: Client.name, schema: ClientSchema },
       { name: User.name, schema: UserSchema },
+      { name: Brand.name, schema: BrandSchema },
+      { name: StripeAccount.name, schema: StripeAccountSchema },
+      { name: BankDetail.name, schema: BankDetailSchema },
+      { name: Transaction.name, schema: TransactionSchema },
     ])
   ],
   controllers: [PlanController],
-  providers: [PlanService, JwtService, StripeService],
+  providers: [PlanService, JwtService, StripeService, EmailService],
   exports: [MongooseModule, PlanService]
 })
 export class PlanModule {}

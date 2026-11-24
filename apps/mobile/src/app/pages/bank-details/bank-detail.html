@@ -29,7 +29,7 @@
               <h4>{{ detail.accountName }}</h4>
               <p>{{ detail.accountNo }}</p>
             </ion-label>
-            <ion-note>{{ detail.bankName }}</ion-note>
+            <ion-note>{{ detail.bank }}</ion-note>
           </ion-item>
           <ion-item-options slot="end">
             <ion-item-option (click)="presentDeleteAlert(detail)">
@@ -65,7 +65,7 @@
                   <ion-input 
                   name="bankName"
                   type="text"
-                  [(ngModel)]="bankDetail.bankName" 
+                  [(ngModel)]="bankDetail.bank" 
                   label="Bank name" 
                   labelPlacement="stacked"
                   ></ion-input>
@@ -91,7 +91,7 @@
                   ></ion-input>
               </ion-item>
 
-              <ion-item lines="full">
+              <!-- <ion-item lines="full">
                   <ion-input 
                   name="sortCode"
                   label="Sort Code (Optional)"
@@ -105,14 +105,14 @@
                 <ion-toggle [checked]="bankDetail.disabled">
                   Disable
                 </ion-toggle>
-              </ion-item>
+              </ion-item> -->
           </ion-list>
 
           <div class="p-2">
           <app-primary-button
           [buttonText]="'Save'" 
           (click)="submit()" 
-          [disabled]="!bankDetail.accountName || !bankDetail.accountNo || !bankDetail.bankName"
+          [disabled]="!bankDetail.accountName || !bankDetail.accountNo || !bankDetail.bank"
           icon="save-outline"
           ></app-primary-button>
           </div>
