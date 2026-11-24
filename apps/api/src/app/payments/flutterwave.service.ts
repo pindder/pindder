@@ -15,8 +15,7 @@ import { Bank } from './schemas/bank';
 import { RedisService } from '../shared/redis.service';
 import { BankDetail } from '../bank-details/schema/bank-detail.schema';
 import { AxiosError } from 'axios';
-import { EventEmitter } from 'stream';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Transaction } from './schemas/transaction';
 // import axios from 'axios';
 
@@ -38,7 +37,7 @@ export class FlutterwaveService {
         private readonly http: HttpService,
         private readonly configService: ConfigService,
         private readonly redisService: RedisService,
-        private readonly eventEmitter: EventEmitter 
+        private readonly eventEmitter: EventEmitter2 
     ) {
         this.clientSecret = this.configService.getOrThrow<string>('FLW_SK');
         this.flw_url = this.configService.getOrThrow<string>('FLW_URL');
