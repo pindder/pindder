@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
-import { IonButton, IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, 
+import { IonList, IonItem, IonIcon, IonItemSliding, IonAvatar, IonLabel, 
   IonItemOptions, ViewWillEnter, IonHeader, IonButtons, IonListHeader, IonTitle, 
   IonToolbar, IonContent, IonItemOption, ModalController, IonBackButton, IonNote, 
   ToastController, IonModal, IonItemGroup, IonItemDivider, AlertController, IonSelect, 
@@ -15,7 +15,7 @@ import { AppButton } from '../app-button/app-button';
   selector: 'lib-preview',
   imports: [
     IonHeader, IonItemOptions, IonLabel, IonAvatar, IonItemSliding,
-    IonIcon, IonItem, IonList, IonButton, IonButtons, IonListHeader,
+    IonIcon, IonItem, IonList, IonButtons, IonListHeader,
     IonTitle, IonToolbar, IonContent, IonItemOption, IonBackButton,
     IonToolbar, IonContent, IonItemOption, IonBackButton, DatePipe,
     IonNote, IonModal, IonNote,

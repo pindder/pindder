@@ -1,0 +1,7 @@
+.custom-input {
+  --highlight-color-focused: var(--ion-color-primary);
+  background: var(--ion-background-color, #ffffff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border-radius: 12px;
+  
+}

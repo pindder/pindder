@@ -1,10 +1,10 @@
 <!-- ================= HEADER NAV ================= -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
       
       <!-- Logo -->
       <a routerLink="/" class="flex items-center gap-2 group">
-        <img src="images/logo.png" alt="pindde-logo" class="w-32" />
+        <img src="images/logo.png" alt="pindder-logo" class="w-32" />
       </a>
 
       <!-- Navigation Links -->
@@ -19,7 +19,9 @@
         <a routerLink="/auth/login" class="px-6 py-2.5 rounded-full brand-button text-sm font-bold shadow-md shadow-brand/20">
           Login
         </a>
+        <a routerLink="/auth/register" [style]="{backgroundColor: '#F1641D', color: '#FFFFFF'}" class="px-6 py-2.5 rounded-full brand-button text-sm font-bold shadow-md shadow-brand/20">
+          Get Started
+        </a>
       </div>
-
     </div>
 </header>

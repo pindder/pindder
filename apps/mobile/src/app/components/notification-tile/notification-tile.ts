@@ -6,8 +6,6 @@ import {
   IonButton, 
   IonIcon,
   IonItemSliding,
-  IonItemOptions, 
-  IonItemOption 
 } from "@ionic/angular";
 import { DataTypes, INotification, IResponse, NotificationStatus } from '@pindder/contracts';
 import { NotificationService } from '../../services/notification.service';
@@ -16,8 +14,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-notification-tile',
   imports: [
-    IonItemOption, 
-    IonItemOptions,
     IonItemSliding, 
     IonIcon, 
     IonButton, 

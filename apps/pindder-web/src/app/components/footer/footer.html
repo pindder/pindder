@@ -1,5 +1,5 @@
-<footer class="bg-white border-t border-slate-100 py-5 text-slate-500 text-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+<footer class="bg-[#F7F7F7] border-t border-slate-100 py-5 text-slate-500 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
       
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         
@@ -8,23 +8,79 @@
           <div class="flex items-center justify-center md:justify-start gap-2">
             <img src="images/logo.png" alt="pindde-logo" class="w-32" />
           </div>
-          <p class="text-xs text-slate-500">Made to help tailors build and succeed.</p>
+          <!-- <p class="text-xs text-slate-500">Made to help tailors build and succeed.</p> -->
+          <div class="flex gap-2 pt-2">
+            <a 
+              href="https://play.google.com/store/apps/details?id=com.pindder.app&hl=en" 
+              class="border inline-flex items-center gap-2 px-2 rounded-xl text-white shadow-lg transition-all"
+            >
+              <ion-icon name="logo-google-playstore" size="large"></ion-icon>
+              <div class="">
+                  <span class="text-xs">Get it on</span>
+                  <p class="font-semibold">Google Play</p>
+              </div>
+            </a>
+            <a 
+              href="https://apps.apple.com/us/app/pindder/id6797538451" 
+              class="border inline-flex items-center gap-2 px-2 rounded-xl text-white shadow-lg transition-all"
+            >
+              <ion-icon name="logo-apple" size="large"></ion-icon>
+              <div>
+                  <span class="text-xs">Download on the</span>
+                  <p class="font-semibold">App Store</p>
+              </div>
+            </a>
+          </div>
         </div>
 
         <!-- Links -->
-        <div class="flex items-center gap-8 text-xs font-semibold text-slate-600">
-          <a href="#hero" class="hover:text-brand transition-colors">Privacy Policy</a>
-          <a href="#hero" class="flex items-center gap-1.5 hover:text-brand transition-colors">
-            <ion-icon name="mail-outline"></ion-icon>
-            <span>Contact us</span>
-          </a>
+        <div class="flex md:flex-col items-start gap-5 text-xs font-semibold text-slate-600">
+          <a href="#hero" class="">About</a>
+          <a href="#hero" class="">Features</a>
+          <a href="#hero" class="">Pricing</a>
+          <a href="#hero" class="">Contact us</a>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <h2>Sign up for our newsletter</h2>
+          <p>Be the first to know about releases and app updates.</p>
+          <form #newsletterForm="ngForm" class="flex gap-2" (ngSubmit)="submit()">
+            <ion-input
+            class="custom-input"
+            placeholder="Enter your email"
+            [(ngModel)]="email"
+            />
+            <ion-button
+            color="primary"
+            size="medium"
+            [disabled]="!email"
+            (click)="submit()"
+            >
+              Subscribe
+            </ion-button>
+          </form>
         </div>
 
       </div>
 
-      <!-- Copyright -->
-      <div class="pt-8 border-t border-slate-100 text-center text-xs text-slate-400">
-        © 2026 Pindder. All rights reserved.
+      <div class="flex flex-wrap items-center justify-between pt-8 border-t border-slate-100 text-center text-xs text-slate-400">
+        <!-- social Links-->
+        <div class="flex gap-5 items-center">
+          <a href="https://x.com/usepindder"><ion-icon name="logo-x" size="small"></ion-icon></a>
+          <a href="https://web.facebook.com/profile.php?id=61586141444014"><ion-icon name="logo-facebook" size="small"></ion-icon></a>
+          <a href="https://www.instagram.com/pindder.app"><ion-icon name="logo-instagram" size="small"></ion-icon></a>
+          <a href="https://github.com/pindder/pindder"><ion-icon name="logo-github" size="small"></ion-icon></a>
+        </div>
+        <!-- Legal & Support-->
+        <div class="flex flex-wrap gap-2 items-center">
+          <a href="/privacy-policy" class="">Privacy Policy</a>
+          <a href="/terms-and-conditions" class="">Terms & Conditions</a>
+          <a href="/support" class="">Support</a>
+        </div>
+        <!-- Copyright -->
+        <div class="flex justify-center text-center">
+          © 2026 Pindder. All rights reserved.
+        </div>
       </div>
 
     </div>

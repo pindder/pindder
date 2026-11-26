@@ -101,7 +101,7 @@
     </ion-list>
 
     @if(brand()._id){
-    <div class="px-3">
+    <div class="px-5">
         <p class="text-sm font-semibold text-gray-500 m-0">
             Locations of your business across different states of even countries.
         </p>
@@ -114,34 +114,26 @@
         </ion-item>
     </ion-list>
 
-    <div class="px-3">
+    <div class="px-5">
         <p class="text-sm font-semibold text-gray-500 m-0">
-            Setup a virtual account on pindder to enable you recieve payments through pindder.
+            Provide your account details on pindder to enable you recieve payments through pindder.
         </p>
     </div>
-    <ion-list>
+    <ion-list inset="true">
         <ion-item button lines="none" (click)="openNewAccountModal()">
             <ion-label>
                 <p>Setup Account</p>
             </ion-label>
         </ion-item>
-    </ion-list>
-
-    <ion-list>
-        <ion-item button lines="none" (click)="null">
-            <ion-label>
-                <p>View Transactions</p>
-            </ion-label>
-        </ion-item>
     </ion-list>}
 
     <div class="p-3">
-      <app-primary-button
+      <lib-button
         [buttonText]="'Save'"
         [icon]="'save-outline'"
         [disabled]="!brand().name || !brand().country || !brand().tel || !brand().countryCode"
         (action)="submit()"
-      ></app-primary-button>
+      ></lib-button>
     </div>
   </form>
 
@@ -199,8 +191,10 @@
   </ion-modal>
 
     <!-- Account Detail Modal-->
-    <ion-modal #newAccountModal
-    (didDismiss)="dismissModal()">
+    <ion-modal 
+    #newAccountModal
+    (didDismiss)="dismissModal()"
+    >
       <ng-template>
         <ion-content>
             <ion-toolbar>

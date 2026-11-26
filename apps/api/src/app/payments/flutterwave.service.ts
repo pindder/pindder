@@ -166,8 +166,16 @@ export class FlutterwaveService {
 
     async fetchBanks() {
         try {
+            const redisInitialized = this.redisService.isInitialized();
+
+            if(!redisInitialized) {
+                const banks = await this.fetchBanksList();
+                
+                return banks;
+            }
+
             const cached = await this.redisService.getCachedResponse('banks');
-            
+        
             if(cached !== null) {
                 this.logger.log('CACHE_HIT_BANKS_LIST');
                 return cached;
@@ -175,28 +183,44 @@ export class FlutterwaveService {
             
             this.logger.log('CACHE_MISS_BANKS_LIST');
 
+            const banks = await this.fetchBanksList();
+
+            // cache banks list to redis if redis is initialized
+            await this.redisService.setCachedResponse('banks', banks);
+
+            // return list of banks to client
+            return banks;
+        } catch(error: any) {
+            this.logger.error(error);
+            return error;
+        }
+    }
+
+    async fetchBanksList() {
+        try {
+            // First check if banks already exist in DB
             const banks = await this.bankModel.find().sort({
                 name: 'desc'
             });
 
-            if(banks.length > 0) {
-                await this.redisService.setCachedResponse('banks', banks);
+            // If banks have already been fetched before return it to client
+            if(banks) {
                 return banks;
             }
 
+            // If not banks retrieve banks list from flutterwave
             const response = await firstValueFrom(this.http.get(
                 `${this.flw_url}/banks/NG`,
                 { timeout: 20000, headers: this.header}
             ));
-
-            // this.logger.log('FLW_BANKS_LIST_CACHED:::', response.data);
-            const saved = await this.bankModel.insertMany(response.data.data);
-            await this.redisService.setCachedResponse('banks', saved);
-
-            return saved;
+            
+            // Emit event to persist banks in DB
+            this.eventEmitter.emit('persist-banks', response.data.data);
+            
+            // Return retrieved banks list
+            return response.data.data;
         } catch(error: any) {
             this.logger.error(error);
-            return error;
         }
     }
 
@@ -281,5 +305,11 @@ export class FlutterwaveService {
             this.logger.error(error);
             return;
         }
+    }
+
+    @OnEvent('persist-banks')
+    async handlePersistBanks(data: any) {
+        await this.bankModel.insertMany(data);
+        this.logger.log(`BANKS_PERSISTED_TO_DB`);
     }
 }

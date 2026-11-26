@@ -1,59 +1,42 @@
 <!-- HOW IT WORKS SECTION -->
-<section id="how-it-works" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Section Title -->
-        <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Get Started in Minutes
-            </h2>
-            <p class="text-base text-slate-600">
-                Simple setup, powerful results. Here's how Pindder transforms your workflow.
-            </p>
+<section class="guide max-w-7xl mx-auto ">
+    <div class="bg-[#F7F7F7] p-8 rounded-3xl sm:px-6 lg:px-8 space-y-8">
+        <div class="flex flex-col justify-center items-center text-center space-y-5">
+            <p class="text-3xl sm:text-5xl font-extrabold">How to get started</p>
+            <p class="md:w-xl text-gray-400">Create your account today and experience an elevated level of efficiency, creativity, and success in your design endeavors.</p>
         </div>
-
-        <!-- 3 Steps -->
-        <div class="max-w-3xl mx-auto space-y-6">
-            <!-- Step 1 -->
-            <div class="flex items-start gap-6 p-6 rounded-2xl hover:bg-slate-50 transition-colors">
-                <div class="w-14 h-14 rounded-2xl bg-orange-50 text-brand font-extrabold text-xl flex items-center justify-center shrink-0">
-                01
-                </div>
-                <div class="space-y-1 pt-1">
-                <h3 class="text-xl font-bold text-slate-900">Create Your Account</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                    Sign up as a tailor and set up your business profile in under 2 minutes.
-                </p>
-                </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="flex items-start gap-6 p-6 rounded-2xl hover:bg-slate-50 transition-colors">
-                <div class="w-14 h-14 rounded-2xl bg-orange-50 text-brand font-extrabold text-xl flex items-center justify-center shrink-0">
-                02
-                </div>
-                <div class="space-y-1 pt-1">
-                <h3 class="text-xl font-bold text-slate-900">Add Your Styles</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                    Upload photos and details of the styles you offer to create your digital catalog.
-                </p>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="flex items-start gap-6 p-6 rounded-2xl hover:bg-slate-50 transition-colors">
-                <div class="w-14 h-14 rounded-2xl bg-orange-50 text-brand font-extrabold text-xl flex items-center justify-center shrink-0">
-                03
-                </div>
-                <div class="space-y-1 pt-1">
-                <h3 class="text-xl font-bold text-slate-900">Start Taking Orders</h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                    Share your unique catalog link with clients and receive orders directly.
-                </p>
-                </div>
-            </div>
-
-        </div>
-
     </div>
 </section>
+
+@for(step of steps; track step.id){
+<section [id]="step.title" class="max-w-7xl mx-auto  pt-10">
+    <div class="bg-[#F7F7F7] p-10 rounded-3xl sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 space-6">
+            <div 
+                class="flex flex-col items-start gap-6 p-6 rounded-2xl hover:bg-slate-50 transition-colors"
+                [ngClass]="{'order-1': $index % 2 === 0}"
+            >
+                <span class="px-2 py-1 rounded-full border border-[#F1641D] text-brand font-semibold text-xl flex items-center justify-center shrink-0">
+                    Step {{ $index + 1 }}
+                </span>
+                <div class="space-y-1 pt-1">
+                    <p class="text-3xl font-extrabold text-slate-900">{{ step.title }}</p>
+                    <ul class="flex flex-col space-y-5">
+                        @for(item of step.list; track item){
+                        <li class="flex gap-4 items-center">
+                            <span class="w-8 h-8 rounded-2xl bg-orange-50 text-brand flex items-center justify-center text-2xl">
+                            <ion-icon name="checkmark-outline" color="primary" size="medium"></ion-icon>
+                            </span>
+                            {{ item }}
+                        </li>}
+                    </ul>
+                </div>
+            </div>
+            <div class=""
+                [ngClass]="{'order-2': $index % 2 !== 0}"
+            >
+                <img src="" alt="" class="" />
+            </div>
+        </div>
+    </div>
+</section>}

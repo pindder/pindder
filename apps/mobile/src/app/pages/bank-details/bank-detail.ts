@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
 import { IonContent, IonList, IonBackButton, IonToolbar, IonButtons, IonHeader, 
   IonIcon, IonTitle, ViewWillEnter, IonButton, IonModal, IonItem, IonInput, 
-  IonToggle, IonLabel, IonNote, 
+  IonLabel, IonNote, 
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
@@ -19,7 +19,8 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-bank-detail',
-  imports: [IonNote, IonToggle,
+  imports: [
+    IonNote,
     IonItemSliding,
     IonItemOptions,
     IonItemOption,
