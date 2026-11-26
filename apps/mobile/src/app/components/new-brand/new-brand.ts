@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, inject, signal, OnInit, ViewChild } from 
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonInput, IonItem, IonList, IonSelect, 
   IonSelectOption, IonTextarea, IonIcon, ModalController,
-  ToastController, AlertController, IonModal, IonButton, IonTitle, IonToolbar, IonButtons, IonHeader, IonToggle } from "@ionic/angular";
+  ToastController, AlertController, IonModal, IonButton, IonTitle, IonToolbar, IonButtons, IonHeader } from "@ionic/angular";
 import { PrimaryButton } from '../primary-button/primary-button';
 import { countries, IAddress, IBankDetail, IBrand, IProfile, IResponse } from '@pindder/contracts';
 import { BrandService } from '../../services/brand.service';
@@ -15,14 +15,15 @@ import { IonItemSliding, IonItemOptions, IonItemOption } from "@ionic/angular";
 import { EmptyState } from '../empty-state/empty-state';
 import { AppService } from '../../services/app.service';
 import { Browser } from '@capacitor/browser';
+import { AppButton } from '@pindder/shared-ui';
 
 @Component({
   selector: 'app-new-brand',
-  imports: [IonToggle, IonHeader, IonButtons, IonToolbar, IonTitle, IonButton, 
-    IonModal, 
-    IonItemOption, 
-    IonItemOptions, 
-    IonItemSliding, 
+  imports: [IonHeader, IonButtons, IonToolbar, IonTitle, IonButton,
+    IonModal,
+    IonItemOption,
+    IonItemOptions,
+    IonItemSliding,
     IonLabel, IonText,
     IonIcon,
     IonList,
@@ -33,7 +34,7 @@ import { Browser } from '@capacitor/browser';
     FormsModule,
     IonSelectOption,
     PrimaryButton,
-    IonTextarea, EmptyState],
+    IonTextarea, EmptyState, AppButton],
   templateUrl: './new-brand.html',
   styleUrl: './new-brand.css',
 })
@@ -189,7 +190,7 @@ export class NewBrand implements OnInit{
   }
 
   dismissModal() {
-    return;
+    this.modalController.dismiss();
   }
 
   createBrand() {

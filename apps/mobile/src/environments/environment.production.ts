@@ -2,6 +2,7 @@ import { Capacitor } from '@capacitor/core';
 
 export const localUri = 'http://localhost:4000/api';
 export const serverUri = 'https://pindder-api.onrender.com/api';
+export const stagingUri = 'https://staging-pindder-api.onrender.com'
 
 // Define a proper full base URL depending on environment
 export const getApiUrl = () => {

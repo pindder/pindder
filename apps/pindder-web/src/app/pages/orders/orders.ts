@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { IonTitle, IonHeader, IonToolbar, IonButtons, 
-  IonBackButton, IonContent, ViewWillEnter, IonGrid, 
-  IonRow, IonCol, ModalController,
+  IonBackButton, IonContent, ViewWillEnter, 
+  ModalController,
   IonSearchbar, IonInfiniteScrollContent, IonInfiniteScroll, 
-  InfiniteScrollCustomEvent} from "@ionic/angular";
+  InfiniteScrollCustomEvent 
+} from "@ionic/angular";
 import { AppService } from '../../services/app.service';
 import { Router } from '@angular/router';
 import { catchError, map, Observable, of, shareReplay, Subject, tap } from 'rxjs';
@@ -17,9 +18,9 @@ import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-orders',
-  imports: [IonInfiniteScroll, IonInfiniteScrollContent, IonCol, IonRow, IonContent, IonBackButton, IonButtons,
+  imports: [IonInfiniteScroll, IonInfiniteScrollContent, IonContent, IonBackButton, IonButtons,
     IonToolbar, IonHeader, IonTitle, EmptyState,
-    IonGrid, IonRow, IonSearchbar, AsyncPipe, AppButton, ItemList
+    IonSearchbar, AsyncPipe, AppButton, ItemList
   ],
   templateUrl: './orders.html',
   styleUrl: './orders.css',

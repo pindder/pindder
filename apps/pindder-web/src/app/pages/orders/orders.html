@@ -35,21 +35,16 @@
     </div>
     }
     
-    <!-- styles grid-->
-    <ion-grid >
-      <ion-row class="p-0">
-      @for (order of orders; track order._id) {
-        <ion-col class="p-0" size-lg="4" size-md="4" size-xs="6">
-          <lib-items-list 
-          [order]="order" 
-          [dataType]="dataTypes.ORDER"
-          (action)="navigate($event)"
-          > 
-          </lib-items-list>
-        </ion-col>
-      }
-      </ion-row>
-    </ion-grid>
+    <div class="container">
+    @for (order of orders; track order._id) {
+      <lib-items-list 
+      [order]="order" 
+      [dataType]="dataTypes.ORDER"
+      (action)="navigate($event)"
+      > 
+      </lib-items-list>
+    }
+    </div>
 
     @if(orders.length === 0) {     
       <lib-empty-state 

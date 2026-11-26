@@ -126,6 +126,8 @@ export class OrderView implements ViewWillEnter, OnInit{
     // console.log(res);
     if (res && res.data.link) {
       this.sharePaymentLink(res.data.link);
+    } else {
+      this.sharePaymentLink(res);
     }
   }
 
@@ -171,15 +173,15 @@ export class OrderView implements ViewWillEnter, OnInit{
 
   async presentDeleteAlert() {
     const alert = await this.alertCtrl.create({
-      header: `Delete Order`,
-      message: `Are you sure you want to delete this ${DataTypes.ORDER}?`,
+      header: `Cancel Order`,
+      message: `Are you sure you want to cancel this ${DataTypes.ORDER}?`,
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel'
         },
         {
-          text: 'Delete',
+          text: 'Proceed',
           role: 'confirm',
           handler: () => {
             this.cancelOrder();
