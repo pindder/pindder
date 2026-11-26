@@ -15,7 +15,6 @@ def capacitor_pods
   pod 'CapacitorCommunityStripe', :path => '../../../../node_modules/@capacitor-community/stripe'
   pod 'CapacitorBrowser', :path => '../../../../node_modules/@capacitor/browser'
   pod 'CapacitorCamera', :path => '../../../../node_modules/@capacitor/camera'
-  pod 'CapacitorHttp', :path => '../../../../node_modules/@capacitor/http'
   pod 'CapacitorLocalNotifications', :path => '../../../../node_modules/@capacitor/local-notifications'
   pod 'CapacitorPreferences', :path => '../../../../node_modules/@capacitor/preferences'
   pod 'CapacitorPushNotifications', :path => '../../../../node_modules/@capacitor/push-notifications'
@@ -30,9 +29,10 @@ target 'App' do
 end
 
 post_install do |installer|
+  assertDeploymentTarget(installer)
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0' # Match your target version
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0' # Match your target version
     end
   end
   assertDeploymentTarget(installer)

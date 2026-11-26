@@ -1,0 +1,15 @@
+{
+  "defaultPlatform": "ios",
+  "platforms": {
+    "ios": {
+      "build": {
+        "profiles": {
+          "development": {
+            "command": "npm ci --legacy-peer-deps && npx nx run contracts:build && npx nx run mobile:build && npx nx run mobile:cap-add-ios && npx nx run mobile:cap-sync-ios && xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath build/ios",
+            "artifact": "ios/build/Build/Products/Debug-iphonesimulator/*.app"
+          }
+        }
+      }
+    }
+  }
+}
