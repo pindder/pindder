@@ -132,6 +132,13 @@
         "command": "npx cap open ios",
         "cwd": "apps/mobile"
       }
+    },
+    "cap-add-ios": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap add ios",
+        "cwd": "apps/mobile"
+      }
     }
   }
 }

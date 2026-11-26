@@ -2,7 +2,7 @@
     <ion-card class="flex mx-3">
         <ion-card-content>
             <div class="flex flex-row items-center gap-2" lines="none">
-                <ion-button (click)="share.emit()" fill="outline" size="default" color="primary">
+                <ion-button (click)="share.emit(catalogLink)" fill="outline" size="default" color="primary">
                     <ion-icon slot="icon-only" name="arrow-redo-outline"></ion-icon>
                 </ion-button>
                 <ion-label>
@@ -12,9 +12,9 @@
             </div>
             <div class="w-full flex mt-2">
                 <div class="px-3 rounded-rectangle">
-                    <p>https://pindder.com/catalogs/{{ profile.username }}</p>
+                    <p>{{ catalogLink.substring(0, 40) }}{{ catalogLink.length > 43 ? '...' : '' }}</p>
                 </div>
-                <ion-button (click)="action.emit()" class="ml" size="default" fill="outline">
+                <ion-button (click)="action.emit(catalogLink)" class="ml" size="default" fill="outline">
                     <ion-icon name="copy-outline" size="small" slot="icon-only"></ion-icon>
                 </ion-button>
             </div>

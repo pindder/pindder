@@ -22,10 +22,15 @@
 }@else{
 <ion-content color="light" [fullscreen]="true">
     <!-- Client Information-->
+     <div class="px-5">
+        <p class="text-sm font-semibold text-gray-500 m-0">
+            Client Information
+        </p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Client Information</ion-label>
-        </ion-list-header>
+        </ion-list-header> -->
 
         @if(!selectedClient){
         <div class="">
@@ -68,84 +73,90 @@
     }
 
     <!-- Selected Styles-->
-    <ion-list [inset]="true">
-        <ion-list-header>
-            <ion-label>Styles</ion-label>
-        </ion-list-header>
-
-        @if(order.styles && order.styles.length === 0){
-        <div class="">
-            <app-empty-state 
-            [icon]="'color-palette-outline'" 
-            [title]="'No Style Added'" 
-            [desc]="'click the button to add a style to this order.'" 
-            [buttonText]="'Add Style'"
-            (action)="openDesignActionSheet()"
-            ></app-empty-state>
-        </div>
-        }@else {
-            @for(style of order.styles; track style._id){
-                <ion-item-sliding>
-                    <ion-item [button]="true" (click)="openModalSheet($index, style)">
-                        <ion-avatar aria-hidden="true" slot="start">
-                            <img alt="" src="{{ style.images[0] }}" />
-                        </ion-avatar>
-                        <ion-label>
-                            <h2>{{ style.name }}</h2>
-                            @if(style.type === designTypes.BESPOKE && style.amount !== null){
-                                <p>{{ style.quantity < 1 ? style.amount.toLocaleString() : (style.amount * style.quantity).toLocaleString() }}</p>
-                            } @else if(style.type === designTypes.READYMADE && style.selections.length > 0){
-                                <p>{{ style.totalAmount.toLocaleString() }}</p>
-                            } @else {
-                                <p>{{ style.amount !== null ? style.amount.toLocaleString() : 0 }}</p>
-                            }
-                            @for(size of style.specifications; track size){
-                                @if(size.quantity > 0){
-                                    <span class="text-sm">
-                                    {{ size.size }}
-                                    </span>
-                                }
-                            }
-                        </ion-label>
-                    </ion-item>
-                    <ion-item-options slot="end">
-                        <ion-item-option 
-                        (click)="viewDesignDetails(style)" 
-                        color="primary">
-                            <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
-                        </ion-item-option>
-                        <ion-item-option 
-                        color="danger" 
-                        expandable="true" 
-                        (click)="removeSelectedDesign($index)">
-                            <ion-icon slot="icon-only" name="trash"></ion-icon>
-                        </ion-item-option>
-                    </ion-item-options>
-                </ion-item-sliding>
-            }
-        }
-
-        <!-- Add Style Button-->
-        @if(order.styles.length > 0){
-            <div class="p-3">
-                <ion-button 
-                expand="block" 
-                fill="outline"
-                color="primary"
-                (click)="openDesignActionSheet()">
-                    <ion-icon slot="start" name="add-outline"></ion-icon>
-                    Add Style
-                </ion-button>
-            </div>
-        }
+    <div class="px-5">
+        <p class="text-sm font-semibold text-gray-500 m-0">
+            Styles
+        </p>
+    </div>
+    @if(order.styles && order.styles.length === 0){
+    <ion-list inset="true">
+        <app-empty-state 
+        [icon]="'color-palette-outline'" 
+        [title]="'No Style Added'" 
+        [desc]="'click the button to add a style to this order.'" 
+        [buttonText]="'Add Style'"
+        (action)="openDesignActionSheet()"
+        ></app-empty-state>
     </ion-list>
+    }@else {
+        @for(style of order.styles; track style._id){
+        <ion-list [inset]="true">
+            <ion-item-sliding>
+                <ion-item [button]="true" (click)="openModalSheet($index, style)">
+                    <ion-avatar aria-hidden="true" slot="start">
+                        <img alt="" src="{{ style.images[0] }}" />
+                    </ion-avatar>
+                    <ion-label>
+                        <h2>{{ style.name }}</h2>
+                        @if(style.type === designTypes.BESPOKE && style.amount !== null){
+                            <p>{{ style.quantity < 1 ? style.amount.toLocaleString() : (style.amount * style.quantity).toLocaleString() }}</p>
+                        } @else if(style.type === designTypes.READYMADE && style.selections.length > 0){
+                            <p>{{ style.totalAmount.toLocaleString() }}</p>
+                        } @else {
+                            <p>{{ style.amount !== null ? style.amount.toLocaleString() : 0 }}</p>
+                        }
+                        @for(size of style.specifications; track size){
+                            @if(size.quantity > 0){
+                                <span class="text-sm">
+                                {{ size.size }}
+                                </span>
+                            }
+                        }
+                    </ion-label>
+                </ion-item>
+                <ion-item-options slot="end">
+                    <ion-item-option 
+                    (click)="viewDesignDetails(style)" 
+                    color="primary">
+                        <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+                    </ion-item-option>
+                    <ion-item-option 
+                    color="danger" 
+                    expandable="true" 
+                    (click)="removeSelectedDesign($index)">
+                        <ion-icon slot="icon-only" name="trash"></ion-icon>
+                    </ion-item-option>
+                </ion-item-options>
+            </ion-item-sliding>
+        </ion-list>
+        }
+    }
+
+    <!-- Add Style Button-->
+    @if(order.styles.length > 0){
+        <div class="p-3">
+            <ion-button 
+            expand="block" 
+            fill="outline"
+            color="primary"
+            (click)="openDesignActionSheet()">
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                Add Style
+            </ion-button>
+        </div>
+    }
 
     <!-- Additional Info Section-->
     @if(selectedClient && order.styles.length > 0){
+    <div class="px-5">
+        <p class="text-sm font-semibold text-gray-500 m-0">
+            Additional Detail
+        </p>
+    </div>
     <ion-list [inset]="true">
-        <ion-list-header>
+        <!-- <ion-list-header>
             <ion-label>Additional Details</ion-label>
-        </ion-list-header>
+        </ion-list-header> -->
 
         <form #orderForm="ngForm" (ngSubmit)="submit()" class="p-3">
             <ion-list lines="true">
@@ -208,10 +219,15 @@
     }
 
     @if(order.totalAmount > 0) {
-        <ion-list [inset]="true">
-            <ion-list-header>
+        <div class="px-5">
+            <p class="text-sm font-semibold text-gray-500 m-0">
                 Cost Breakdown
-            </ion-list-header>
+            </p>
+        </div>
+        <ion-list [inset]="true">
+            <!-- <ion-list-header>
+                Cost Breakdown
+            </ion-list-header> -->
 
             <ion-item lines="none">
                 <ion-label>

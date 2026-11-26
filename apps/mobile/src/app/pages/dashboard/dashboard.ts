@@ -48,7 +48,7 @@ export class Dashboard implements ViewWillEnter{
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
 
-  profile = signal<IProfile>({});
+  profile!: IProfile;
   environmentInjector = inject(EnvironmentInjector);
   presentingElement!: HTMLElement | null;
   userBalance = signal<number>(0);
@@ -139,11 +139,11 @@ export class Dashboard implements ViewWillEnter{
   async loadProfile() {
     const profile = await this.tokenService.getProfile();
     if(profile) {
-      this.profile.set(JSON.parse(profile));
-      this.sseService.connectToNotificationStream(this.profile()._id!)
+      this.profile = JSON.parse(profile);
+      if(this.profile._id) this.sseService.connectToNotificationStream(this.profile._id);
     }
     
-    this.catalog = `https://pindder.com/catalogs/${this.profile().username}`;
+    this.catalog = `https://pindder.com/catalogs/${this.profile.username}`;
     this.cdr.markForCheck();
     this.fetchNotifications();
 
@@ -159,11 +159,11 @@ export class Dashboard implements ViewWillEnter{
   }
 
   fetchNotifications() {
-    if(!this.profile()._id) {
+    if(!this.profile._id) {
       return;
     }
 
-    this.notificationService.getNotifications(this.profile()._id!).subscribe({
+    this.notificationService.getNotifications(this.profile._id).subscribe({
       next: (res: IResponse<INotification[]>) => {
         if(res.data) {
           const yesterday = new Date();
@@ -174,8 +174,8 @@ export class Dashboard implements ViewWillEnter{
           const yesterdayTimestamp = yesterday.getTime();
           this.notifications = res.data.filter(notification => notification.read === false && new Date(notification.createdAt).getTime() >= yesterdayTimestamp)
           if(res.meta?.totalNotificationsUnread)
-            this.notificationService.totalUnreadNotifications.set(res.meta?.totalNotificationsUnread)
-          console.log(this.notifications);
+            this.notificationService.totalUnreadNotifications.set(res.meta?.totalNotificationsUnread);
+          // console.log(this.notifications);
         }
         this.cdr.markForCheck();
       }
@@ -210,14 +210,14 @@ export class Dashboard implements ViewWillEnter{
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  async shareLink() {
+  async shareLink(link?: string) {
     if (!this.isSharingSupported()) return;
 
     try {
       await Share.share({
         title: 'Check out pindder!',
         text: 'Hey, kindly check out my design catalog on pindder.',
-        url: `https://pindder.com/catalogs/${this.profile().username}`, // The link you want to share
+        url: link ?? `https://pindder.com/catalogs/${this.profile.username}`, // The link you want to share
         dialogTitle: 'Share pindder with friends', // Android only title for the popup
       });
     } catch (error) {
@@ -225,9 +225,9 @@ export class Dashboard implements ViewWillEnter{
     }
   }
 
-  async copyToClipboard(): Promise<void> {
+  async copyToClipboard(link?: string): Promise<void> {
     try {
-      await navigator.clipboard.writeText(this.catalog);
+      await navigator.clipboard.writeText(link ?? this.catalog);
       await this.showToast('Referral link copied to clipboard!');
     } catch (err) {
       await this.showToast('Failed to copy link. Please copy manually.');

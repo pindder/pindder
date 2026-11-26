@@ -11,7 +11,7 @@
     <p>{{ profile.email }}</p>
   </ion-label>
   @if(!hideNotification){
-    <ion-button color="light" size="medium" class="notification-bt  n" (click)="action.emit()">
+    <ion-button color="light" size="medium" class="notification-btn" (click)="action.emit()">
       <ion-icon name="notifications" size="medium"></ion-icon>
       <ion-badge color="primary" class="notification-badge">{{ totalUnread() }}</ion-badge>
     </ion-button>

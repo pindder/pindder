@@ -26,6 +26,7 @@ export class ProfileCard implements OnInit{
   }
 
   ngOnInit(): void {
-    console.log(this.showBadge);
+    // console.log(this.showBadge);
+    return;
   }
 }

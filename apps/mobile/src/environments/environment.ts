@@ -1,7 +1,8 @@
-import { getApiUrl } from './environment.production';
+import { getApiUrl, appUri } from './environment.production';
 
 export const environment = {
   production: false,
+  appUri: appUri,
   apiUrl: getApiUrl(),
   cloudName: 'w28vsff3',
   presetName: 'pindder',
